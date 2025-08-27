@@ -63,33 +63,36 @@ export default function Footer() {
                             {/* Instagram */}
                             <a href="https://www.instagram.com/theadamantofficial"
                                className="social-link group" target="_blank">
-                                        <IconBrandInstagram className="social-icon group-hover:hidden"/>
-                                        <IconBrandInstagramFilled className="social-icon hidden group-hover:block text-[#FF0069]"/>
+                                <IconBrandInstagram className="social-icon group-hover:hidden"/>
+                                <IconBrandInstagramFilled
+                                    className="social-icon hidden group-hover:block text-[#FF0069]"/>
                             </a>
 
                             {/* Facebook */}
                             <a href="/" className="social-link group" target="_blank">
-                                        <IconBrandFacebook className="social-icon group-hover:hidden"/>
-                                        <IconBrandFacebookFilled className="social-icon hidden group-hover:block text-[#0866FF]"/>
+                                <IconBrandFacebook className="social-icon group-hover:hidden"/>
+                                <IconBrandFacebookFilled
+                                    className="social-icon hidden group-hover:block text-[#0866FF]"/>
                             </a>
 
                             {/* LinkedIn */}
                             <a href="https://www.linkedin.com/company/the-adamant"
                                className="social-link group" target="_blank">
-                                        <IconBrandLinkedin className="social-icon group-hover:hidden"/>
-                                        <IconBrandLinkedinFilled className="social-icon hidden group-hover:block text-[#0A66C2]"/>
+                                <IconBrandLinkedin className="social-icon group-hover:hidden"/>
+                                <IconBrandLinkedinFilled
+                                    className="social-icon hidden group-hover:block text-[#0A66C2]"/>
                             </a>
 
                             {/* X (Twitter) */}
                             <a href="https://x.com/theadamantofc" className="social-link group" target="_blank">
-                                        <IconBrandX className="social-icon group-hover:hidden"/>
-                                        <IconBrandXFilled
-                                            className="social-icon hidden group-hover:block text-black dark:text-white"/>
+                                <IconBrandX className="social-icon group-hover:hidden"/>
+                                <IconBrandXFilled
+                                    className="social-icon hidden group-hover:block text-black dark:text-white"/>
                             </a>
 
                             {/* Medium */}
                             <a href="https://medium.com/@theadamant" className="social-link group" target="_blank">
-                                        <IconBrandMedium className="social-icon text-black dark:text-white"/>
+                                <IconBrandMedium className="social-icon text-black dark:text-white"/>
                             </a>
                         </div>
                     </div>
@@ -99,10 +102,11 @@ export default function Footer() {
                         {quickLinks.map((section) => (
                             <div key={section.title} className="flex flex-col gap-4">
                                 <h1 className="font-medium">{section.title}</h1>
+
                                 <ul>
                                     {section.links.map((link) => (
                                         <li key={link.name} className="py-1">
-                                            <Link href={link.href} className="hover:underline">
+                                            <Link href={link.href} className="hover:underline max-sm:text-sm">
                                                 {link.name}
                                             </Link>
                                         </li>
@@ -114,7 +118,7 @@ export default function Footer() {
 
                 </div>
 
-                <p className="text-center">
+                <p className="text-center max-sm:text-sm">
                     &copy; {new Date().getFullYear()} The Adamant. All rights reserved.
                 </p>
             </div>
