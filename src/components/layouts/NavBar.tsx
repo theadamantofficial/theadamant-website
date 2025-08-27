@@ -9,16 +9,17 @@ import {
     NavItems
 } from "@/components/ui/resizable-navbar";
 import {IconMoon, IconSun} from "@tabler/icons-react";
+import Link from "next/link";
 
 export function Navbar() {
     const navItems = [
         {
-            name: "Features",
-            link: "#features",
+            name: "About",
+            link: "#about",
         },
         {
-            name: "Pricing",
-            link: "#pricing",
+            name: "Services",
+            link: "#services",
         },
         {
             name: "Contact",
@@ -109,14 +110,14 @@ export function Navbar() {
                     onClose={() => setIsMobileMenuOpen(false)}
                 >
                     {navItems.map((item, idx) => (
-                        <a
+                        <Link
                             key={`mobile-link-${idx}`}
                             href={item.link}
                             onClick={() => setIsMobileMenuOpen(false)}
                             className="relative text-neutral-600 dark:text-neutral-300"
                         >
                             <span className="block">{item.name}</span>
-                        </a>
+                        </Link>
                     ))}
                     <div
                         className="flex w-full flex-col gap-4 cursor-pointer"

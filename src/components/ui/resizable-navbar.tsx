@@ -9,6 +9,7 @@ import {
 } from "motion/react";
 import Image from "next/image";
 import React, {useRef, useState} from "react";
+import Link from "next/link";
 
 
 interface NavbarProps {
@@ -125,7 +126,7 @@ export const NavItems = ({items, className, onItemClick}: NavItemsProps) => {
             )}
         >
             {items.map((item, idx) => (
-                <a
+                <Link
                     onMouseEnter={() => setHovered(idx)}
                     onClick={onItemClick}
                     className="relative px-4 py-2 text-neutral-600 dark:text-neutral-300"
@@ -139,7 +140,7 @@ export const NavItems = ({items, className, onItemClick}: NavItemsProps) => {
                         />
                     )}
                     <span className="relative z-20">{item.name}</span>
-                </a>
+                </Link>
             ))}
         </motion.div>
     );
@@ -229,11 +230,11 @@ export const MobileNavToggle = ({
     );
 };
 
-export const NavbarLogo = () => {
+export const NavbarLogo = ({includeText = true, className = ""}: { includeText?: boolean, className?: string }) => {
     return (
-        <a
-            href="#"
-            className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black"
+        <Link
+            href="/"
+            className={`${className} relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black`}
         >
             <Image
                 src="https://assets.aceternity.com/logo-dark.png"
@@ -242,8 +243,11 @@ export const NavbarLogo = () => {
                 height={30}
                 priority
             />
-            <span className="font-medium text-black dark:text-white">The Adamant</span>
-        </a>
+
+            {includeText && (
+                <span className="font-medium text-black dark:text-white">The Adamant</span>
+            )}
+        </Link>
     );
 };
 
