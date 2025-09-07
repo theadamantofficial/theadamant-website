@@ -83,10 +83,12 @@ export function Navbar() {
     };
 
     return (
-        <NavbarComponent>
+        <NavbarComponent
+        >
+            {/* className="bg-red-400 sm:bg-orange-300 md:bg-yellow-200 lg:bg-green-300 xl:bg-blue-300 2xl:bg-violet-300"*/}
             {/* Desktop Navigation */}
             <NavBody>
-                <NavbarLogo/>
+                <NavbarLogo className="mr-4 px-2"/>
                 <NavItems items={navItems}/>
                 <div className="flex items-center gap-4">
                     <div className="cursor-pointer relative inline-block" onClick={toggleTheme}>
@@ -98,7 +100,7 @@ export function Navbar() {
             {/* Mobile Navigation */}
             <MobileNav>
                 <MobileNavHeader>
-                    <NavbarLogo/>
+                    <NavbarLogo className="mr-4 px-2"/>
                     <MobileNavToggle
                         isOpen={isMobileMenuOpen}
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

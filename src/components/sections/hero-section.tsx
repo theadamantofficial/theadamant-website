@@ -8,6 +8,7 @@ export default function HeroSection() {
             <h1 className="hero-heading">
                 Turning Ideas into Digital Reality.
             </h1>
+
             <h2 className="hero-sub-heading">
                 Firm in vision, bold in action.
             </h2>

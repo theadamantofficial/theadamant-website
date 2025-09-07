@@ -17,10 +17,10 @@ export default function Footer() {
     // Quick Links data
     const quickLinks = [
         {
-            title: "Pages",
+            title: "Quick Links",
             links: [
                 {name: "Home", href: "/"},
-                {name: "About", href: "/about"},
+                {name: "Contact Us", href: "/#contact-us"},
             ],
         },
         {
@@ -35,7 +35,7 @@ export default function Footer() {
 
     return <footer className="">
         <div
-            className="relative flex w-full items-center justify-center pt-20 pb-10 border-t-2 rounded-t-4xl overflow-hidden border-foreground/25 bg-white dark:bg-background">
+            className="relative flex w-full items-center justify-center pt-20 pb-10 border-t-2 rounded-t-4xl max-sm:rounded-t-2xl overflow-hidden border-foreground/25 bg-white dark:bg-background">
             <div
                 className={cn(
                     "absolute inset-0",
