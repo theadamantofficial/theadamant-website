@@ -29,7 +29,7 @@ export default function ContactUsSection() {
             <div
                 className="shadow-input flex flex-col xl:flex-row items-center justify-between w-full max-w-6xl">
 
-                {/*Image*/}
+                {/* Image */}
                 <div className="hidden xl:block">
                     <Image src="/images/img-contact-us-light.png" alt="" className="dark:hidden" width={500}
                            height={500}/>
@@ -38,11 +38,11 @@ export default function ContactUsSection() {
                 </div>
 
                 {/* Form with Background */}
-                <BackgroundGradient containerClassName="w-4/5 md:w-4/6 xl:w-1/2 my-8"
+                <BackgroundGradient containerClassName="w-5/6 md:w-4/6 xl:w-1/2 my-8"
                                     className="rounded-[22px] bg-white dark:bg-zinc-900">
 
                     {/* Form */}
-                    <form className="flex flex-col items-center w-full h-full gap-8 p-8 lg:p-10"
+                    <form className="flex flex-col items-center w-full h-full gap-8 px-6 lg:px-8 py-8 lg:p-10"
                           onSubmit={handleSubmit}>
 
                         {/* Name */}
