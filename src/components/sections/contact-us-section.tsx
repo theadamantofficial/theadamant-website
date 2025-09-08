@@ -1,4 +1,5 @@
 "use client";
+
 import React, {useState} from "react";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
@@ -19,10 +20,10 @@ export default function ContactUsSection() {
     };
 
     return (
-        <div className="mx-auto my-10 w-full p-4 md:p-8 flex flex-col items-center gap-10">
-            <h1 className="text-4xl">
+        <section id="contact" className="mx-auto my-10 w-full p-4 md:p-8 flex flex-col items-center gap-10">
+            <h2 className="text-3xl font-bold md:text-4xl">
                 Contact Us
-            </h1>
+            </h2>
 
             {/* Image & Form */}
             <div
@@ -109,7 +110,7 @@ export default function ContactUsSection() {
 
                 </BackgroundGradient>
             </div>
-        </div>
+        </section>
     );
 }
 

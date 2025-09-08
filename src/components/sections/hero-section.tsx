@@ -4,7 +4,7 @@ export default function HeroSection() {
     return <section className="hero-section">
         <BackgroundRippleEffect/>
 
-        <div className="mt-60 w-full">
+        <div className="flex flex-col gap-10 mt-60 w-full">
             <h1 className="hero-heading">
                 Turning Ideas into Digital Reality.
             </h1>

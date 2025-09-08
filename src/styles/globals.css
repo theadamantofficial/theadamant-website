@@ -150,11 +150,11 @@
     }
 
     .hero-heading {
-        @apply relative z-10 mx-auto max-w-6xl text-center font-bold text-neutral-800 text-xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl dark:text-neutral-100
+        @apply relative z-10 mx-auto max-w-7xl text-center font-bold text-neutral-800 text-xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-6xl dark:text-neutral-100
     }
 
     .hero-sub-heading {
-        @apply relative z-10 mx-auto mt-4 max-w-3xl text-center text-lg sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-neutral-800 dark:text-neutral-500
+        @apply relative z-10 mx-auto mt-4 max-w-7xl text-center text-lg sm:text-3xl md:text-4xl lg:text-5xl xl:text-5xl text-neutral-800 dark:text-neutral-500
     }
 
     .social-link {
