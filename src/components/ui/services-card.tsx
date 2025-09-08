@@ -13,9 +13,9 @@ interface ServiceCardProps {
 
 export function ServiceCard({title, description, image, techStack = []}: ServiceCardProps) {
     return (
-        <CardContainer className="inter-var">
+        <CardContainer className="inter-var h-full">
             <CardBody
-                className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-full h-auto rounded-xl p-6 border  ">
+                className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-full h-full rounded-xl p-6 border  ">
 
                 {/* Image */}
                 <CardItem translateZ="100" className="w-full">
@@ -53,7 +53,7 @@ export function ServiceCard({title, description, image, techStack = []}: Service
                 {techStack.length > 0 && (
                     <CardItem
                         translateZ="40"
-                        className="flex w-full justify-center gap-4 mt-4"
+                        className="flex flex-wrap w-full justify-center gap-4 mt-6"
                     >
                         {techStack.map((tech, index) => (
                             <div
@@ -61,18 +61,21 @@ export function ServiceCard({title, description, image, techStack = []}: Service
                                 className="flex items-center gap-2 px-3 py-1 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-sm"
                             >
                                 <div className="relative w-6 h-6">
-                                    {tech.isBlackLogo
-                                        ? <Image
+                                    {tech.isBlackLogo ? (
+                                        <Image
                                             src={tech.icon}
                                             alt={tech.label}
                                             fill
-                                            className="object-contain dark:invert dark:brightness-200"/>
-                                        : <Image
+                                            className="object-contain dark:invert dark:brightness-200"
+                                        />
+                                    ) : (
+                                        <Image
                                             src={tech.icon}
                                             alt={tech.label}
                                             fill
                                             className="object-contain"
-                                        />}
+                                        />
+                                    )}
                                 </div>
 
                                 <span className="text-sm font-medium text-neutral-600 dark:text-neutral-300">

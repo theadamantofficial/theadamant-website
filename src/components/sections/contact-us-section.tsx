@@ -20,7 +20,7 @@ export default function ContactUsSection() {
     };
 
     return (
-        <section id="contact" className="mx-auto my-10 w-full p-4 md:p-8 flex flex-col items-center gap-10">
+        <section id="contact" className="mx-auto my-10 w-full p-0 md:p-8 flex flex-col items-center gap-10">
             <h2 className="text-3xl font-bold md:text-4xl">
                 Contact Us
             </h2>
@@ -42,7 +42,7 @@ export default function ContactUsSection() {
                                     className="rounded-[22px] bg-white dark:bg-zinc-900">
 
                     {/* Form */}
-                    <form className="flex flex-col items-center w-full h-full gap-8 p-10"
+                    <form className="flex flex-col items-center w-full h-full gap-8 p-8 lg:p-10"
                           onSubmit={handleSubmit}>
 
                         {/* Name */}
