@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {
     MobileNav,
     MobileNavHeader, MobileNavMenu, MobileNavToggle,
-    Navbar as NavbarComponent, NavbarLogo,
+    Navbar as NavbarComponent, AppLogo,
     NavBody,
     NavItems
 } from "@/components/ui/resizable-navbar";
@@ -13,10 +13,6 @@ import Link from "next/link";
 
 export function Navbar() {
     const navItems = [
-        // {
-        //     name: "About",
-        //     link: "#about",
-        // },
         {
             name: "Services",
             link: "#services",
@@ -88,7 +84,7 @@ export function Navbar() {
             {/* className="bg-red-400 sm:bg-orange-300 md:bg-yellow-200 lg:bg-green-300 xl:bg-blue-300 2xl:bg-violet-300"*/}
             {/* Desktop Navigation */}
             <NavBody>
-                <NavbarLogo className="mr-4 px-2"/>
+                <AppLogo className="mr-4 px-2"/>
                 <NavItems items={navItems}/>
                 <div className="flex items-center gap-4">
                     <div className="cursor-pointer relative inline-block" onClick={toggleTheme}>
@@ -100,7 +96,7 @@ export function Navbar() {
             {/* Mobile Navigation */}
             <MobileNav>
                 <MobileNavHeader>
-                    <NavbarLogo className="mr-4 px-2"/>
+                    <AppLogo className="mr-4 px-2"/>
                     <MobileNavToggle
                         isOpen={isMobileMenuOpen}
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

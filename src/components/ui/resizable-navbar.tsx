@@ -230,14 +230,14 @@ export const MobileNavToggle = ({
     );
 };
 
-export const NavbarLogo = ({includeText = true, className = ""}: { includeText?: boolean, className?: string }) => {
+export const AppLogo = ({includeText = true, className = ""}: { includeText?: boolean, className?: string }) => {
     return (
         <Link
             href="/"
             className={`${className} relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black`}
         >
             <Image
-                src="https://assets.aceternity.com/logo-dark.png"
+                src="../vectors/logo-the-adamant.svg"
                 alt="logo"
                 width={30}
                 height={30}

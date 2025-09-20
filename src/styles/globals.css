@@ -3,7 +3,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
+@theme inline
+{
     --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out none 1 var(--delay, 0ms);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
@@ -132,6 +133,23 @@
     --sidebar-ring: #a3a3a3; /* neutral-400 */
 }
 
+@layer utilities {
+    @keyframes fadeIn {
+        0% {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fadeIn {
+        animation: fadeIn 1s ease-in forwards;
+    }
+}
+
 @layer components {
     .cursor-default {
         cursor: var(--cursor-default) !important;
@@ -146,7 +164,7 @@
     }
 
     .hero-section {
-        @apply relative flex min-h-screen w-full flex-col items-start justify-start overflow-hidden
+        @apply relative flex min-h-[95vh] w-full flex-col items-center justify-start overflow-hidden
     }
 
     .hero-heading {

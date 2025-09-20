@@ -10,7 +10,7 @@ import {
     IconBrandX,
     IconBrandXFilled
 } from "@tabler/icons-react";
-import {NavbarLogo} from "@/components/ui/resizable-navbar";
+import {AppLogo} from "@/components/ui/resizable-navbar";
 import Link from "next/link";
 
 export default function Footer() {
@@ -55,7 +55,7 @@ export default function Footer() {
                     {/* About */}
                     <div>
                         <div className="flex flex-col gap-4">
-                            <NavbarLogo includeText={false}/>
+                            <AppLogo includeText={false}/>
                             <h1 className="font-bold text-≈lg">The Adamant</h1>
                         </div>
 
