@@ -9,28 +9,16 @@ export default function ServicesSection() {
             title: "UI/UX Design",
             description: "Clean, modern, and user-friendly designs that engage and convert.",
             image: "/images/img-ui-ux-design.png",
-            techStack: [
-                {icon: "/vectors/logo-figma.svg", isBlackLogo: false, label: "Figma"},
-            ],
         },
         {
             title: "Website Development",
             description: "Fast, scalable, and SEO-friendly websites tailored to your business.",
             image: "/images/img-web-dev.png",
-            techStack: [
-                {icon: "/vectors/logo-react.svg", isBlackLogo: false, label: "React.js"},
-                {icon: "/vectors/logo-nextjs.svg", isBlackLogo: true, label: "Next.js"},
-            ],
         },
         {
             title: "Mobile App Development",
             description: "High-performance apps with sleek design and seamless functionality.",
             image: "/images/img-app-dev.png",
-            techStack: [
-                {icon: "/vectors/logo-android.svg", isBlackLogo: false, label: "Android"},
-                {icon: "/vectors/logo-apple.svg", isBlackLogo: true, label: "iOS"},
-                {icon: "/vectors/logo-flutter.svg", isBlackLogo: false, label: "Flutter"},
-            ],
         },
     ];
 
@@ -61,7 +49,6 @@ export default function ServicesSection() {
                             title={service.title}
                             description={service.description}
                             image={service.image}
-                            techStack={service.techStack}
                         />
                     </StaggerItem>
                 ))}
