@@ -5,15 +5,24 @@ import ContactUsSection from "@/components/sections/contact-us-section";
 import ServicesSection from "@/components/sections/services-section";
 import ValuePropsSection from "@/components/sections/value-props-section";
 import ProcessSection from "@/components/sections/process-section";
-import FaqSection, {faqItems} from "@/components/sections/faq-section";
+import FaqSection from "@/components/sections/faq-section";
+import {SiteCopy} from "@/lib/site-copy";
+import {SiteLocale} from "@/lib/site-locale";
 
-export default function HomePage() {
+export default function HomePage({
+    copy,
+    locale,
+}: {
+    copy: SiteCopy;
+    locale: SiteLocale;
+}) {
     const schemas = [
         {
             "@context": "https://schema.org",
             "@type": "Organization",
             name: "The Adamant",
-            description: "The Adamant designs websites, product interfaces, and mobile experiences with clear messaging, fast performance, and SEO-ready foundations.",
+            description: copy.schema.organizationDescription,
+            inLanguage: locale,
             sameAs: [
                 "https://www.instagram.com/theadamantofficial",
                 "https://www.linkedin.com/company/the-adamant",
@@ -24,7 +33,8 @@ export default function HomePage() {
         {
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            mainEntity: faqItems.map((item) => ({
+            inLanguage: locale,
+            mainEntity: copy.faq.items.map((item) => ({
                 "@type": "Question",
                 name: item.question,
                 acceptedAnswer: {
@@ -44,20 +54,20 @@ export default function HomePage() {
             />
         ))}
 
-        <Navbar/>
+        <Navbar copy={copy.navbar} locale={locale}/>
 
-        <HeroSection/>
+        <HeroSection copy={copy.hero} locale={locale}/>
 
-        <ValuePropsSection/>
+        <ValuePropsSection copy={copy.valueProps}/>
 
-        <ServicesSection/>
+        <ServicesSection copy={copy.services}/>
 
-        <ProcessSection/>
+        <ProcessSection copy={copy.process}/>
 
-        <FaqSection/>
+        <FaqSection copy={copy.faq}/>
 
-        <ContactUsSection/>
+        <ContactUsSection copy={copy.contact}/>
 
-        <Footer/>
+        <Footer copy={copy.footer} locale={locale}/>
     </main>;
 }

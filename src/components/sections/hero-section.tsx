@@ -5,47 +5,29 @@ import {DotLottieReact} from "@lottiefiles/dotlottie-react";
 import Link from "next/link";
 import {ArrowRight, LayoutTemplate, Search, Sparkles, Zap} from "lucide-react";
 import {motion} from "motion/react";
+import {SiteCopy} from "@/lib/site-copy";
+import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 
 const smoothEase = [0.22, 1, 0.36, 1] as const;
 
-export default function HeroSection() {
-    const positioningPoints = [
-        "Clear messaging that explains value in seconds",
-        "Semantic structure that helps search engines understand the page",
-        "Responsive layouts built to feel polished on every device",
-    ];
-
-    const featureCards = [
+export default function HeroSection({
+    copy,
+    locale,
+}: {
+    copy: SiteCopy["hero"];
+    locale: SiteLocale;
+}) {
+    const featureCardIcons = [LayoutTemplate, Search, Zap];
+    const floatingBadgeLayouts = [
         {
-            title: "Attention-first design",
-            description: "Hierarchy, contrast, and motion that guide the eye fast.",
-            icon: LayoutTemplate,
-        },
-        {
-            title: "SEO foundations",
-            description: "Metadata, semantic sections, and search-readable copy.",
-            icon: Search,
-        },
-        {
-            title: "Fast-moving execution",
-            description: "Launch momentum without bloated layouts or vague messaging.",
-            icon: Zap,
-        },
-    ];
-
-    const floatingBadges = [
-        {
-            label: "Modern motion",
             className: "-left-3 top-6 hidden md:flex",
             animation: {y: [0, -8, 0], x: [0, 5, 0]},
         },
         {
-            label: "Search-ready",
             className: "right-4 top-5 hidden sm:flex",
             animation: {y: [0, 8, 0], x: [0, -4, 0]},
         },
         {
-            label: "Conversion-led",
             className: "bottom-5 left-5 hidden lg:flex",
             animation: {y: [0, -10, 0]},
         },
@@ -84,7 +66,7 @@ export default function HeroSection() {
                     variants={heroItemVariants}
                 >
                     <Sparkles className="h-4 w-4"/>
-                    Design, development, and SEO-ready structure
+                    {copy.kicker}
                 </motion.p>
 
                 <motion.h1
@@ -92,26 +74,26 @@ export default function HeroSection() {
                     className="hero-heading mt-8"
                     variants={heroItemVariants}
                 >
-                    Make the first screen impossible to ignore.
+                    {copy.title}
                 </motion.h1>
 
                 <motion.p className="hero-sub-heading mt-6" variants={heroItemVariants}>
-                    The Adamant creates websites, UX systems, and mobile experiences that look premium, explain your offer clearly, and give search engines the structure they need from day one.
+                    {copy.description}
                 </motion.p>
 
                 <motion.div className="mt-8 flex flex-wrap gap-4" variants={heroItemVariants}>
-                    <Link href="#contact" className="button-primary">
-                        Start your project
+                    <Link href={getLocalizedPath(locale, "contact")} className="button-primary">
+                        {copy.primaryCta}
                         <ArrowRight className="h-4 w-4"/>
                     </Link>
 
-                    <Link href="#services" className="button-secondary">
-                        Explore services
+                    <Link href={getLocalizedPath(locale, "services")} className="button-secondary">
+                        {copy.secondaryCta}
                     </Link>
                 </motion.div>
 
                 <motion.div className="mt-10 grid gap-3 sm:grid-cols-3" variants={heroItemVariants}>
-                    {positioningPoints.map((point, index) => (
+                    {copy.positioningPoints.map((point, index) => (
                         <motion.div
                             key={point}
                             className="feature-chip min-h-20 items-start rounded-3xl px-4 py-4 text-left text-sm leading-6"
@@ -140,22 +122,22 @@ export default function HeroSection() {
                     <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-foreground/25 to-transparent"/>
 
                     <div className="flex items-center justify-between text-sm text-foreground/65">
-                        <span>Launch-ready digital presence</span>
-                        <span>Strategy to shipping</span>
+                        <span>{copy.previewEyebrowLeft}</span>
+                        <span>{copy.previewEyebrowRight}</span>
                     </div>
 
                     <div className="hero-visual-shell mt-6">
                         <div className="hero-visual-grid"/>
                         <div className="hero-visual-glow"/>
                         <div className="hero-visual-ring"/>
-                        {floatingBadges.map((badge, index) => (
+                        {copy.floatingBadges.map((badgeLabel, index) => (
                             <motion.div
-                                key={badge.label}
-                                className={`hero-floating-chip ${badge.className}`}
-                                animate={badge.animation}
+                                key={badgeLabel}
+                                className={`hero-floating-chip ${floatingBadgeLayouts[index]?.className ?? ""}`}
+                                animate={floatingBadgeLayouts[index]?.animation}
                                 transition={{duration: 5.5 + index, repeat: Infinity, ease: "easeInOut"}}
                             >
-                                {badge.label}
+                                {badgeLabel}
                             </motion.div>
                         ))}
                         <DotLottieReact
@@ -167,13 +149,13 @@ export default function HeroSection() {
                     </div>
 
                     <div className="mt-6 grid gap-3 md:grid-cols-2">
-                        {featureCards.map((card, index) => {
-                            const Icon = card.icon;
+                        {copy.featureCards.map((card, index) => {
+                            const Icon = featureCardIcons[index];
 
                             return (
                             <motion.div
                                 key={card.title}
-                                className={`hero-mini-card lift-card ${index === featureCards.length - 1 ? "md:col-span-2" : ""}`}
+                                className={`hero-mini-card lift-card ${index === copy.featureCards.length - 1 ? "md:col-span-2" : ""}`}
                                 initial={{opacity: 0, y: 18}}
                                 animate={{opacity: 1, y: 0}}
                                 transition={{delay: 0.45 + index * 0.12, duration: 0.55, ease: smoothEase}}

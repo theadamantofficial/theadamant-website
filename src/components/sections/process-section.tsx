@@ -1,48 +1,26 @@
 import {Compass, PencilRuler, Code2, Rocket} from "lucide-react";
 import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
+import {SiteCopy} from "@/lib/site-copy";
 
-const steps = [
-    {
-        number: "01",
-        title: "Clarify the positioning",
-        description: "Define the audience, offer, and message so the page speaks clearly instead of sounding generic.",
-        icon: Compass,
-    },
-    {
-        number: "02",
-        title: "Shape the experience",
-        description: "Turn that positioning into a design system, content hierarchy, and interaction pattern that feels deliberate.",
-        icon: PencilRuler,
-    },
-    {
-        number: "03",
-        title: "Build for performance",
-        description: "Develop the site with responsive layouts, cleaner structure, and practical SEO improvements already in place.",
-        icon: Code2,
-    },
-    {
-        number: "04",
-        title: "Launch with momentum",
-        description: "Refine the final touchpoints so the page is ready to attract, persuade, and convert the right visitors.",
-        icon: Rocket,
-    },
-];
+export default function ProcessSection({copy}: { copy: SiteCopy["process"] }) {
+    const icons = [Compass, PencilRuler, Code2, Rocket];
 
-export default function ProcessSection() {
     return (
         <section id="process" className="section-shell py-24" aria-labelledby="process-heading">
             <Reveal className="max-w-3xl">
-                <p className="section-kicker">Process</p>
+                <p className="section-kicker">{copy.kicker}</p>
                 <h2 id="process-heading" className="section-title">
-                    A simple path from rough presence to a sharper digital brand.
+                    {copy.title}
                 </h2>
                 <p className="section-copy">
-                    Early-stage websites improve fastest when strategy, design, development, and SEO are treated as one system instead of separate tasks.
+                    {copy.description}
                 </p>
             </Reveal>
 
             <StaggerGroup className="mt-10 grid gap-4 lg:auto-rows-fr lg:grid-cols-4">
-                {steps.map(({number, title, description, icon: Icon}) => (
+                {copy.steps.map(({number, title, description}, index) => {
+                    const Icon = icons[index];
+                    return (
                     <StaggerItem key={number} className="h-full">
                         <article className="glass-panel lift-card flex h-full flex-col p-6">
                         <div className="flex items-center justify-between">
@@ -56,7 +34,8 @@ export default function ProcessSection() {
                         <p className="mt-3 flex-1 text-sm leading-6 text-foreground/68">{description}</p>
                         </article>
                     </StaggerItem>
-                ))}
+                    );
+                })}
             </StaggerGroup>
         </section>
     );

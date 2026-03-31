@@ -11,26 +11,21 @@ import {
 import {IconMoon, IconSun} from "@tabler/icons-react";
 import Link from "next/link";
 import {LanguageSwitcher} from "@/components/ui/language-switcher";
+import {SiteCopy} from "@/lib/site-copy";
+import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 
-export function Navbar() {
-    const navItems = [
-        {
-            name: "Services",
-            link: "#services",
-        },
-        {
-            name: "Process",
-            link: "#process",
-        },
-        {
-            name: "FAQ",
-            link: "#faq",
-        },
-        {
-            name: "Contact",
-            link: "#contact",
-        },
-    ];
+export function Navbar({
+    copy,
+    locale,
+}: {
+    copy: SiteCopy["navbar"];
+    locale: SiteLocale;
+}) {
+    const navItems = copy.navItems.map((item) => ({
+        name: item.name,
+        link: getLocalizedPath(locale, item.anchor),
+    }));
+    const homeHref = getLocalizedPath(locale);
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -91,14 +86,14 @@ export function Navbar() {
         <NavbarComponent
         >
             <NavBody>
-                <AppLogo className="mr-4 px-2"/>
+                <AppLogo className="mr-4 px-2" href={homeHref}/>
                 <NavItems items={navItems}/>
                 <div className="flex items-center gap-3">
                     <LanguageSwitcher/>
 
                     <button
                         type="button"
-                        aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                        aria-label={isDarkMode ? copy.lightMode : copy.darkMode}
                         className="theme-toggle"
                         onClick={toggleTheme}
                     >
@@ -107,15 +102,15 @@ export function Navbar() {
                             : <IconMoon className="theme-toggle-icon" stroke={1.8}/>}
                     </button>
 
-                    <Link href="#contact" className="button-primary px-4 py-2.5 text-sm">
-                        Start a project
+                    <Link href={getLocalizedPath(locale, "contact")} className="button-primary px-4 py-2.5 text-sm">
+                        {copy.startProject}
                     </Link>
                 </div>
             </NavBody>
 
             <MobileNav>
                 <MobileNavHeader>
-                    <AppLogo className="mr-4 px-2"/>
+                    <AppLogo className="mr-4 px-2" href={homeHref}/>
                     <MobileNavToggle
                         isOpen={isMobileMenuOpen}
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -139,21 +134,21 @@ export function Navbar() {
                     <LanguageSwitcher mobile/>
                     <button
                         type="button"
-                        aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                        aria-label={isDarkMode ? copy.lightMode : copy.darkMode}
                         className="feature-chip justify-start"
                         onClick={toggleTheme}
                     >
                         {isDarkMode
                             ? <IconSun className="theme-toggle-icon" stroke={1.8}/>
                             : <IconMoon className="theme-toggle-icon" stroke={1.8}/>}
-                        <span>{isDarkMode ? "Light mode" : "Dark mode"}</span>
+                        <span>{isDarkMode ? copy.lightMode : copy.darkMode}</span>
                     </button>
                     <Link
-                        href="#contact"
+                        href={getLocalizedPath(locale, "contact")}
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="button-primary w-full"
                     >
-                        Start a project
+                        {copy.startProject}
                     </Link>
                 </MobileNavMenu>
             </MobileNav>
