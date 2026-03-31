@@ -138,11 +138,6 @@ export default function HeroSection() {
                     transition={{duration: 0.3, ease: "easeOut"}}
                 >
                     <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-foreground/25 to-transparent"/>
-                    <motion.div
-                        className="hero-sheen"
-                        animate={{x: ["-140%", "160%"]}}
-                        transition={{duration: 7, repeat: Infinity, ease: "linear", repeatDelay: 1.8}}
-                    />
 
                     <div className="flex items-center justify-between text-sm text-foreground/65">
                         <span>Launch-ready digital presence</span>
