@@ -8,16 +8,19 @@ export default function ServicesSection() {
         {
             title: "UI/UX Design",
             description: "Clean, modern, and user-friendly designs that engage and convert.",
+            detail: "Landing page design, website redesign, responsive interface design, wireframes, user journeys, and conversion-focused layouts built to improve trust, engagement, and lead generation.",
             image: "/images/img-ui-ux-design.png",
         },
         {
             title: "Website Development",
             description: "Fast, scalable, and SEO-friendly websites tailored to your business.",
+            detail: "Responsive website development, performance optimization, technical SEO foundations, clean front-end architecture, and business websites designed to rank better and convert more visitors.",
             image: "/images/img-web-dev.png",
         },
         {
             title: "Mobile App Development",
             description: "High-performance apps with sleek design and seamless functionality.",
+            detail: "Cross-platform mobile app development, mobile app UI design, smooth onboarding flows, scalable product experiences, and user-friendly app interfaces for Android and iOS growth.",
             image: "/images/img-app-dev.png",
         },
     ];
@@ -48,6 +51,7 @@ export default function ServicesSection() {
                         <ServiceCard
                             title={service.title}
                             description={service.description}
+                            detail={service.detail}
                             image={service.image}
                         />
                     </StaggerItem>
