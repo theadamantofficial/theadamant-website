@@ -18,6 +18,14 @@ export function Navbar() {
             link: "#services",
         },
         {
+            name: "Process",
+            link: "#process",
+        },
+        {
+            name: "FAQ",
+            link: "#faq",
+        },
+        {
             name: "Contact",
             link: "#contact",
         },
@@ -81,19 +89,27 @@ export function Navbar() {
     return (
         <NavbarComponent
         >
-            {/* className="bg-red-400 sm:bg-orange-300 md:bg-yellow-200 lg:bg-green-300 xl:bg-blue-300 2xl:bg-violet-300"*/}
-            {/* Desktop Navigation */}
             <NavBody>
                 <AppLogo className="mr-4 px-2"/>
                 <NavItems items={navItems}/>
-                <div className="flex items-center gap-4">
-                    <div className="cursor-pointer relative inline-block" onClick={toggleTheme}>
-                        {isDarkMode ? <IconSun size={24}/> : <IconMoon size={24}/>}
-                    </div>
+                <div className="flex items-center gap-3">
+                    <button
+                        type="button"
+                        aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                        className="theme-toggle"
+                        onClick={toggleTheme}
+                    >
+                        {isDarkMode
+                            ? <IconSun className="theme-toggle-icon" stroke={1.8}/>
+                            : <IconMoon className="theme-toggle-icon" stroke={1.8}/>}
+                    </button>
+
+                    <Link href="#contact" className="button-primary px-4 py-2.5 text-sm">
+                        Start a project
+                    </Link>
                 </div>
             </NavBody>
 
-            {/* Mobile Navigation */}
             <MobileNav>
                 <MobileNavHeader>
                     <AppLogo className="mr-4 px-2"/>
@@ -117,12 +133,24 @@ export function Navbar() {
                             <span className="block">{item.name}</span>
                         </Link>
                     ))}
-                    <div
-                        className="flex w-full flex-col gap-4 cursor-pointer"
+                    <button
+                        type="button"
+                        aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                        className="feature-chip justify-start"
                         onClick={toggleTheme}
                     >
-                        {isDarkMode ? <IconSun size={24}/> : <IconMoon size={24}/>}
-                    </div>
+                        {isDarkMode
+                            ? <IconSun className="theme-toggle-icon" stroke={1.8}/>
+                            : <IconMoon className="theme-toggle-icon" stroke={1.8}/>}
+                        <span>{isDarkMode ? "Light mode" : "Dark mode"}</span>
+                    </button>
+                    <Link
+                        href="#contact"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="button-primary w-full"
+                    >
+                        Start a project
+                    </Link>
                 </MobileNavMenu>
             </MobileNav>
         </NavbarComponent>

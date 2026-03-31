@@ -34,29 +34,35 @@ export default function ServicesSection() {
     ];
 
     return (
-        <section id="services" className="py-20">
-            <div className="mx-auto max-w-6xl px-6 text-center">
-                {/* Section Heading */}
-                <h2 className="text-3xl font-bold md:text-4xl">
-                    Our Services
+        <section id="services" className="section-shell py-24" aria-labelledby="services-heading">
+            <div className="max-w-3xl">
+                <p className="section-kicker">Services</p>
+                <h2 id="services-heading" className="section-title">
+                    Design and development services built to convert interest into action.
                 </h2>
 
-                <p className="mt-4 text-lg">
-                    We craft solutions that transform ideas into impact.
+                <p className="section-copy">
+                    From UI/UX design to SEO-friendly website development and mobile app delivery, each service is shaped to help you look credible quickly and keep momentum after launch.
                 </p>
 
-                {/* Services Grid */}
-                <div className="grid md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                    {services.map((service, index) => (
-                        <ServiceCard
-                            key={index}
-                            title={service.title}
-                            description={service.description}
-                            image={service.image}
-                            techStack={service.techStack}
-                        />
-                    ))}
+                <div className="mt-6 flex flex-wrap gap-3">
+                    <span className="feature-chip">Landing pages</span>
+                    <span className="feature-chip">Marketing websites</span>
+                    <span className="feature-chip">Product interfaces</span>
+                    <span className="feature-chip">Cross-platform mobile apps</span>
                 </div>
+            </div>
+
+            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {services.map((service) => (
+                    <ServiceCard
+                        key={service.title}
+                        title={service.title}
+                        description={service.description}
+                        image={service.image}
+                        techStack={service.techStack}
+                    />
+                ))}
             </div>
         </section>
     );

@@ -1,8 +1,7 @@
 "use client";
 
 import {cn} from "@/lib/utils";
-import {motion, stagger, useAnimate, useInView} from "motion/react";
-import {useEffect} from "react";
+import {motion} from "motion/react";
 
 export const TypewriterEffectSmooth = ({
                                            words,

@@ -7,60 +7,96 @@ import {cn} from "@/lib/utils";
 import Image from "next/image";
 import {Dropdown} from "@/components/ui/dropdown";
 import {Textarea} from "@/components/ui/text-area";
-import {BackgroundGradient} from "@/components/ui/background-gradient";
-import {IconClick} from "@tabler/icons-react";
+import {CheckCircle2, Clock3, Mail, MessageSquareText} from "lucide-react";
 
 export default function ContactUsSection() {
     const [isSubmitted, setIsSubmitted] = useState(false);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log("Form submitted");
+        e.currentTarget.reset();
         setIsSubmitted(true);
     };
 
+    const contactHighlights = [
+        {
+            title: "Share the real goal",
+            description: "Tell us what you want users to understand, feel, or do when they land on the page.",
+            icon: MessageSquareText,
+        },
+        {
+            title: "Expect a focused reply",
+            description: "We can shape the right mix of design, development, and SEO foundations around your scope.",
+            icon: Mail,
+        },
+        {
+            title: "Move at launch speed",
+            description: "The process is meant to keep momentum high, especially for early-stage websites and product ideas.",
+            icon: Clock3,
+        },
+    ];
+
     return (
-        <section id="contact" className="mx-auto my-10 w-full p-0 md:p-8 flex flex-col items-center gap-10">
-            <h2 className="text-3xl font-bold md:text-4xl">
-                Contact Us
-            </h2>
+        <section id="contact" className="section-shell pb-24 pt-10" aria-labelledby="contact-heading">
+            <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+                <div className="glass-panel overflow-hidden p-8 sm:p-10">
+                    <p className="section-kicker">Contact</p>
+                    <h2 id="contact-heading" className="section-title">
+                        Tell us what you want to build.
+                    </h2>
 
-            {/* Image & Form */}
-            <div
-                className="shadow-input flex flex-col xl:flex-row items-center justify-between w-full max-w-6xl">
+                    <p className="section-copy">
+                        If the goal is to make a stronger first impression, improve clarity, or build a search-friendly foundation, this is the right place to start. Share your scope, timeline, and what success should look like.
+                    </p>
 
-                {/* Image */}
-                <div className="hidden xl:block">
-                    <Image src="/images/img-contact-us-light.png" alt="" className="dark:hidden" width={500}
-                           height={500}/>
-                    <Image src="/images/img-contact-us-dark.png" alt="" className="hidden dark:block" width={500}
-                           height={500}/>
+                    <div className="mt-8 grid gap-4">
+                        {contactHighlights.map(({title, description, icon: Icon}) => (
+                            <div key={title} className="rounded-[1.5rem] border border-black/8 bg-white/70 p-4 dark:border-white/10 dark:bg-white/5">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background">
+                                        <Icon className="h-5 w-5"/>
+                                    </div>
+                                    <p className="font-semibold text-foreground">{title}</p>
+                                </div>
+                                <p className="mt-3 text-sm leading-6 text-foreground/68">{description}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="mt-8 overflow-hidden rounded-[1.75rem] border border-black/8 bg-[#edf4f1] dark:border-white/10 dark:bg-[#122326]">
+                        <Image
+                            src="/images/img-contact-us-light.png"
+                            alt="Illustration representing contact and project planning"
+                            className="w-full dark:hidden"
+                            width={700}
+                            height={520}
+                        />
+                        <Image
+                            src="/images/img-contact-us-dark.png"
+                            alt="Illustration representing contact and project planning"
+                            className="hidden w-full dark:block"
+                            width={700}
+                            height={520}
+                        />
+                    </div>
                 </div>
 
-                {/* Form with Background */}
-                <BackgroundGradient containerClassName="w-5/6 md:w-4/6 xl:w-1/2 my-8"
-                                    className="rounded-[22px] bg-white dark:bg-zinc-900">
-
-                    {/* Form */}
-                    <form className="flex flex-col items-center w-full h-full gap-8 px-6 lg:px-8 py-8 lg:p-10"
+                <div className="glass-panel p-2 sm:p-3">
+                    <form className="flex h-full flex-col gap-8 rounded-[1.7rem] bg-white/88 px-6 py-8 dark:bg-zinc-950/90 lg:px-8 lg:py-10"
                           onSubmit={handleSubmit}>
-
-                        {/* Name */}
                         <LabelInputContainer>
                             <Label htmlFor="fullname" required>Full name</Label>
-                            <Input id="fullname" placeholder="Rahul Patel" type="text" required/>
+                            <Input id="fullname" name="fullname" autoComplete="name" placeholder="Rahul Patel" type="text" required/>
                         </LabelInputContainer>
 
-                        {/* Email */}
                         <LabelInputContainer>
                             <Label htmlFor="email" required>Email Address</Label>
-                            <Input id="email" placeholder="rahulpatel@example.com" type="email" required/>
+                            <Input id="email" name="email" autoComplete="email" placeholder="rahulpatel@example.com" type="email" required/>
                         </LabelInputContainer>
 
-                        {/* Purpose */}
                         <LabelInputContainer>
                             <Label htmlFor="purpose" required>Select purpose</Label>
-                            <Dropdown id="purpose" defaultValue="" required>
+                            <Dropdown id="purpose" name="purpose" defaultValue="" required>
                                 <option value="" disabled>
                                     Select purpose...
                                 </option>
@@ -75,56 +111,38 @@ export default function ContactUsSection() {
                             </Dropdown>
                         </LabelInputContainer>
 
-                        {/* Description */}
                         <LabelInputContainer>
                             <Label htmlFor="description" required>Description</Label>
                             <Textarea
                                 id="description"
-                                placeholder="Write your message here..."
+                                name="description"
+                                placeholder="Tell us about the page, product, or experience you want users to remember."
                                 required
                                 rows={4}
                             />
                         </LabelInputContainer>
 
                         {isSubmitted ? (
-                            // Success message
-                            <div className="flex gap-3 py-2 text-green-500">
-                                <IconClick size={24}/>
-
+                            <div aria-live="polite" className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-600 dark:text-emerald-400">
+                                <CheckCircle2 className="h-5 w-5"/>
                                 <span className="font-medium">
-                                  Submitted successfully 🎉
+                                  Message captured. You can refine it and send another version anytime.
                                 </span>
                             </div>
                         ) : (
-                            // Submit button
                             <button
-                                className="group/btn mt-4 relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
+                                className="button-primary mt-2 w-full"
                                 type="submit"
                             >
-                                Submit
-                                <BottomGradient/>
+                                Send project details
                             </button>
                         )}
-
                     </form>
-
-                </BackgroundGradient>
+                </div>
             </div>
         </section>
     );
 }
-
-const BottomGradient = () => {
-    return (
-        <>
-            <span
-                className="absolute inset-x-0 -bottom-px block h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-0 transition duration-500 group-hover/btn:opacity-100"/>
-
-            <span
-                className="absolute inset-x-10 -bottom-px mx-auto block h-px w-1/2 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-0 blur-sm transition duration-500 group-hover/btn:opacity-100"/>
-        </>
-    );
-};
 
 const LabelInputContainer = ({
                                  children,
