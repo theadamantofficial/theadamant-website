@@ -11,13 +11,14 @@ import {Textarea} from "@/components/ui/text-area";
 import {Calendar, CheckCircle2, Clock3, FileText, Mail, MessageSquareText, Target} from "lucide-react";
 import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 import toast from "react-hot-toast";
+import {SiteCopy} from "@/lib/site-copy";
 
 const SUCCESS_RESET_MS = 4000;
 const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "default_service";
 const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
 const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 
-export default function ContactUsSection() {
+export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submissionError, setSubmissionError] = useState<string | null>(null);
@@ -41,7 +42,7 @@ export default function ContactUsSection() {
         setSubmissionError(null);
 
         if (!EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
-            const errorMessage = "EmailJS is not fully configured yet. Add the template ID and public key to continue.";
+            const errorMessage = copy.form.configError;
             setSubmissionError(errorMessage);
             toast.error(errorMessage);
             return;
@@ -61,10 +62,10 @@ export default function ContactUsSection() {
 
             form.reset();
             setIsSubmitted(true);
-            toast.success("Project details sent.");
+            toast.success(copy.form.successToast);
         } catch (error) {
             console.error("EmailJS submission failed", error);
-            const errorMessage = "Could not send the message right now. Please try again.";
+            const errorMessage = copy.form.sendError;
             setSubmissionError(errorMessage);
             toast.error(errorMessage);
         } finally {
@@ -72,72 +73,44 @@ export default function ContactUsSection() {
         }
     };
 
-    const contactHighlights = [
-        {
-            title: "Share the real goal",
-            description: "Tell us what you want users to understand, feel, or do when they land on the page.",
-            icon: MessageSquareText,
-        },
-        {
-            title: "Expect a focused reply",
-            description: "We can shape the right mix of design, development, and SEO foundations around your scope.",
-            icon: Mail,
-        },
-        {
-            title: "Move at launch speed",
-            description: "The process is meant to keep momentum high, especially for early-stage websites and product ideas.",
-            icon: Clock3,
-        },
-    ];
-
-    const projectBriefItems = [
-        {
-            title: "Business goal",
-            description: "What should this page, product, or launch help you achieve?",
-            icon: Target,
-        },
-        {
-            title: "Launch timing",
-            description: "Share the target window so the scope can match the pace.",
-            icon: Calendar,
-        },
-        {
-            title: "References",
-            description: "Links, examples, or competitors help us understand the direction quickly.",
-            icon: FileText,
-        },
-    ];
+    const highlightIcons = [MessageSquareText, Mail, Clock3];
+    const briefIcons = [Target, Calendar, FileText];
 
     return (
         <section id="contact" className="section-shell pb-24 pt-10" aria-labelledby="contact-heading">
             <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-                <Reveal className="glass-panel flex h-full flex-col overflow-hidden p-8 sm:p-10">
-                    <p className="section-kicker">Contact</p>
-                    <h2 id="contact-heading" className="section-title">
-                        Tell us what you want to build.
-                    </h2>
+                <Reveal className="glass-panel flex h-full flex-col justify-between gap-8 overflow-hidden p-8 sm:p-10">
+                    <div>
+                        <p className="section-kicker">{copy.kicker}</p>
+                        <h2 id="contact-heading" className="section-title">
+                            {copy.title}
+                        </h2>
 
-                    <p className="section-copy">
-                        If the goal is to make a stronger first impression, improve clarity, or build a search-friendly foundation, this is the right place to start. Share your scope, timeline, and what success should look like.
-                    </p>
+                        <p className="section-copy">
+                            {copy.description}
+                        </p>
 
-                    <StaggerGroup className="mt-8 grid gap-4 md:grid-cols-2">
-                        {contactHighlights.map(({title, description, icon: Icon}, index) => (
-                            <StaggerItem key={title} className={index === contactHighlights.length - 1 ? "md:col-span-2" : ""}>
-                                <div className="lift-card rounded-[1.5rem] border border-black/8 bg-white/70 p-4 dark:border-white/10 dark:bg-white/5">
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background">
-                                            <Icon className="h-5 w-5"/>
+                        <StaggerGroup className="mt-8 grid gap-4 md:grid-cols-2">
+                            {copy.highlights.map(({title, description}, index) => {
+                                const Icon = highlightIcons[index];
+                                return (
+                                <StaggerItem key={title} className={index === copy.highlights.length - 1 ? "md:col-span-2" : ""}>
+                                    <div className="lift-card rounded-[1.5rem] border border-black/8 bg-white/70 p-4 dark:border-white/10 dark:bg-white/5">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background">
+                                                <Icon className="h-5 w-5"/>
+                                            </div>
+                                            <p className="font-semibold text-foreground">{title}</p>
                                         </div>
-                                        <p className="font-semibold text-foreground">{title}</p>
+                                        <p className="mt-3 text-sm leading-6 text-foreground/68">{description}</p>
                                     </div>
-                                    <p className="mt-3 text-sm leading-6 text-foreground/68">{description}</p>
-                                </div>
-                            </StaggerItem>
-                        ))}
-                    </StaggerGroup>
+                                </StaggerItem>
+                                );
+                            })}
+                        </StaggerGroup>
+                    </div>
 
-                    <div className="mt-auto overflow-hidden rounded-[1.75rem] border border-black/8 bg-[#edf4f1] pt-6 dark:border-white/10 dark:bg-[#122326]">
+                    <div className="overflow-hidden rounded-[1.75rem] border border-black/8 bg-[#edf4f1] pt-6 dark:border-white/10 dark:bg-[#122326]">
                         <Image
                             src="/images/img-contact-us-light.png"
                             alt="Illustration representing contact and project planning"
@@ -163,38 +136,33 @@ export default function ContactUsSection() {
 
                         <div className="flex flex-1 flex-col gap-8">
                             <LabelInputContainer>
-                                <Label htmlFor="fullname" required>Full name</Label>
-                                <Input id="fullname" name="user_name" autoComplete="name" placeholder="Rahul Patel" type="text" required/>
+                                <Label htmlFor="fullname" required>{copy.form.fullNameLabel}</Label>
+                                <Input id="fullname" name="user_name" autoComplete="name" placeholder={copy.form.fullNamePlaceholder} type="text" required/>
                             </LabelInputContainer>
 
                             <LabelInputContainer>
-                                <Label htmlFor="email" required>Email Address</Label>
-                                <Input id="email" name="user_email" autoComplete="email" placeholder="rahulpatel@example.com" type="email" required/>
+                                <Label htmlFor="email" required>{copy.form.emailLabel}</Label>
+                                <Input id="email" name="user_email" autoComplete="email" placeholder={copy.form.emailPlaceholder} type="email" required/>
                             </LabelInputContainer>
 
                             <LabelInputContainer>
-                                <Label htmlFor="purpose" required>Select purpose</Label>
+                                <Label htmlFor="purpose" required>{copy.form.purposeLabel}</Label>
                                 <Dropdown id="purpose" name="inquiry_type" defaultValue="" required>
                                     <option value="" disabled>
-                                        Select purpose...
+                                        {copy.form.purposePlaceholder}
                                     </option>
-                                    <option value="general">General Inquiry</option>
-                                    <option value="demo">Request a Demo</option>
-                                    <option value="quote">Get a Quote / Pricing</option>
-                                    <option value="support">Technical Support</option>
-                                    <option value="partnership">Partnership / Collaboration</option>
-                                    <option value="careers">Career Opportunities</option>
-                                    <option value="feedback">Feedback / Suggestions</option>
-                                    <option value="other">Other</option>
+                                    {copy.form.purposeOptions.map((option) => (
+                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                    ))}
                                 </Dropdown>
                             </LabelInputContainer>
 
                             <LabelInputContainer>
-                                <Label htmlFor="description" required>Description</Label>
+                                <Label htmlFor="description" required>{copy.form.descriptionLabel}</Label>
                                 <Textarea
                                     id="description"
                                     name="message"
-                                    placeholder="Tell us about the page, product, or experience you want users to remember."
+                                    placeholder={copy.form.descriptionPlaceholder}
                                 required
                                 rows={4}
                             />
@@ -206,15 +174,17 @@ export default function ContactUsSection() {
                                         <CheckCircle2 className="h-5 w-5"/>
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-foreground">A better brief gets a sharper first reply.</p>
+                                        <p className="font-semibold text-foreground">{copy.briefTitle}</p>
                                         <p className="mt-1 text-sm leading-6 text-foreground/68">
-                                            If you already have these details, include them so the first response can be more specific.
+                                            {copy.briefDescription}
                                         </p>
                                     </div>
                                 </div>
 
                                 <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                                    {projectBriefItems.map(({title, description, icon: Icon}) => (
+                                    {copy.briefItems.map(({title, description}, index) => {
+                                        const Icon = briefIcons[index];
+                                        return (
                                         <div
                                             key={title}
                                             className="rounded-[1.25rem] border border-black/8 bg-white/80 p-4 dark:border-white/10 dark:bg-white/5"
@@ -225,7 +195,8 @@ export default function ContactUsSection() {
                                             <p className="mt-3 text-sm font-semibold text-foreground">{title}</p>
                                             <p className="mt-2 text-xs leading-5 text-foreground/62">{description}</p>
                                         </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>
@@ -241,7 +212,7 @@ export default function ContactUsSection() {
                                 <div aria-live="polite" className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-600 dark:text-emerald-400">
                                     <CheckCircle2 className="h-5 w-5"/>
                                     <span className="font-medium">
-                                      Message captured. The button will return in a few seconds.
+                                      {copy.form.successLabel}
                                     </span>
                                 </div>
                             ) : (
@@ -250,7 +221,7 @@ export default function ContactUsSection() {
                                     type="submit"
                                     disabled={isSubmitting}
                                 >
-                                    {isSubmitting ? "Sending project details..." : "Send project details"}
+                                    {isSubmitting ? copy.form.submittingLabel : copy.form.submitLabel}
                                 </button>
                             )}
                         </div>

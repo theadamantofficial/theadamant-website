@@ -240,10 +240,18 @@ export const MobileNavToggle = ({
     );
 };
 
-export const AppLogo = ({includeText = true, className = ""}: { includeText?: boolean, className?: string }) => {
+export const AppLogo = ({
+    includeText = true,
+    className = "",
+    href = "/",
+}: {
+    includeText?: boolean;
+    className?: string;
+    href?: string;
+}) => {
     return (
         <Link
-            href="/"
+            href={href}
             className={`${className} relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black dark:text-white`}
         >
             <Image

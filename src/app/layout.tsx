@@ -3,6 +3,8 @@ import "../styles/globals.css";
 import {ReactNode} from "react";
 import {Manrope, Space_Grotesk} from "next/font/google";
 import {Toaster} from "react-hot-toast";
+import {headers} from "next/headers";
+import {DEFAULT_SITE_LOCALE, isSiteLocale, localeToHtmlLang} from "@/lib/site-locale";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
@@ -42,9 +44,6 @@ export const metadata: Metadata = {
     ...(siteUrl
         ? {
             metadataBase: new URL(siteUrl),
-            alternates: {
-                canonical: "/",
-            },
         }
         : {}),
 };
@@ -59,20 +58,24 @@ const spaceGrotesk = Space_Grotesk({
     variable: "--font-display",
 });
 
-export default function RootLayout({children}: Readonly<{
+export default async function RootLayout({children}: Readonly<{
     children: ReactNode;
 }>) {
-    return (
-        <html lang="en" suppressHydrationWarning>
-        <body className={`${manrope.variable} ${spaceGrotesk.variable}`}>
+    const requestHeaders = await headers();
+    const siteLocaleHeader = requestHeaders.get("x-site-locale");
+    const siteLocale = isSiteLocale(siteLocaleHeader ?? "")
+        ? siteLocaleHeader as "en" | "hi" | "es" | "fr"
+        : DEFAULT_SITE_LOCALE;
 
+    return (
+        <html lang={localeToHtmlLang(siteLocale)} suppressHydrationWarning>
+        <body className={`${manrope.variable} ${spaceGrotesk.variable}`}>
         <Toaster
             position="top-right"
             reverseOrder={false}
             containerClassName="mt-14"/>
 
         {children}
-
         </body>
         </html>
     );

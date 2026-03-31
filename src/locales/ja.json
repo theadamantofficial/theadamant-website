@@ -1,0 +1,233 @@
+{
+  "locale": "ja",
+  "dir": "ltr",
+  "metadata": {
+    "title": "The Adamant | Webデザイン・開発・SEO",
+    "description": "The Adamantは、より強い第一印象、明確なメッセージ、SEOに強い土台を備えたWebサイト、UXシステム、モバイル体験を制作します。"
+  },
+  "schema": {
+    "organizationDescription": "The Adamantは、明確なメッセージ、高速なパフォーマンス、SEO対応の基盤を備えたWebサイト、プロダクトUI、モバイル体験を設計します。"
+  },
+  "navbar": {
+    "navItems": [
+      {"name": "サービス", "anchor": "services"},
+      {"name": "進め方", "anchor": "process"},
+      {"name": "FAQ", "anchor": "faq"},
+      {"name": "お問い合わせ", "anchor": "contact"}
+    ],
+    "startProject": "プロジェクトを始める",
+    "lightMode": "ライトモード",
+    "darkMode": "ダークモード",
+    "languageAriaLabel": "サイトの言語を変更"
+  },
+  "hero": {
+    "kicker": "デザイン・開発・SEO対応構造",
+    "title": "最初の画面を見逃せないものにする。",
+    "description": "The Adamantは、上質に見え、提供価値を明確に伝え、検索エンジンが初日から理解しやすい構造を持つWebサイト、UXシステム、モバイル体験を制作します。",
+    "primaryCta": "プロジェクトを始める",
+    "secondaryCta": "サービスを見る",
+    "positioningPoints": [
+      "数秒で価値が伝わる明確なメッセージ",
+      "検索エンジンがページを理解しやすいセマンティック構造",
+      "あらゆるデバイスで洗練されて感じられるレスポンシブレイアウト"
+    ],
+    "previewEyebrowLeft": "公開準備が整ったデジタルプレゼンス",
+    "previewEyebrowRight": "戦略から実装まで",
+    "floatingBadges": ["モダンなモーション", "検索対応", "コンバージョン重視"],
+    "featureCards": [
+      {
+        "title": "視線をつかむデザイン",
+        "description": "階層、コントラスト、動きで視線を素早く導きます。"
+      },
+      {
+        "title": "SEOの土台",
+        "description": "メタデータ、セマンティック構造、検索エンジンが読みやすいコピー。"
+      },
+      {
+        "title": "素早い実行",
+        "description": "重いレイアウトや曖昧なメッセージなしでローンチの勢いを作ります。"
+      }
+    ]
+  },
+  "valueProps": {
+    "kicker": "なぜ効果があるのか",
+    "title": "より良いホームページは、見た目が良いだけでは足りません。",
+    "description": "注意を導き、価値をすばやく伝え、初めての訪問者がその場に留まりたくなるだけの信頼を生む必要があります。",
+    "items": [
+      {
+        "title": "すばやく注意を引く",
+        "description": "より強い階層設計、明確なコピー、意図的なビジュアルで、訪問者が提供価値をすぐに理解できます。"
+      },
+      {
+        "title": "SEOを基盤に組み込む",
+        "description": "セマンティックセクション、より良いメタデータ、FAQ、内部アンカーが最初から検索可視性を支えます。"
+      },
+      {
+        "title": "最初の打ち合わせ前に信頼を得る",
+        "description": "ページの信頼感と上質さを高めることで、ユーザーはより長く閲覧し、クリックし、問い合わせしやすくなります。"
+      }
+    ]
+  },
+  "services": {
+    "kicker": "サービス",
+    "title": "関心を行動に変えるためのデザイン・開発サービス。",
+    "description": "UI/UXデザインからSEOを意識したWeb開発、モバイルアプリ開発まで、各サービスは信頼性を高め、公開後の勢いを作るために設計されています。",
+    "chips": ["ランディングページ", "マーケティングサイト", "プロダクトUI", "クロスプラットフォームアプリ"],
+    "items": [
+      {
+        "title": "UI/UXデザイン",
+        "description": "洗練され、使いやすく、成果につながるモダンなデザイン。",
+        "detail": "ランディングページ設計、サイトリニューアル、レスポンシブUI設計、ワイヤーフレーム、ユーザージャーニー、コンバージョン重視のレイアウトで信頼性とリード獲得を高めます。",
+        "image": "/images/img-ui-ux-design.png"
+      },
+      {
+        "title": "Web開発",
+        "description": "高速で拡張しやすく、SEOに強いビジネス向けWebサイト。",
+        "detail": "レスポンシブWeb開発、パフォーマンス最適化、技術的SEOの基盤、クリーンなフロントエンド設計により、より上位表示されやすくコンバージョンしやすいサイトを構築します。",
+        "image": "/images/img-web-dev.png"
+      },
+      {
+        "title": "モバイルアプリ開発",
+        "description": "洗練されたデザインと滑らかな体験を備えた高性能アプリ。",
+        "detail": "クロスプラットフォーム開発、モバイルUI設計、スムーズなオンボーディング、拡張可能な体験設計により、AndroidとiOSの成長を支えます。",
+        "image": "/images/img-app-dev.png"
+      }
+    ]
+  },
+  "process": {
+    "kicker": "進め方",
+    "title": "粗いオンライン存在感を、より鋭いデジタルブランドへ変えるシンプルな流れ。",
+    "description": "立ち上げ初期のWebサイトは、戦略、デザイン、開発、SEOを別々ではなく一つの仕組みとして扱うと最も速く改善します。",
+    "steps": [
+      {
+        "number": "01",
+        "title": "ポジショニングを明確にする",
+        "description": "誰に何を届けるのか、どんなメッセージで伝えるのかを定義し、ページが曖昧に見えないようにします。"
+      },
+      {
+        "number": "02",
+        "title": "体験を形にする",
+        "description": "そのポジショニングを、デザインシステム、情報階層、意図的なインタラクションへ落とし込みます。"
+      },
+      {
+        "number": "03",
+        "title": "パフォーマンスを前提に構築する",
+        "description": "レスポンシブレイアウト、よりクリーンな構造、実用的なSEO改善を含めてサイトを実装します。"
+      },
+      {
+        "number": "04",
+        "title": "勢いを持って公開する",
+        "description": "最後の接点を磨き、適切な訪問者を引き付け、納得させ、問い合わせにつなげられる状態にします。"
+      }
+    ]
+  },
+  "faq": {
+    "kicker": "FAQ",
+    "title": "問い合わせ前によくある質問。",
+    "description": "これらの回答はページの意味構造も強化し、検索エンジンに対してサービス内容の文脈をより明確に伝えます。",
+    "items": [
+      {
+        "question": "The Adamantはどのようなプロジェクトに対応していますか？",
+        "answer": "The Adamantは、より強いデジタルプレゼンスと第一印象を求めるブランド向けに、UI/UXデザイン、Web開発、モバイル体験を提供しています。"
+      },
+      {
+        "question": "最初からSEOに配慮したサイトにできますか？",
+        "answer": "はい。強いメタデータ、クロールしやすい構造、有用な補足コピー、内部リンク、FAQは最初から組み込めます。"
+      },
+      {
+        "question": "なぜホームページの構造がそれほど重要なのですか？",
+        "answer": "ホームページは、新規訪問者が読み進めるか離脱するかを左右することが多いからです。明確な階層、焦点の合ったメッセージ、見えやすい次の行動が価値理解を早めます。"
+      },
+      {
+        "question": "デザインは開発と同じくらいコンバージョンに影響しますか？",
+        "answer": "はい。デザインが明確さを高める場合、レイアウト、流れ、コントラスト、CTA配置の改善が迷いを減らし、信頼感を高めます。"
+      }
+    ]
+  },
+  "contact": {
+    "kicker": "お問い合わせ",
+    "title": "何を作りたいか教えてください。",
+    "description": "より強い第一印象、より高い明確さ、検索に強い基盤づくりが目的なら、ここが最適なスタート地点です。スコープ、希望時期、成功イメージを共有してください。",
+    "highlights": [
+      {
+        "title": "本当の目的を共有する",
+        "description": "ページに来た人に、何を理解し、感じ、行動してほしいのかを教えてください。"
+      },
+      {
+        "title": "焦点の合った返答を受け取る",
+        "description": "ご要望に合わせて、適切なデザイン、開発、SEO基盤の組み合わせを整理できます。"
+      },
+      {
+        "title": "公開のスピード感で進める",
+        "description": "このプロセスは、特に立ち上げ初期のサイトやプロダクトで勢いを保つために設計されています。"
+      }
+    ],
+    "briefTitle": "より良いブリーフは、より鋭い最初の返答につながります。",
+    "briefDescription": "すでにこれらの情報があれば、最初の返答をより具体的にするために共有してください。",
+    "briefItems": [
+      {
+        "title": "ビジネス目標",
+        "description": "このページ、プロダクト、またはローンチで何を実現したいですか？"
+      },
+      {
+        "title": "公開時期",
+        "description": "希望する時期を共有いただければ、適切なスコープと進行速度を合わせられます。"
+      },
+      {
+        "title": "参考例",
+        "description": "リンク、事例、競合情報があると方向性を素早く理解できます。"
+      }
+    ],
+    "form": {
+      "fullNameLabel": "氏名",
+      "fullNamePlaceholder": "Rahul Patel",
+      "emailLabel": "メールアドレス",
+      "emailPlaceholder": "rahulpatel@example.com",
+      "purposeLabel": "目的を選択",
+      "purposePlaceholder": "目的を選択...",
+      "descriptionLabel": "説明",
+      "descriptionPlaceholder": "記憶に残るページ、プロダクト、体験について教えてください。",
+      "purposeOptions": [
+        {"value": "general", "label": "一般的なお問い合わせ"},
+        {"value": "demo", "label": "デモを依頼"},
+        {"value": "quote", "label": "見積もり / 料金"},
+        {"value": "support", "label": "技術サポート"},
+        {"value": "partnership", "label": "提携 / コラボレーション"},
+        {"value": "careers", "label": "採用情報"},
+        {"value": "feedback", "label": "フィードバック / 提案"},
+        {"value": "other", "label": "その他"}
+      ],
+      "submitLabel": "プロジェクト詳細を送信",
+      "submittingLabel": "プロジェクト詳細を送信中...",
+      "successLabel": "メッセージを受け取りました。ボタンは数秒後に戻ります。",
+      "configError": "EmailJSの設定がまだ完全ではありません。template IDとpublic keyを追加してください。",
+      "sendError": "現在メッセージを送信できません。時間をおいて再度お試しください。",
+      "successToast": "プロジェクト詳細を送信しました。"
+    }
+  },
+  "footer": {
+    "description": "信頼をすばやく築き、最初から検索可視性を支えるために設計された、デザイン重視のWebサイト、プロダクトUI、モバイル体験。",
+    "sections": [
+      {
+        "title": "ナビゲーション",
+        "links": [
+          {"name": "ホーム", "anchor": ""},
+          {"name": "サービス", "anchor": "services"},
+          {"name": "進め方", "anchor": "process"},
+          {"name": "FAQ", "anchor": "faq"},
+          {"name": "お問い合わせ", "anchor": "contact"}
+        ]
+      },
+      {
+        "title": "重点領域",
+        "links": [
+          {"name": "UI/UXデザイン", "anchor": "services"},
+          {"name": "Web開発", "anchor": "services"},
+          {"name": "モバイルアプリ", "anchor": "services"}
+        ]
+      }
+    ],
+    "copyright": "The Adamant. All rights reserved.",
+    "tagline": "明確さ、速さ、そして強い第一印象のために設計。"
+  }
+}
