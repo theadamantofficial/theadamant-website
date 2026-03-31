@@ -8,7 +8,7 @@ import {cn} from "@/lib/utils";
 import Image from "next/image";
 import {Dropdown} from "@/components/ui/dropdown";
 import {Textarea} from "@/components/ui/text-area";
-import {CheckCircle2, Clock3, Mail, MessageSquareText} from "lucide-react";
+import {Calendar, CheckCircle2, Clock3, FileText, Mail, MessageSquareText, Target} from "lucide-react";
 import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 import toast from "react-hot-toast";
 
@@ -87,6 +87,24 @@ export default function ContactUsSection() {
             title: "Move at launch speed",
             description: "The process is meant to keep momentum high, especially for early-stage websites and product ideas.",
             icon: Clock3,
+        },
+    ];
+
+    const projectBriefItems = [
+        {
+            title: "Business goal",
+            description: "What should this page, product, or launch help you achieve?",
+            icon: Target,
+        },
+        {
+            title: "Launch timing",
+            description: "Share the target window so the scope can match the pace.",
+            icon: Calendar,
+        },
+        {
+            title: "References",
+            description: "Links, examples, or competitors help us understand the direction quickly.",
+            icon: FileText,
         },
     ];
 
@@ -177,10 +195,39 @@ export default function ContactUsSection() {
                                     id="description"
                                     name="message"
                                     placeholder="Tell us about the page, product, or experience you want users to remember."
-                                    required
-                                    rows={4}
-                                />
+                                required
+                                rows={4}
+                            />
                             </LabelInputContainer>
+
+                            <div className="mt-auto rounded-[1.5rem] border border-black/8 bg-black/[0.03] p-5 dark:border-white/10 dark:bg-white/[0.03]">
+                                <div className="flex items-start gap-3">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
+                                        <CheckCircle2 className="h-5 w-5"/>
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-foreground">A better brief gets a sharper first reply.</p>
+                                        <p className="mt-1 text-sm leading-6 text-foreground/68">
+                                            If you already have these details, include them so the first response can be more specific.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                                    {projectBriefItems.map(({title, description, icon: Icon}) => (
+                                        <div
+                                            key={title}
+                                            className="rounded-[1.25rem] border border-black/8 bg-white/80 p-4 dark:border-white/10 dark:bg-white/5"
+                                        >
+                                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-foreground/8 text-foreground dark:bg-white/10">
+                                                <Icon className="h-4 w-4"/>
+                                            </div>
+                                            <p className="mt-3 text-sm font-semibold text-foreground">{title}</p>
+                                            <p className="mt-2 text-xs leading-5 text-foreground/62">{description}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
 
                         <div className="mt-6 space-y-4">
