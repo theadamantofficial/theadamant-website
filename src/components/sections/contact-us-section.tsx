@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {cn} from "@/lib/utils";
@@ -10,8 +10,22 @@ import {Textarea} from "@/components/ui/text-area";
 import {CheckCircle2, Clock3, Mail, MessageSquareText} from "lucide-react";
 import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 
+const SUCCESS_RESET_MS = 4000;
+
 export default function ContactUsSection() {
     const [isSubmitted, setIsSubmitted] = useState(false);
+
+    useEffect(() => {
+        if (!isSubmitted) {
+            return;
+        }
+
+        const timeoutId = window.setTimeout(() => {
+            setIsSubmitted(false);
+        }, SUCCESS_RESET_MS);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [isSubmitted]);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -129,7 +143,7 @@ export default function ContactUsSection() {
                             <div aria-live="polite" className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-600 dark:text-emerald-400">
                                 <CheckCircle2 className="h-5 w-5"/>
                                 <span className="font-medium">
-                                  Message captured. You can refine it and send another version anytime.
+                                  Message captured. The button will return in a few seconds.
                                 </span>
                             </div>
                         ) : (
