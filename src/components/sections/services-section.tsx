@@ -45,9 +45,9 @@ export default function ServicesSection() {
                 </div>
             </Reveal>
 
-            <StaggerGroup className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <StaggerGroup className="mt-10 grid items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {services.map((service) => (
-                    <StaggerItem key={service.title}>
+                    <StaggerItem key={service.title} className="h-full">
                         <ServiceCard
                             title={service.title}
                             description={service.description}
