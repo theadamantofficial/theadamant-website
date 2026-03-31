@@ -11,6 +11,7 @@ export function LanguageSwitcher({mobile = false}: { mobile?: boolean }) {
         languagePreference,
         setLanguagePreference,
         supportedLanguages,
+        translationAvailable,
     } = useSiteTranslation();
 
     return (
@@ -25,9 +26,10 @@ export function LanguageSwitcher({mobile = false}: { mobile?: boolean }) {
             <div className="flex min-w-0 flex-1 items-center gap-2">
                 <select
                     aria-label="Change website language"
-                    className="w-full min-w-0 bg-transparent text-sm font-medium text-foreground outline-none"
+                    className="w-full min-w-0 bg-transparent text-sm font-medium text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-60"
                     value={languagePreference}
-                    disabled={isTranslating}
+                    disabled={isTranslating || !translationAvailable}
+                    title={!translationAvailable ? "Translation unavailable" : undefined}
                     onChange={(event) => {
                         void setLanguagePreference(event.target.value === AUTO_LANGUAGE ? AUTO_LANGUAGE : event.target.value as typeof activeLanguage);
                     }}

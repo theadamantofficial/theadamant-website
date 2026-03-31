@@ -15,13 +15,6 @@ interface TranslationRequestBody {
 
 export async function POST(request: NextRequest) {
     const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
-    if (!apiKey) {
-        return NextResponse.json(
-            {error: "Google Translate is not configured on the server."},
-            {status: 503},
-        );
-    }
-
     let body: TranslationRequestBody;
     try {
         body = await request.json();
@@ -40,7 +33,14 @@ export async function POST(request: NextRequest) {
     }
 
     if (!texts.length) {
-        return NextResponse.json({translations: []});
+        return NextResponse.json({available: Boolean(apiKey), translations: []});
+    }
+
+    if (!apiKey) {
+        return NextResponse.json({
+            available: false,
+            translations: texts,
+        });
     }
 
     if (texts.length > MAX_TRANSLATION_ITEMS) {
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         };
 
         const translations = payload.data?.translations?.map((item) => item.translatedText ?? "") ?? [];
-        return NextResponse.json({translations});
+        return NextResponse.json({available: true, translations});
     } catch (error) {
         console.error("Translation route failed", error);
         return NextResponse.json({error: "Translation request failed."}, {status: 500});

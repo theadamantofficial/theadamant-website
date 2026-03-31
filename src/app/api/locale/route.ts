@@ -18,5 +18,6 @@ export async function GET() {
 
     return NextResponse.json({
         language: detectedLanguage,
+        translationEnabled: Boolean(process.env.GOOGLE_TRANSLATE_API_KEY),
     });
 }

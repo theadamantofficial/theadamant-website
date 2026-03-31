@@ -57,6 +57,7 @@ interface SiteTranslateContextValue {
     activeLanguage: SupportedLanguageCode;
     languagePreference: LanguagePreference;
     isTranslating: boolean;
+    translationAvailable: boolean;
     supportedLanguages: SupportedLanguage[];
     setLanguagePreference: (preference: LanguagePreference) => Promise<void>;
 }
@@ -89,6 +90,7 @@ export function SiteTranslateProvider({children}: { children: React.ReactNode })
     const [languagePreference, setLanguagePreferenceState] = useState<LanguagePreference>(AUTO_LANGUAGE);
     const [pendingPreference, setPendingPreference] = useState<LanguagePreference | null>(null);
     const [isTranslating, setIsTranslating] = useState(false);
+    const [translationAvailable, setTranslationAvailable] = useState(false);
 
     const requestIdRef = useRef(0);
     const refreshTimeoutRef = useRef<number | null>(null);
@@ -101,10 +103,15 @@ export function SiteTranslateProvider({children}: { children: React.ReactNode })
     } | null>(null);
     const translationCacheRef = useRef(new Map<SupportedLanguageCode, Map<string, string>>());
     const latestActiveLanguageRef = useRef<SupportedLanguageCode>(DEFAULT_LANGUAGE);
+    const translationAvailableRef = useRef(false);
 
     useEffect(() => {
         latestActiveLanguageRef.current = activeLanguage;
     }, [activeLanguage]);
+
+    useEffect(() => {
+        translationAvailableRef.current = translationAvailable;
+    }, [translationAvailable]);
 
     useEffect(() => {
         const storedPreference = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
@@ -343,15 +350,26 @@ export function SiteTranslateProvider({children}: { children: React.ReactNode })
         });
 
         const payload = await response.json() as {
+            available?: boolean;
             error?: string;
             translations?: string[];
         };
+
+        if (payload.available === false) {
+            return {
+                available: false,
+                translations: texts,
+            };
+        }
 
         if (!response.ok || !Array.isArray(payload.translations)) {
             throw new Error(payload.error || "Translation request failed.");
         }
 
-        return payload.translations.map((text) => decodeHtmlEntities(text));
+        return {
+            available: true,
+            translations: payload.translations.map((text) => decodeHtmlEntities(text)),
+        };
     }
 
     function restoreOriginalContent() {
@@ -397,7 +415,7 @@ export function SiteTranslateProvider({children}: { children: React.ReactNode })
             requestId: number;
             updateLanguageState: boolean;
         },
-    ) {
+    ): Promise<boolean> {
         if (targetLanguage === DEFAULT_LANGUAGE) {
             restoreOriginalContent();
 
@@ -405,7 +423,7 @@ export function SiteTranslateProvider({children}: { children: React.ReactNode })
                 setActiveLanguage(DEFAULT_LANGUAGE);
             }
 
-            return;
+            return true;
         }
 
         const cache = getCachedTranslations(targetLanguage);
@@ -424,13 +442,17 @@ export function SiteTranslateProvider({children}: { children: React.ReactNode })
         const unresolvedTexts = uniqueTexts.filter((text) => !cache.has(text));
         if (unresolvedTexts.length) {
             for (const chunk of chunkStrings(unresolvedTexts, TRANSLATION_BATCH_SIZE)) {
-                const translations = await fetchTranslations(chunk, targetLanguage);
+                const response = await fetchTranslations(chunk, targetLanguage);
+                if (!response.available) {
+                    return false;
+                }
+
                 if (requestId !== requestIdRef.current) {
-                    return;
+                    return false;
                 }
 
                 chunk.forEach((original, index) => {
-                    cache.set(original, translations[index] ?? original);
+                    cache.set(original, response.translations[index] ?? original);
                 });
             }
 
@@ -438,7 +460,7 @@ export function SiteTranslateProvider({children}: { children: React.ReactNode })
         }
 
         if (requestId !== requestIdRef.current) {
-            return;
+            return false;
         }
 
         isApplyingRef.current = true;
@@ -475,13 +497,17 @@ export function SiteTranslateProvider({children}: { children: React.ReactNode })
         }
 
         releaseApplyingLock(isApplyingRef);
+        return true;
     }
 
     async function detectPreferredLanguage() {
         try {
             const response = await fetch("/api/locale", {cache: "no-store"});
             if (response.ok) {
-                const payload = await response.json() as { language?: string };
+                const payload = await response.json() as { language?: string; translationEnabled?: boolean };
+                const isTranslationEnabled = Boolean(payload.translationEnabled);
+                translationAvailableRef.current = isTranslationEnabled;
+                setTranslationAvailable(isTranslationEnabled);
                 const normalizedLanguage = normalizeLanguageCode(payload.language);
                 if (normalizedLanguage) {
                     return normalizedLanguage;
@@ -513,10 +539,23 @@ export function SiteTranslateProvider({children}: { children: React.ReactNode })
             if (nextLanguage === DEFAULT_LANGUAGE) {
                 restoreOriginalContent();
             } else {
-                await translateDocument(nextLanguage, {
+                if (!translationAvailableRef.current) {
+                    restoreOriginalContent();
+                    setActiveLanguage(DEFAULT_LANGUAGE);
+                    return null;
+                }
+
+                const translated = await translateDocument(nextLanguage, {
                     requestId,
                     updateLanguageState: true,
                 });
+                if (!translated) {
+                    translationAvailableRef.current = false;
+                    setTranslationAvailable(false);
+                    restoreOriginalContent();
+                    setActiveLanguage(DEFAULT_LANGUAGE);
+                    return null;
+                }
             }
 
             if (requestId !== requestIdRef.current) {
@@ -531,9 +570,7 @@ export function SiteTranslateProvider({children}: { children: React.ReactNode })
             }
 
             return nextLanguage;
-        } catch (error) {
-            console.error("Site translation failed", error);
-            toast.error("Translation is unavailable right now.");
+        } catch {
             return null;
         } finally {
             if (requestId === requestIdRef.current) {
@@ -547,10 +584,14 @@ export function SiteTranslateProvider({children}: { children: React.ReactNode })
         activeLanguage,
         languagePreference: pendingPreference ?? languagePreference,
         isTranslating,
+        translationAvailable,
         supportedLanguages: SUPPORTED_LANGUAGES,
         setLanguagePreference: async (preference) => {
             const resolvedLanguage = await applyPreference(preference, {persist: true});
             if (!resolvedLanguage) {
+                if (preference !== AUTO_LANGUAGE && preference !== DEFAULT_LANGUAGE) {
+                    toast.error("Language switching is temporarily unavailable.");
+                }
                 return;
             }
 
