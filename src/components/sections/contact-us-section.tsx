@@ -92,8 +92,8 @@ export default function ContactUsSection() {
 
     return (
         <section id="contact" className="section-shell pb-24 pt-10" aria-labelledby="contact-heading">
-            <div className="grid gap-8 lg:items-start lg:grid-cols-[0.9fr_1.1fr]">
-                <Reveal className="glass-panel overflow-hidden p-8 sm:p-10">
+            <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+                <Reveal className="glass-panel flex h-full flex-col overflow-hidden p-8 sm:p-10">
                     <p className="section-kicker">Contact</p>
                     <h2 id="contact-heading" className="section-title">
                         Tell us what you want to build.
@@ -119,90 +119,94 @@ export default function ContactUsSection() {
                         ))}
                     </StaggerGroup>
 
-                    <div className="mt-6 overflow-hidden rounded-[1.75rem] border border-black/8 bg-[#edf4f1] dark:border-white/10 dark:bg-[#122326]">
+                    <div className="mt-auto overflow-hidden rounded-[1.75rem] border border-black/8 bg-[#edf4f1] pt-6 dark:border-white/10 dark:bg-[#122326]">
                         <Image
                             src="/images/img-contact-us-light.png"
                             alt="Illustration representing contact and project planning"
-                            className="max-h-[290px] w-full object-cover object-center dark:hidden"
+                            className="max-h-[250px] w-full object-cover object-center dark:hidden"
                             width={700}
                             height={520}
                         />
                         <Image
                             src="/images/img-contact-us-dark.png"
                             alt="Illustration representing contact and project planning"
-                            className="hidden max-h-[290px] w-full object-cover object-center dark:block"
+                            className="hidden max-h-[250px] w-full object-cover object-center dark:block"
                             width={700}
                             height={520}
                         />
                     </div>
                 </Reveal>
 
-                <Reveal className="glass-panel self-start p-2 sm:p-3" delay={0.12}>
-                    <form className="flex flex-col gap-8 rounded-[1.7rem] bg-white/88 px-6 py-8 dark:bg-zinc-950/90 lg:px-8 lg:py-10"
+                <Reveal className="glass-panel h-full p-2 sm:p-3" delay={0.12}>
+                    <form className="flex h-full flex-col rounded-[1.7rem] bg-white/88 px-6 py-8 dark:bg-zinc-950/90 lg:px-8 lg:py-10"
                           onSubmit={handleSubmit}>
                         <input type="hidden" name="site_name" value="The Adamant"/>
                         <input type="hidden" name="submitted_at" value={new Date().toISOString()}/>
 
-                        <LabelInputContainer>
-                            <Label htmlFor="fullname" required>Full name</Label>
-                            <Input id="fullname" name="user_name" autoComplete="name" placeholder="Rahul Patel" type="text" required/>
-                        </LabelInputContainer>
+                        <div className="flex flex-1 flex-col gap-8">
+                            <LabelInputContainer>
+                                <Label htmlFor="fullname" required>Full name</Label>
+                                <Input id="fullname" name="user_name" autoComplete="name" placeholder="Rahul Patel" type="text" required/>
+                            </LabelInputContainer>
 
-                        <LabelInputContainer>
-                            <Label htmlFor="email" required>Email Address</Label>
-                            <Input id="email" name="user_email" autoComplete="email" placeholder="rahulpatel@example.com" type="email" required/>
-                        </LabelInputContainer>
+                            <LabelInputContainer>
+                                <Label htmlFor="email" required>Email Address</Label>
+                                <Input id="email" name="user_email" autoComplete="email" placeholder="rahulpatel@example.com" type="email" required/>
+                            </LabelInputContainer>
 
-                        <LabelInputContainer>
-                            <Label htmlFor="purpose" required>Select purpose</Label>
-                            <Dropdown id="purpose" name="inquiry_type" defaultValue="" required>
-                                <option value="" disabled>
-                                    Select purpose...
-                                </option>
-                                <option value="general">General Inquiry</option>
-                                <option value="demo">Request a Demo</option>
-                                <option value="quote">Get a Quote / Pricing</option>
-                                <option value="support">Technical Support</option>
-                                <option value="partnership">Partnership / Collaboration</option>
-                                <option value="careers">Career Opportunities</option>
-                                <option value="feedback">Feedback / Suggestions</option>
-                                <option value="other">Other</option>
-                            </Dropdown>
-                        </LabelInputContainer>
+                            <LabelInputContainer>
+                                <Label htmlFor="purpose" required>Select purpose</Label>
+                                <Dropdown id="purpose" name="inquiry_type" defaultValue="" required>
+                                    <option value="" disabled>
+                                        Select purpose...
+                                    </option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="demo">Request a Demo</option>
+                                    <option value="quote">Get a Quote / Pricing</option>
+                                    <option value="support">Technical Support</option>
+                                    <option value="partnership">Partnership / Collaboration</option>
+                                    <option value="careers">Career Opportunities</option>
+                                    <option value="feedback">Feedback / Suggestions</option>
+                                    <option value="other">Other</option>
+                                </Dropdown>
+                            </LabelInputContainer>
 
-                        <LabelInputContainer>
-                            <Label htmlFor="description" required>Description</Label>
-                            <Textarea
-                                id="description"
-                                name="message"
-                                placeholder="Tell us about the page, product, or experience you want users to remember."
-                                required
-                                rows={4}
-                            />
-                        </LabelInputContainer>
+                            <LabelInputContainer>
+                                <Label htmlFor="description" required>Description</Label>
+                                <Textarea
+                                    id="description"
+                                    name="message"
+                                    placeholder="Tell us about the page, product, or experience you want users to remember."
+                                    required
+                                    rows={4}
+                                />
+                            </LabelInputContainer>
+                        </div>
 
-                        {submissionError && (
-                            <div aria-live="polite" className="rounded-2xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400">
-                                {submissionError}
-                            </div>
-                        )}
+                        <div className="mt-6 space-y-4">
+                            {submissionError && (
+                                <div aria-live="polite" className="rounded-2xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+                                    {submissionError}
+                                </div>
+                            )}
 
-                        {isSubmitted ? (
-                            <div aria-live="polite" className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-600 dark:text-emerald-400">
-                                <CheckCircle2 className="h-5 w-5"/>
-                                <span className="font-medium">
-                                  Message captured. The button will return in a few seconds.
-                                </span>
-                            </div>
-                        ) : (
-                            <button
-                                className="button-primary mt-2 w-full"
-                                type="submit"
-                                disabled={isSubmitting}
-                            >
-                                {isSubmitting ? "Sending project details..." : "Send project details"}
-                            </button>
-                        )}
+                            {isSubmitted ? (
+                                <div aria-live="polite" className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-600 dark:text-emerald-400">
+                                    <CheckCircle2 className="h-5 w-5"/>
+                                    <span className="font-medium">
+                                      Message captured. The button will return in a few seconds.
+                                    </span>
+                                </div>
+                            ) : (
+                                <button
+                                    className="button-primary w-full"
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? "Sending project details..." : "Send project details"}
+                                </button>
+                            )}
+                        </div>
                     </form>
                 </Reveal>
             </div>
