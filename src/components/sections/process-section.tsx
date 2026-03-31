@@ -41,10 +41,10 @@ export default function ProcessSection() {
                 </p>
             </Reveal>
 
-            <StaggerGroup className="mt-10 grid gap-4 lg:grid-cols-4">
+            <StaggerGroup className="mt-10 grid gap-4 lg:auto-rows-fr lg:grid-cols-4">
                 {steps.map(({number, title, description, icon: Icon}) => (
-                    <StaggerItem key={number}>
-                        <article className="glass-panel lift-card p-6">
+                    <StaggerItem key={number} className="h-full">
+                        <article className="glass-panel lift-card flex h-full flex-col p-6">
                         <div className="flex items-center justify-between">
                             <span className="text-sm font-semibold tracking-[0.24em] text-foreground/45">{number}</span>
                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background">
@@ -53,7 +53,7 @@ export default function ProcessSection() {
                         </div>
 
                         <h3 className="mt-8 text-xl font-semibold tracking-tight text-foreground">{title}</h3>
-                        <p className="mt-3 text-sm leading-6 text-foreground/68">{description}</p>
+                        <p className="mt-3 flex-1 text-sm leading-6 text-foreground/68">{description}</p>
                         </article>
                     </StaggerItem>
                 ))}

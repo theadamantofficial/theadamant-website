@@ -92,7 +92,7 @@ export default function ContactUsSection() {
 
     return (
         <section id="contact" className="section-shell pb-24 pt-10" aria-labelledby="contact-heading">
-            <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="grid gap-8 lg:items-start lg:grid-cols-[0.9fr_1.1fr]">
                 <Reveal className="glass-panel overflow-hidden p-8 sm:p-10">
                     <p className="section-kicker">Contact</p>
                     <h2 id="contact-heading" className="section-title">
@@ -137,8 +137,8 @@ export default function ContactUsSection() {
                     </div>
                 </Reveal>
 
-                <Reveal className="glass-panel p-2 sm:p-3" delay={0.12}>
-                    <form className="flex h-full flex-col gap-8 rounded-[1.7rem] bg-white/88 px-6 py-8 dark:bg-zinc-950/90 lg:px-8 lg:py-10"
+                <Reveal className="glass-panel self-start p-2 sm:p-3" delay={0.12}>
+                    <form className="flex flex-col gap-8 rounded-[1.7rem] bg-white/88 px-6 py-8 dark:bg-zinc-950/90 lg:px-8 lg:py-10"
                           onSubmit={handleSubmit}>
                         <input type="hidden" name="site_name" value="The Adamant"/>
                         <input type="hidden" name="submitted_at" value={new Date().toISOString()}/>

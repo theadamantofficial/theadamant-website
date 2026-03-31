@@ -4,15 +4,17 @@ import HomePage from "@/views/home-page";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
 export const metadata: Metadata = {
-    title: "Websites, UX Design, and Mobile Apps",
+    title: {
+        absolute: "The Adamant",
+    },
     description: "Explore The Adamant's approach to UI/UX design, website development, and mobile app delivery with a stronger first impression and SEO-friendly foundations.",
     openGraph: {
-        title: "The Adamant | Websites, UX Design, and Mobile Apps",
+        title: "The Adamant",
         description: "Explore The Adamant's approach to UI/UX design, website development, and mobile app delivery with a stronger first impression and SEO-friendly foundations.",
     },
     twitter: {
         card: "summary_large_image",
-        title: "The Adamant | Websites, UX Design, and Mobile Apps",
+        title: "The Adamant",
         description: "Explore The Adamant's approach to UI/UX design, website development, and mobile app delivery with a stronger first impression and SEO-friendly foundations.",
     },
     ...(siteUrl

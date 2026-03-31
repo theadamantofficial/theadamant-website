@@ -166,14 +166,14 @@ export default function HeroSection() {
                         />
                     </div>
 
-                    <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    <div className="mt-6 grid gap-3 md:grid-cols-2">
                         {featureCards.map((card, index) => {
                             const Icon = card.icon;
 
                             return (
                             <motion.div
                                 key={card.title}
-                                className="hero-mini-card lift-card"
+                                className={`hero-mini-card lift-card ${index === featureCards.length - 1 ? "md:col-span-2" : ""}`}
                                 initial={{opacity: 0, y: 18}}
                                 animate={{opacity: 1, y: 0}}
                                 transition={{delay: 0.45 + index * 0.12, duration: 0.55, ease: smoothEase}}
