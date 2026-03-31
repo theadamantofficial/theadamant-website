@@ -1,0 +1,233 @@
+{
+  "locale": "de",
+  "dir": "ltr",
+  "metadata": {
+    "title": "The Adamant | Webdesign, Entwicklung und SEO",
+    "description": "The Adamant entwickelt Websites, UX-Systeme und mobile Erlebnisse mit stärkerem ersten Eindruck, klarerer Kommunikation und SEO-fähigem Fundament."
+  },
+  "schema": {
+    "organizationDescription": "The Adamant gestaltet Websites, Produktinterfaces und mobile Erlebnisse mit klarer Kommunikation, schneller Performance und SEO-fähigen Grundlagen."
+  },
+  "navbar": {
+    "navItems": [
+      {"name": "Leistungen", "anchor": "services"},
+      {"name": "Prozess", "anchor": "process"},
+      {"name": "FAQ", "anchor": "faq"},
+      {"name": "Kontakt", "anchor": "contact"}
+    ],
+    "startProject": "Projekt starten",
+    "lightMode": "Heller Modus",
+    "darkMode": "Dunkler Modus",
+    "languageAriaLabel": "Sprache der Website ändern"
+  },
+  "hero": {
+    "kicker": "Design, Entwicklung und SEO-fähige Struktur",
+    "title": "Machen Sie den ersten Bildschirm unmöglich zu ignorieren.",
+    "description": "The Adamant entwickelt Websites, UX-Systeme und mobile Erlebnisse, die hochwertig wirken, Ihr Angebot klar erklären und Suchmaschinen vom ersten Tag an die richtige Struktur liefern.",
+    "primaryCta": "Projekt starten",
+    "secondaryCta": "Leistungen ansehen",
+    "positioningPoints": [
+      "Klare Botschaften, die den Nutzen in Sekunden erklären",
+      "Semantische Struktur, die Suchmaschinen hilft, die Seite zu verstehen",
+      "Responsive Layouts, die sich auf jedem Gerät hochwertig anfühlen"
+    ],
+    "previewEyebrowLeft": "Startbereite digitale Präsenz",
+    "previewEyebrowRight": "Von Strategie bis Umsetzung",
+    "floatingBadges": ["Moderne Motion", "Suchbereit", "Conversion-orientiert"],
+    "featureCards": [
+      {
+        "title": "Design mit Fokus auf Aufmerksamkeit",
+        "description": "Hierarchie, Kontrast und Bewegung, die den Blick schnell lenken."
+      },
+      {
+        "title": "SEO-Grundlagen",
+        "description": "Metadaten, semantische Bereiche und suchmaschinenlesbare Texte."
+      },
+      {
+        "title": "Schnelle Umsetzung",
+        "description": "Launch-Momentum ohne überladene Layouts oder unklare Botschaften."
+      }
+    ]
+  },
+  "valueProps": {
+    "kicker": "Warum das funktioniert",
+    "title": "Eine bessere Homepage sollte mehr leisten als nur gut auszusehen.",
+    "description": "Sie sollte Aufmerksamkeit lenken, den Nutzen schnell erklären und genug Vertrauen schaffen, damit neue Besucher auf der Seite bleiben. Genau darauf sind diese Verbesserungen ausgelegt.",
+    "items": [
+      {
+        "title": "Aufmerksamkeit schnell gewinnen",
+        "description": "Stärkere Hierarchie, klarere Texte und bewusstere Visuals helfen Besuchern, das Angebot sofort zu verstehen."
+      },
+      {
+        "title": "SEO ins Fundament einbauen",
+        "description": "Semantische Bereiche, bessere Metadaten, FAQ-Inhalte und interne Anker stärken die Sichtbarkeit von Anfang an."
+      },
+      {
+        "title": "Vertrauen vor dem ersten Gespräch aufbauen",
+        "description": "Die Seite wirkt glaubwürdiger und hochwertiger, sodass Nutzer eher weiter scrollen, klicken und eine Anfrage senden."
+      }
+    ]
+  },
+  "services": {
+    "kicker": "Leistungen",
+    "title": "Design- und Entwicklungsleistungen, die Interesse in Handlung verwandeln.",
+    "description": "Von UI/UX-Design über SEO-freundliche Webentwicklung bis hin zu mobilen Apps ist jede Leistung darauf ausgerichtet, Ihre Marke schneller glaubwürdig wirken zu lassen.",
+    "chips": ["Landingpages", "Marketing-Websites", "Produktinterfaces", "Plattformübergreifende Apps"],
+    "items": [
+      {
+        "title": "UI/UX-Design",
+        "description": "Saubere, moderne und benutzerfreundliche Designs, die binden und konvertieren.",
+        "detail": "Landingpage-Design, Website-Redesign, responsive Interface-Design, Wireframes, User Journeys und conversion-orientierte Layouts zur Verbesserung von Vertrauen, Interaktion und Leads.",
+        "image": "/images/img-ui-ux-design.png"
+      },
+      {
+        "title": "Webentwicklung",
+        "description": "Schnelle, skalierbare und SEO-freundliche Websites für Ihr Unternehmen.",
+        "detail": "Responsive Webentwicklung, Performance-Optimierung, technische SEO-Grundlagen, saubere Frontend-Architektur und Business-Websites, die besser ranken und mehr Besucher konvertieren.",
+        "image": "/images/img-web-dev.png"
+      },
+      {
+        "title": "App-Entwicklung",
+        "description": "Leistungsstarke Apps mit elegantem Design und reibungsloser Funktionalität.",
+        "detail": "Plattformübergreifende App-Entwicklung, mobiles UI-Design, reibungslose Onboarding-Flows, skalierbare Produkterlebnisse und benutzerfreundliche Interfaces für Android und iOS.",
+        "image": "/images/img-app-dev.png"
+      }
+    ]
+  },
+  "process": {
+    "kicker": "Prozess",
+    "title": "Ein klarer Weg von einer groben Präsenz zu einer schärferen digitalen Marke.",
+    "description": "Websites in frühen Phasen verbessern sich am schnellsten, wenn Strategie, Design, Entwicklung und SEO als ein System behandelt werden.",
+    "steps": [
+      {
+        "number": "01",
+        "title": "Positionierung klären",
+        "description": "Definieren Sie Zielgruppe, Angebot und Botschaft, damit die Seite klar spricht statt generisch zu wirken."
+      },
+      {
+        "number": "02",
+        "title": "Erlebnis formen",
+        "description": "Übersetzen Sie diese Positionierung in ein Designsystem, eine Content-Hierarchie und ein bewusstes Interaktionsmuster."
+      },
+      {
+        "number": "03",
+        "title": "Für Performance bauen",
+        "description": "Entwickeln Sie die Seite mit responsiven Layouts, sauberer Struktur und praktischen SEO-Verbesserungen von Anfang an."
+      },
+      {
+        "number": "04",
+        "title": "Mit Momentum launchen",
+        "description": "Verfeinern Sie die letzten Details, damit die Seite die richtigen Besucher anzieht, überzeugt und konvertiert."
+      }
+    ]
+  },
+  "faq": {
+    "kicker": "FAQ",
+    "title": "Fragen, die Menschen oft haben, bevor sie Kontakt aufnehmen.",
+    "description": "Diese Antworten stärken die Seite auch semantisch und geben Suchmaschinen mehr Kontext zu Ihren Leistungen.",
+    "items": [
+      {
+        "question": "Welche Arten von Projekten übernimmt The Adamant?",
+        "answer": "The Adamant konzentriert sich auf UI/UX-Design, Webentwicklung und mobile Erlebnisse für Marken, die eine stärkere digitale Präsenz und einen besseren ersten Eindruck wollen."
+      },
+      {
+        "question": "Kann die Website von Anfang an SEO-freundlich aufgebaut werden?",
+        "answer": "Ja. Starke Metadaten, crawlbare Struktur, hilfreiche Texte, interne Links und FAQ-Inhalte können früh in die Website eingebaut werden."
+      },
+      {
+        "question": "Warum ist die Struktur der Homepage so wichtig?",
+        "answer": "Die Homepage entscheidet oft darüber, ob neue Besucher weiter scrollen oder abspringen. Klare Hierarchie, fokussierte Botschaften und sichtbare nächste Schritte vermitteln den Wert schneller."
+      },
+      {
+        "question": "Beeinflusst Design Conversions genauso stark wie Entwicklung?",
+        "answer": "Ja, wenn Design die Klarheit verbessert. Besseres Layout, Tempo, Kontrast und CTA-Platzierung reduzieren Zweifel und erhöhen die Glaubwürdigkeit."
+      }
+    ]
+  },
+  "contact": {
+    "kicker": "Kontakt",
+    "title": "Erzählen Sie uns, was Sie bauen möchten.",
+    "description": "Wenn das Ziel ein stärkerer erster Eindruck, mehr Klarheit oder ein suchfreundliches Fundament ist, dann ist dies der richtige Ausgangspunkt. Teilen Sie Umfang, Zeitrahmen und Erfolgsbild mit.",
+    "highlights": [
+      {
+        "title": "Das echte Ziel teilen",
+        "description": "Sagen Sie uns, was Nutzer verstehen, fühlen oder tun sollen, wenn sie auf der Seite landen."
+      },
+      {
+        "title": "Eine fokussierte Antwort erhalten",
+        "description": "Wir können die passende Mischung aus Design, Entwicklung und SEO-Grundlagen für Ihren Umfang definieren."
+      },
+      {
+        "title": "Im Launch-Tempo vorankommen",
+        "description": "Der Prozess ist darauf ausgelegt, Momentum hoch zu halten, besonders bei frühen Websites und Produktideen."
+      }
+    ],
+    "briefTitle": "Ein besseres Briefing führt zu einer präziseren ersten Antwort.",
+    "briefDescription": "Wenn Sie diese Details schon haben, fügen Sie sie hinzu, damit die erste Antwort konkreter ausfallen kann.",
+    "briefItems": [
+      {
+        "title": "Geschäftsziel",
+        "description": "Was soll diese Seite, dieses Produkt oder dieser Launch für Sie erreichen?"
+      },
+      {
+        "title": "Launch-Zeitpunkt",
+        "description": "Teilen Sie das gewünschte Zeitfenster, damit Umfang und Tempo zusammenpassen."
+      },
+      {
+        "title": "Referenzen",
+        "description": "Links, Beispiele oder Wettbewerber helfen uns, die Richtung schneller zu verstehen."
+      }
+    ],
+    "form": {
+      "fullNameLabel": "Vollständiger Name",
+      "fullNamePlaceholder": "Rahul Patel",
+      "emailLabel": "E-Mail-Adresse",
+      "emailPlaceholder": "rahulpatel@example.com",
+      "purposeLabel": "Zweck auswählen",
+      "purposePlaceholder": "Zweck auswählen...",
+      "descriptionLabel": "Beschreibung",
+      "descriptionPlaceholder": "Erzählen Sie uns von der Seite, dem Produkt oder dem Erlebnis, an das sich Nutzer erinnern sollen.",
+      "purposeOptions": [
+        {"value": "general", "label": "Allgemeine Anfrage"},
+        {"value": "demo", "label": "Demo anfragen"},
+        {"value": "quote", "label": "Angebot / Preise"},
+        {"value": "support", "label": "Technischer Support"},
+        {"value": "partnership", "label": "Partnerschaft / Zusammenarbeit"},
+        {"value": "careers", "label": "Karrieremöglichkeiten"},
+        {"value": "feedback", "label": "Feedback / Vorschläge"},
+        {"value": "other", "label": "Sonstiges"}
+      ],
+      "submitLabel": "Projektdetails senden",
+      "submittingLabel": "Projektdetails werden gesendet...",
+      "successLabel": "Nachricht erfasst. Der Button erscheint in wenigen Sekunden wieder.",
+      "configError": "EmailJS ist noch nicht vollständig konfiguriert. Fügen Sie Template-ID und Public Key hinzu.",
+      "sendError": "Die Nachricht konnte gerade nicht gesendet werden. Bitte versuchen Sie es erneut.",
+      "successToast": "Projektdetails gesendet."
+    }
+  },
+  "footer": {
+    "description": "Designorientierte Websites, Produktinterfaces und mobile Erlebnisse, die schnell Vertrauen schaffen und die Sichtbarkeit in Suchmaschinen von Anfang an unterstützen.",
+    "sections": [
+      {
+        "title": "Navigation",
+        "links": [
+          {"name": "Start", "anchor": ""},
+          {"name": "Leistungen", "anchor": "services"},
+          {"name": "Prozess", "anchor": "process"},
+          {"name": "FAQ", "anchor": "faq"},
+          {"name": "Kontakt", "anchor": "contact"}
+        ]
+      },
+      {
+        "title": "Schwerpunkte",
+        "links": [
+          {"name": "UI/UX-Design", "anchor": "services"},
+          {"name": "Webentwicklung", "anchor": "services"},
+          {"name": "Mobile Apps", "anchor": "services"}
+        ]
+      }
+    ],
+    "copyright": "The Adamant. Alle Rechte vorbehalten.",
+    "tagline": "Entwickelt für Klarheit, Geschwindigkeit und stärkere erste Eindrücke."
+  }
+}

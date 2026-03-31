@@ -1,7 +1,10 @@
+import deCopy from "@/locales/de.json";
 import enCopy from "@/locales/en.json";
 import esCopy from "@/locales/es.json";
 import frCopy from "@/locales/fr.json";
 import hiCopy from "@/locales/hi.json";
+import jaCopy from "@/locales/ja.json";
+import ptCopy from "@/locales/pt.json";
 import {
     DEFAULT_SITE_LOCALE,
     SiteLocale,
@@ -131,6 +134,9 @@ const siteCopyMap: Record<SiteLocale, SiteCopy> = {
     hi: hiCopy as SiteCopy,
     es: esCopy as SiteCopy,
     fr: frCopy as SiteCopy,
+    de: deCopy as SiteCopy,
+    pt: ptCopy as SiteCopy,
+    ja: jaCopy as SiteCopy,
 };
 
 export function getSiteCopy(locale: SiteLocale): SiteCopy {

@@ -1,5 +1,5 @@
 export const DEFAULT_SITE_LOCALE = "en";
-export const SEO_SITE_LOCALES = ["en", "hi", "es", "fr"] as const;
+export const SEO_SITE_LOCALES = ["en", "hi", "es", "fr", "de", "pt", "ja"] as const;
 export const INDEXABLE_SITE_LOCALES = SEO_SITE_LOCALES.filter((locale) => locale !== DEFAULT_SITE_LOCALE);
 export const SITE_LOCALE_COOKIE = "site-locale";
 
@@ -16,14 +16,21 @@ export const SITE_LOCALE_OPTIONS: SiteLocaleOption[] = [
     {code: "hi", label: "Hindi", nativeLabel: "हिन्दी"},
     {code: "es", label: "Spanish", nativeLabel: "Español"},
     {code: "fr", label: "French", nativeLabel: "Français"},
+    {code: "de", label: "German", nativeLabel: "Deutsch"},
+    {code: "pt", label: "Portuguese", nativeLabel: "Português"},
+    {code: "ja", label: "Japanese", nativeLabel: "日本語"},
 ];
 
 const COUNTRY_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
+    AT: "de",
     AR: "es",
     BO: "es",
+    BR: "pt",
+    CH: "de",
     CL: "es",
     CO: "es",
     CR: "es",
+    DE: "de",
     DO: "es",
     EC: "es",
     ES: "es",
@@ -31,10 +38,12 @@ const COUNTRY_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
     GT: "es",
     HN: "es",
     IN: "hi",
+    JP: "ja",
     MX: "es",
     NI: "es",
     PA: "es",
     PE: "es",
+    PT: "pt",
     PY: "es",
     SV: "es",
     UY: "es",
@@ -42,10 +51,13 @@ const COUNTRY_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
 };
 
 const LANGUAGE_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
+    de: "de",
     en: "en",
     es: "es",
     fr: "fr",
     hi: "hi",
+    ja: "ja",
+    pt: "pt",
 };
 
 export function isSiteLocale(value: string): value is SiteLocale {
@@ -60,6 +72,12 @@ export function localeToHtmlLang(locale: SiteLocale) {
             return "es";
         case "fr":
             return "fr";
+        case "de":
+            return "de";
+        case "pt":
+            return "pt";
+        case "ja":
+            return "ja";
         default:
             return "en";
     }
@@ -120,6 +138,9 @@ export function getLanguageAlternates() {
         hi: "/hi",
         es: "/es",
         fr: "/fr",
+        de: "/de",
+        pt: "/pt",
+        ja: "/ja",
         "x-default": "/",
     };
 }
