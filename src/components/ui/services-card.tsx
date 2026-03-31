@@ -8,10 +8,9 @@ interface ServiceCardProps {
     title: string;
     description: string;
     image: string;
-    techStack?: { icon: string; label: string, isBlackLogo: boolean }[];
 }
 
-export function ServiceCard({title, description, image, techStack = []}: ServiceCardProps) {
+export function ServiceCard({title, description, image}: ServiceCardProps) {
     return (
         <CardContainer className="inter-var h-full w-full" containerClassName="w-full py-0">
             <CardBody
@@ -44,43 +43,6 @@ export function ServiceCard({title, description, image, techStack = []}: Service
                 >
                     {description}
                 </CardItem>
-
-                {techStack.length > 0 && (
-                    <CardItem
-                        translateZ="40"
-                        className="mt-6 flex w-full flex-wrap gap-3"
-                    >
-                        {techStack.map((tech, index) => (
-                            <div
-                                key={index}
-                                className="flex items-center gap-2 rounded-full border border-black/8 bg-white/90 px-3 py-1.5 shadow-sm dark:border-white/10 dark:bg-neutral-900/80"
-                            >
-                                <div className="relative w-6 h-6">
-                                    {tech.isBlackLogo ? (
-                                        <Image
-                                            src={tech.icon}
-                                            alt={tech.label}
-                                            fill
-                                            className="object-contain dark:invert dark:brightness-200"
-                                        />
-                                    ) : (
-                                        <Image
-                                            src={tech.icon}
-                                            alt={tech.label}
-                                            fill
-                                            className="object-contain"
-                                        />
-                                    )}
-                                </div>
-
-                                <span className="text-sm font-medium text-foreground/75 dark:text-neutral-300">
-                                    {tech.label}
-                                </span>
-                            </div>
-                        ))}
-                    </CardItem>
-                )}
-
             </CardBody>
 
         </CardContainer>
