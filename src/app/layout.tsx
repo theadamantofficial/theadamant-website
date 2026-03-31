@@ -1,26 +1,70 @@
 import type {Metadata} from "next";
 import "../styles/globals.css";
 import {ReactNode} from "react";
-import {Open_Sans} from 'next/font/google';
+import {Manrope, Space_Grotesk} from "next/font/google";
 import {Toaster} from "react-hot-toast";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+
 export const metadata: Metadata = {
-    title: "The Adamant",
-    description: "Firm in Vision. Bold in Action",
+    title: {
+        default: "The Adamant | Digital Product Design and Development",
+        template: "%s | The Adamant",
+    },
+    description: "The Adamant designs websites, product interfaces, and mobile experiences built to look sharp, load fast, and support SEO from day one.",
+    applicationName: "The Adamant",
+    authors: [{name: "The Adamant"}],
+    creator: "The Adamant",
+    publisher: "The Adamant",
+    keywords: [
+        "web design",
+        "website development",
+        "SEO-friendly websites",
+        "UI UX design",
+        "mobile app development",
+        "digital product studio",
+    ],
+    robots: {
+        index: true,
+        follow: true,
+    },
+    openGraph: {
+        title: "The Adamant | Digital Product Design and Development",
+        description: "Design-forward websites, UX systems, and mobile experiences with clear messaging, fast performance, and SEO-ready structure.",
+        type: "website",
+        siteName: "The Adamant",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "The Adamant | Digital Product Design and Development",
+        description: "Design-forward websites, UX systems, and mobile experiences with clear messaging, fast performance, and SEO-ready structure.",
+    },
+    ...(siteUrl
+        ? {
+            metadataBase: new URL(siteUrl),
+            alternates: {
+                canonical: "/",
+            },
+        }
+        : {}),
 };
 
-const openSans = Open_Sans({
-    subsets: ['latin'],
-    weight: ['400', '700'],
-    fallback: ['Arial', 'sans-serif'],
+const manrope = Manrope({
+    subsets: ["latin"],
+    variable: "--font-sans",
+});
+
+const spaceGrotesk = Space_Grotesk({
+    subsets: ["latin"],
+    variable: "--font-display",
 });
 
 export default function RootLayout({children}: Readonly<{
     children: ReactNode;
 }>) {
     return (
-        <html lang="en">
-        <body className={openSans.className}>
+        <html lang="en" suppressHydrationWarning>
+        <body className={`${manrope.variable} ${spaceGrotesk.variable}`}>
 
         <Toaster
             position="top-right"

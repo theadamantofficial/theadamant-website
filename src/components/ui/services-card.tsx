@@ -15,11 +15,17 @@ export function ServiceCard({title, description, image, techStack = []}: Service
     return (
         <CardContainer className="inter-var h-full">
             <CardBody
-                className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-full h-full rounded-xl p-6 border  ">
+                className="relative flex h-full w-full flex-col overflow-hidden rounded-[2rem] border border-black/[0.08] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,230,0.88))] p-6 shadow-[0_35px_80px_-45px_rgba(15,23,42,0.45)] dark:border-white/[0.12] dark:bg-[linear-gradient(180deg,rgba(18,19,20,0.96),rgba(21,24,26,0.86))]">
+                <CardItem
+                    translateZ="40"
+                    as="p"
+                    className="text-xs font-semibold uppercase tracking-[0.24em] text-foreground/45"
+                >
+                    Service
+                </CardItem>
 
-                {/* Image */}
                 <CardItem translateZ="100" className="w-full">
-                    <div className="relative w-full h-60">
+                    <div className="relative mt-4 h-60 w-full overflow-hidden rounded-[1.5rem] border border-black/6 dark:border-white/8">
                         <Image
                             src={image}
                             alt={title}
@@ -32,33 +38,30 @@ export function ServiceCard({title, description, image, techStack = []}: Service
                     </div>
                 </CardItem>
 
-                {/* Title */}
                 <CardItem
                     translateZ="80"
-                    className="w-full text-center text-xl font-bold mt-4 text-neutral-600 dark:text-white"
+                    className="mt-6 w-full text-2xl font-semibold tracking-tight text-foreground"
                 >
                     {title}
                 </CardItem>
 
-                {/* Description */}
                 <CardItem
                     as="p"
                     translateZ="60"
-                    className="text-neutral-500 text-sm max-w-sm mt-2 dark:text-neutral-300"
+                    className="mt-3 max-w-sm flex-1 text-sm leading-6 text-foreground/68"
                 >
                     {description}
                 </CardItem>
 
-                {/* Tech Stack */}
                 {techStack.length > 0 && (
                     <CardItem
                         translateZ="40"
-                        className="flex flex-wrap w-full justify-center gap-4 mt-6"
+                        className="mt-6 flex w-full flex-wrap gap-3"
                     >
                         {techStack.map((tech, index) => (
                             <div
                                 key={index}
-                                className="flex items-center gap-2 px-3 py-1 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-sm"
+                                className="flex items-center gap-2 rounded-full border border-black/8 bg-white/90 px-3 py-1.5 shadow-sm dark:border-white/10 dark:bg-neutral-900/80"
                             >
                                 <div className="relative w-6 h-6">
                                     {tech.isBlackLogo ? (
@@ -78,7 +81,7 @@ export function ServiceCard({title, description, image, techStack = []}: Service
                                     )}
                                 </div>
 
-                                <span className="text-sm font-medium text-neutral-600 dark:text-neutral-300">
+                                <span className="text-sm font-medium text-foreground/75 dark:text-neutral-300">
                                     {tech.label}
                                 </span>
                             </div>
