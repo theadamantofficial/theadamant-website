@@ -96,10 +96,12 @@ export function Navbar() {
                     <button
                         type="button"
                         aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-                        className="feature-chip h-11 w-11 p-0"
+                        className="theme-toggle"
                         onClick={toggleTheme}
                     >
-                        {isDarkMode ? <IconSun size={24}/> : <IconMoon size={24}/>}
+                        {isDarkMode
+                            ? <IconSun className="theme-toggle-icon" stroke={1.8}/>
+                            : <IconMoon className="theme-toggle-icon" stroke={1.8}/>}
                     </button>
 
                     <Link href="#contact" className="button-primary px-4 py-2.5 text-sm">
@@ -134,10 +136,12 @@ export function Navbar() {
                     <button
                         type="button"
                         aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-                        className="feature-chip"
+                        className="feature-chip justify-start"
                         onClick={toggleTheme}
                     >
-                        {isDarkMode ? <IconSun size={24}/> : <IconMoon size={24}/>}
+                        {isDarkMode
+                            ? <IconSun className="theme-toggle-icon" stroke={1.8}/>
+                            : <IconMoon className="theme-toggle-icon" stroke={1.8}/>}
                         <span>{isDarkMode ? "Light mode" : "Dark mode"}</span>
                     </button>
                     <Link
