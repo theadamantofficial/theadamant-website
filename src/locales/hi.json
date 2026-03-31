@@ -1,0 +1,233 @@
+{
+  "locale": "hi",
+  "dir": "ltr",
+  "metadata": {
+    "title": "The Adamant | वेबसाइट डिज़ाइन, डेवलपमेंट और SEO",
+    "description": "The Adamant प्रीमियम वेबसाइट, UX सिस्टम और मोबाइल अनुभव बनाता है जो मजबूत पहली छाप, बेहतर संदेश और SEO-ready संरचना देते हैं।"
+  },
+  "schema": {
+    "organizationDescription": "The Adamant वेबसाइट, प्रोडक्ट इंटरफेस और मोबाइल अनुभव बनाता है जिनमें साफ संदेश, तेज प्रदर्शन और SEO-ready foundations होती हैं।"
+  },
+  "navbar": {
+    "navItems": [
+      {"name": "सेवाएँ", "anchor": "services"},
+      {"name": "प्रक्रिया", "anchor": "process"},
+      {"name": "FAQ", "anchor": "faq"},
+      {"name": "संपर्क", "anchor": "contact"}
+    ],
+    "startProject": "प्रोजेक्ट शुरू करें",
+    "lightMode": "लाइट मोड",
+    "darkMode": "डार्क मोड",
+    "languageAriaLabel": "वेबसाइट भाषा बदलें"
+  },
+  "hero": {
+    "kicker": "डिज़ाइन, डेवलपमेंट और SEO-ready संरचना",
+    "title": "पहली स्क्रीन को नज़रअंदाज़ करना मुश्किल बनाइए।",
+    "description": "The Adamant ऐसी वेबसाइट, UX सिस्टम और मोबाइल अनुभव बनाता है जो प्रीमियम दिखें, आपकी पेशकश को साफ़ तरीके से समझाएँ और search engines को पहले दिन से सही संरचना दें।",
+    "primaryCta": "अपना प्रोजेक्ट शुरू करें",
+    "secondaryCta": "सेवाएँ देखें",
+    "positioningPoints": [
+      "स्पष्ट संदेश जो कुछ सेकंड में value समझा दे",
+      "Semantic structure जो search engines को पेज समझने में मदद करे",
+      "Responsive layouts जो हर डिवाइस पर polished महसूस हों"
+    ],
+    "previewEyebrowLeft": "लॉन्च के लिए तैयार डिजिटल प्रेज़ेंस",
+    "previewEyebrowRight": "रणनीति से शिपिंग तक",
+    "floatingBadges": ["आधुनिक motion", "Search-ready", "Conversion-led"],
+    "featureCards": [
+      {
+        "title": "Attention-first design",
+        "description": "Hierarchy, contrast और motion जो नज़र को जल्दी guide करें।"
+      },
+      {
+        "title": "SEO foundations",
+        "description": "Metadata, semantic sections और search-friendly copy."
+      },
+      {
+        "title": "तेज़ execution",
+        "description": "बिना भारी layouts या vague messaging के launch momentum."
+      }
+    ]
+  },
+  "valueProps": {
+    "kicker": "यह क्यों काम करता है",
+    "title": "एक बेहतर homepage सिर्फ अच्छा दिखना ही नहीं चाहिए।",
+    "description": "उसे attention guide करनी चाहिए, value जल्दी समझानी चाहिए और इतना trust बनाना चाहिए कि नया visitor पेज पर बना रहे। यही सुधार यहाँ केंद्र में हैं।",
+    "items": [
+      {
+        "title": "ध्यान जल्दी खींचें",
+        "description": "मज़बूत hierarchy, साफ copy और purposeful visuals visitors को offer तुरंत समझने में मदद करते हैं।"
+      },
+      {
+        "title": "SEO को नींव में जोड़ें",
+        "description": "Semantic sections, बेहतर metadata, FAQ content और keyword-rich copy search visibility को शुरुआत से support करते हैं।"
+      },
+      {
+        "title": "पहली call से पहले trust बनाएँ",
+        "description": "पेज को अधिक credible और premium बनाइए ताकि लोग scroll करें, click करें और inquiry भेजें।"
+      }
+    ]
+  },
+  "services": {
+    "kicker": "सेवाएँ",
+    "title": "डिज़ाइन और डेवलपमेंट सेवाएँ जो interest को action में बदलें।",
+    "description": "UI/UX design, SEO-friendly website development और mobile app delivery के साथ हर service आपकी brand presence को तेज़ और credible बनाने के लिए shape की जाती है।",
+    "chips": ["Landing pages", "Marketing websites", "Product interfaces", "Cross-platform mobile apps"],
+    "items": [
+      {
+        "title": "UI/UX डिज़ाइन",
+        "description": "साफ, आधुनिक और user-friendly designs जो engagement और conversion बढ़ाएँ।",
+        "detail": "Landing page design, website redesign, responsive interface design, wireframes, user journeys और conversion-focused layouts जो trust, engagement और lead generation बेहतर करें।",
+        "image": "/images/img-ui-ux-design.png"
+      },
+      {
+        "title": "वेबसाइट डेवलपमेंट",
+        "description": "तेज़, scalable और SEO-friendly websites जो आपके business के लिए tailored हों।",
+        "detail": "Responsive website development, performance optimization, technical SEO foundations, clean front-end architecture और business websites जो बेहतर rank करें और ज़्यादा visitors convert करें।",
+        "image": "/images/img-web-dev.png"
+      },
+      {
+        "title": "मोबाइल ऐप डेवलपमेंट",
+        "description": "स्लीक design और seamless functionality के साथ high-performance apps.",
+        "detail": "Cross-platform mobile app development, mobile app UI design, smooth onboarding flows, scalable product experiences और user-friendly app interfaces for Android and iOS growth.",
+        "image": "/images/img-app-dev.png"
+      }
+    ]
+  },
+  "process": {
+    "kicker": "प्रक्रिया",
+    "title": "एक simple path जो rough presence को sharper digital brand में बदलता है।",
+    "description": "Early-stage websites सबसे तेज़ तब improve होती हैं जब strategy, design, development और SEO को एक ही system की तरह handle किया जाए।",
+    "steps": [
+      {
+        "number": "01",
+        "title": "Positioning स्पष्ट करें",
+        "description": "Audience, offer और message define करें ताकि पेज generic न लगे बल्कि साफ़ बोले।"
+      },
+      {
+        "number": "02",
+        "title": "Experience shape करें",
+        "description": "उस positioning को design system, content hierarchy और interaction pattern में बदलें जो deliberate महसूस हो।"
+      },
+      {
+        "number": "03",
+        "title": "Performance के लिए build करें",
+        "description": "Responsive layouts, cleaner structure और practical SEO improvements के साथ site develop करें।"
+      },
+      {
+        "number": "04",
+        "title": "Momentum के साथ launch करें",
+        "description": "Final touchpoints refine करें ताकि पेज सही visitors को attract, persuade और convert कर सके।"
+      }
+    ]
+  },
+  "faq": {
+    "kicker": "FAQ",
+    "title": "वे सवाल जो लोग संपर्क करने से पहले अक्सर पूछते हैं।",
+    "description": "ये answers search engines को आपकी services और page intent के बारे में clearer context भी देते हैं।",
+    "items": [
+      {
+        "question": "The Adamant किस तरह के projects handle करता है?",
+        "answer": "The Adamant UI/UX design, website development और mobile app experiences पर काम करता है, खासकर उन brands के लिए जो sharper digital presence और stronger first impression चाहते हैं।"
+      },
+      {
+        "question": "क्या वेबसाइट को शुरुआत से ही SEO-friendly बनाया जा सकता है?",
+        "answer": "हाँ। Strong metadata, crawlable structure, useful supporting copy, internal anchors और FAQ content को शुरुआत से build किया जा सकता है।"
+      },
+      {
+        "question": "Homepage structure इतना महत्वपूर्ण क्यों है?",
+        "answer": "Homepage अक्सर तय करता है कि visitor आगे scroll करेगा या नहीं। Clear hierarchy, focused messaging और visible next steps value को जल्दी समझाते हैं।"
+      },
+      {
+        "question": "क्या design conversions पर development जितना असर डालता है?",
+        "answer": "हाँ, जब design clarity बढ़ाता है। बेहतर layout, pacing, contrast और CTA placement hesitation कम करते हैं और credibility बढ़ाते हैं।"
+      }
+    ]
+  },
+  "contact": {
+    "kicker": "संपर्क",
+    "title": "बताइए आप क्या बनाना चाहते हैं।",
+    "description": "अगर आपका लक्ष्य बेहतर first impression, ज़्यादा clarity या search-friendly foundation बनाना है, तो यहीं से शुरुआत करें। अपना scope, timeline और success की definition साझा करें।",
+    "highlights": [
+      {
+        "title": "असल goal बताइए",
+        "description": "बताइए कि users को landing के बाद क्या समझना, महसूस करना या करना चाहिए।"
+      },
+      {
+        "title": "Focused reply पाएँ",
+        "description": "हम आपके scope के लिए सही design, development और SEO mix shape कर सकते हैं।"
+      },
+      {
+        "title": "Launch speed पर चलें",
+        "description": "यह process momentum बनाए रखने के लिए है, खासकर early-stage websites और product ideas के लिए।"
+      }
+    ],
+    "briefTitle": "बेहतर brief से पहली reply और sharp होती है।",
+    "briefDescription": "अगर ये details आपके पास हैं, तो उन्हें शामिल करें ताकि पहला जवाब ज़्यादा specific हो।",
+    "briefItems": [
+      {
+        "title": "Business goal",
+        "description": "यह page, product या launch आपके लिए क्या हासिल करे?"
+      },
+      {
+        "title": "Launch timing",
+        "description": "Target window बताइए ताकि scope उसी pace के अनुसार तय हो।"
+      },
+      {
+        "title": "References",
+        "description": "Links, examples या competitors direction जल्दी समझने में मदद करते हैं।"
+      }
+    ],
+    "form": {
+      "fullNameLabel": "पूरा नाम",
+      "fullNamePlaceholder": "राहुल पटेल",
+      "emailLabel": "ईमेल पता",
+      "emailPlaceholder": "rahulpatel@example.com",
+      "purposeLabel": "उद्देश्य चुनें",
+      "purposePlaceholder": "उद्देश्य चुनें...",
+      "descriptionLabel": "विवरण",
+      "descriptionPlaceholder": "उस page, product या experience के बारे में बताइए जिसे आप चाहते हैं कि users याद रखें।",
+      "purposeOptions": [
+        {"value": "general", "label": "सामान्य पूछताछ"},
+        {"value": "demo", "label": "डेमो का अनुरोध"},
+        {"value": "quote", "label": "कोट / प्राइसिंग"},
+        {"value": "support", "label": "तकनीकी सहायता"},
+        {"value": "partnership", "label": "पार्टनरशिप / सहयोग"},
+        {"value": "careers", "label": "कैरियर अवसर"},
+        {"value": "feedback", "label": "फ़ीडबैक / सुझाव"},
+        {"value": "other", "label": "अन्य"}
+      ],
+      "submitLabel": "प्रोजेक्ट विवरण भेजें",
+      "submittingLabel": "प्रोजेक्ट विवरण भेजे जा रहे हैं...",
+      "successLabel": "संदेश दर्ज हो गया है। बटन कुछ सेकंड में वापस आ जाएगा।",
+      "configError": "EmailJS अभी पूरी तरह configured नहीं है। आगे बढ़ने के लिए template ID और public key जोड़ें।",
+      "sendError": "अभी संदेश भेजा नहीं जा सका। कृपया फिर से कोशिश करें।",
+      "successToast": "प्रोजेक्ट विवरण भेज दिया गया।"
+    }
+  },
+  "footer": {
+    "description": "Design-forward websites, product interfaces और mobile experiences जो जल्दी trust बनाते हैं और शुरुआत से search visibility support करते हैं।",
+    "sections": [
+      {
+        "title": "नेविगेट करें",
+        "links": [
+          {"name": "होम", "anchor": ""},
+          {"name": "सेवाएँ", "anchor": "services"},
+          {"name": "प्रक्रिया", "anchor": "process"},
+          {"name": "FAQ", "anchor": "faq"},
+          {"name": "संपर्क", "anchor": "contact"}
+        ]
+      },
+      {
+        "title": "फोकस क्षेत्र",
+        "links": [
+          {"name": "UI/UX डिज़ाइन", "anchor": "services"},
+          {"name": "वेबसाइट डेवलपमेंट", "anchor": "services"},
+          {"name": "मोबाइल ऐप्स", "anchor": "services"}
+        ]
+      }
+    ],
+    "copyright": "The Adamant. सर्वाधिकार सुरक्षित।",
+    "tagline": "Clarity, speed और stronger first impressions के लिए designed."
+  }
+}
