@@ -111,33 +111,35 @@ export default function ContactUsSection() {
     return (
         <section id="contact" className="section-shell pb-24 pt-10" aria-labelledby="contact-heading">
             <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-                <Reveal className="glass-panel flex h-full flex-col overflow-hidden p-8 sm:p-10">
-                    <p className="section-kicker">Contact</p>
-                    <h2 id="contact-heading" className="section-title">
-                        Tell us what you want to build.
-                    </h2>
+                <Reveal className="glass-panel flex h-full flex-col justify-between gap-8 overflow-hidden p-8 sm:p-10">
+                    <div>
+                        <p className="section-kicker">Contact</p>
+                        <h2 id="contact-heading" className="section-title">
+                            Tell us what you want to build.
+                        </h2>
 
-                    <p className="section-copy">
-                        If the goal is to make a stronger first impression, improve clarity, or build a search-friendly foundation, this is the right place to start. Share your scope, timeline, and what success should look like.
-                    </p>
+                        <p className="section-copy">
+                            If the goal is to make a stronger first impression, improve clarity, or build a search-friendly foundation, this is the right place to start. Share your scope, timeline, and what success should look like.
+                        </p>
 
-                    <StaggerGroup className="mt-8 grid gap-4 md:grid-cols-2">
-                        {contactHighlights.map(({title, description, icon: Icon}, index) => (
-                            <StaggerItem key={title} className={index === contactHighlights.length - 1 ? "md:col-span-2" : ""}>
-                                <div className="lift-card rounded-[1.5rem] border border-black/8 bg-white/70 p-4 dark:border-white/10 dark:bg-white/5">
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background">
-                                            <Icon className="h-5 w-5"/>
+                        <StaggerGroup className="mt-8 grid gap-4 md:grid-cols-2">
+                            {contactHighlights.map(({title, description, icon: Icon}, index) => (
+                                <StaggerItem key={title} className={index === contactHighlights.length - 1 ? "md:col-span-2" : ""}>
+                                    <div className="lift-card rounded-[1.5rem] border border-black/8 bg-white/70 p-4 dark:border-white/10 dark:bg-white/5">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background">
+                                                <Icon className="h-5 w-5"/>
+                                            </div>
+                                            <p className="font-semibold text-foreground">{title}</p>
                                         </div>
-                                        <p className="font-semibold text-foreground">{title}</p>
+                                        <p className="mt-3 text-sm leading-6 text-foreground/68">{description}</p>
                                     </div>
-                                    <p className="mt-3 text-sm leading-6 text-foreground/68">{description}</p>
-                                </div>
-                            </StaggerItem>
-                        ))}
-                    </StaggerGroup>
+                                </StaggerItem>
+                            ))}
+                        </StaggerGroup>
+                    </div>
 
-                    <div className="mt-auto overflow-hidden rounded-[1.75rem] border border-black/8 bg-[#edf4f1] pt-6 dark:border-white/10 dark:bg-[#122326]">
+                    <div className="overflow-hidden rounded-[1.75rem] border border-black/8 bg-[#edf4f1] pt-6 dark:border-white/10 dark:bg-[#122326]">
                         <Image
                             src="/images/img-contact-us-light.png"
                             alt="Illustration representing contact and project planning"
