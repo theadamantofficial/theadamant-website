@@ -1,4 +1,5 @@
 import {Compass, PencilRuler, Code2, Rocket} from "lucide-react";
+import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 
 const steps = [
     {
@@ -30,7 +31,7 @@ const steps = [
 export default function ProcessSection() {
     return (
         <section id="process" className="section-shell py-24" aria-labelledby="process-heading">
-            <div className="max-w-3xl">
+            <Reveal className="max-w-3xl">
                 <p className="section-kicker">Process</p>
                 <h2 id="process-heading" className="section-title">
                     A simple path from rough presence to a sharper digital brand.
@@ -38,11 +39,12 @@ export default function ProcessSection() {
                 <p className="section-copy">
                     Early-stage websites improve fastest when strategy, design, development, and SEO are treated as one system instead of separate tasks.
                 </p>
-            </div>
+            </Reveal>
 
-            <div className="mt-10 grid gap-4 lg:grid-cols-4">
+            <StaggerGroup className="mt-10 grid gap-4 lg:grid-cols-4">
                 {steps.map(({number, title, description, icon: Icon}) => (
-                    <article key={number} className="glass-panel p-6">
+                    <StaggerItem key={number}>
+                        <article className="glass-panel lift-card p-6">
                         <div className="flex items-center justify-between">
                             <span className="text-sm font-semibold tracking-[0.24em] text-foreground/45">{number}</span>
                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background">
@@ -52,9 +54,10 @@ export default function ProcessSection() {
 
                         <h3 className="mt-8 text-xl font-semibold tracking-tight text-foreground">{title}</h3>
                         <p className="mt-3 text-sm leading-6 text-foreground/68">{description}</p>
-                    </article>
+                        </article>
+                    </StaggerItem>
                 ))}
-            </div>
+            </StaggerGroup>
         </section>
     );
 }

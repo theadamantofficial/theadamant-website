@@ -158,6 +158,33 @@
     .animate-float {
         animation: float 6s ease-in-out infinite;
     }
+
+    @keyframes drift {
+        0%, 100% {
+            transform: translate3d(0, 0, 0);
+        }
+        50% {
+            transform: translate3d(0, -12px, 0);
+        }
+    }
+
+    @keyframes chipBob {
+        0%, 100% {
+            transform: translate3d(0, 0, 0);
+        }
+        50% {
+            transform: translate3d(0, -4px, 0);
+        }
+    }
+
+    @keyframes rotateHalo {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
 }
 
 @layer components {
@@ -188,6 +215,10 @@
         @apply inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-white/5;
     }
 
+    .feature-chip-animated {
+        animation: chipBob 4.8s ease-in-out infinite;
+    }
+
     .button-primary {
         @apply inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-background transition duration-200 hover:-translate-y-0.5 hover:shadow-lg;
     }
@@ -202,6 +233,66 @@
 
     .theme-toggle-icon {
         @apply h-5 w-5;
+    }
+
+    .ambient-orb {
+        @apply pointer-events-none absolute rounded-full blur-3xl;
+        background: radial-gradient(circle, rgba(13, 92, 99, 0.24) 0%, rgba(13, 92, 99, 0) 70%);
+        animation: drift 10s ease-in-out infinite;
+    }
+
+    .ambient-orb-left {
+        @apply left-[-5rem] top-24 h-56 w-56;
+    }
+
+    .ambient-orb-right {
+        @apply bottom-20 right-[-3rem] h-64 w-64;
+        background: radial-gradient(circle, rgba(214, 106, 69, 0.2) 0%, rgba(214, 106, 69, 0) 70%);
+    }
+
+    .lift-card {
+        @apply transition duration-300 hover:-translate-y-1 hover:shadow-[0_35px_70px_-50px_rgba(15,23,42,0.55)];
+    }
+
+    .hero-preview-panel {
+        @apply rounded-[2rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(246,239,229,0.7))] shadow-[0_40px_90px_-55px_rgba(15,23,42,0.5)] backdrop-blur-xl dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(13,16,18,0.92),rgba(8,11,13,0.84))];
+    }
+
+    .hero-visual-shell {
+        @apply relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-[radial-gradient(circle_at_top,rgba(13,92,99,0.18),transparent_55%),linear-gradient(180deg,rgba(215,237,232,0.86),rgba(194,225,221,0.66))] dark:border-[#274247] dark:bg-[radial-gradient(circle_at_top,rgba(88,183,179,0.16),transparent_48%),linear-gradient(180deg,rgba(11,24,27,0.98),rgba(11,21,24,0.9))];
+    }
+
+    .hero-visual-grid {
+        @apply absolute inset-0 opacity-45;
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+        background-size: 44px 44px;
+        mask-image: radial-gradient(circle at center, black 42%, transparent 88%);
+    }
+
+    .hero-visual-glow {
+        @apply pointer-events-none absolute inset-x-16 top-10 h-40 rounded-full blur-3xl;
+        background: radial-gradient(circle, rgba(88, 183, 179, 0.35) 0%, rgba(88, 183, 179, 0) 72%);
+    }
+
+    .hero-visual-ring {
+        @apply pointer-events-none absolute inset-[14%] rounded-full opacity-55;
+        background: conic-gradient(from 120deg, rgba(88, 183, 179, 0) 0deg, rgba(88, 183, 179, 0.55) 110deg, rgba(238, 141, 108, 0.45) 210deg, rgba(88, 183, 179, 0) 360deg);
+        mask: radial-gradient(farthest-side, transparent calc(100% - 2px), black calc(100% - 1px));
+        animation: rotateHalo 18s linear infinite;
+    }
+
+    .hero-floating-chip {
+        @apply absolute z-20 rounded-full border border-white/12 bg-black/35 px-3 py-2 text-xs font-semibold tracking-[0.18em] text-white/80 uppercase shadow-lg backdrop-blur-md;
+    }
+
+    .hero-mini-card {
+        @apply rounded-[1.4rem] border border-black/8 bg-white/74 p-4 dark:border-white/10 dark:bg-white/[0.04];
+    }
+
+    .hero-mini-card p:first-of-type {
+        @apply mt-4;
     }
 
     .cursor-default {
