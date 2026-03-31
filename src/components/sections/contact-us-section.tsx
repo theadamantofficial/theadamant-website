@@ -8,6 +8,7 @@ import Image from "next/image";
 import {Dropdown} from "@/components/ui/dropdown";
 import {Textarea} from "@/components/ui/text-area";
 import {CheckCircle2, Clock3, Mail, MessageSquareText} from "lucide-react";
+import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 
 export default function ContactUsSection() {
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -39,7 +40,7 @@ export default function ContactUsSection() {
     return (
         <section id="contact" className="section-shell pb-24 pt-10" aria-labelledby="contact-heading">
             <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-                <div className="glass-panel overflow-hidden p-8 sm:p-10">
+                <Reveal className="glass-panel overflow-hidden p-8 sm:p-10">
                     <p className="section-kicker">Contact</p>
                     <h2 id="contact-heading" className="section-title">
                         Tell us what you want to build.
@@ -49,19 +50,21 @@ export default function ContactUsSection() {
                         If the goal is to make a stronger first impression, improve clarity, or build a search-friendly foundation, this is the right place to start. Share your scope, timeline, and what success should look like.
                     </p>
 
-                    <div className="mt-8 grid gap-4">
+                    <StaggerGroup className="mt-8 grid gap-4">
                         {contactHighlights.map(({title, description, icon: Icon}) => (
-                            <div key={title} className="rounded-[1.5rem] border border-black/8 bg-white/70 p-4 dark:border-white/10 dark:bg-white/5">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background">
-                                        <Icon className="h-5 w-5"/>
+                            <StaggerItem key={title}>
+                                <div className="lift-card rounded-[1.5rem] border border-black/8 bg-white/70 p-4 dark:border-white/10 dark:bg-white/5">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background">
+                                            <Icon className="h-5 w-5"/>
+                                        </div>
+                                        <p className="font-semibold text-foreground">{title}</p>
                                     </div>
-                                    <p className="font-semibold text-foreground">{title}</p>
+                                    <p className="mt-3 text-sm leading-6 text-foreground/68">{description}</p>
                                 </div>
-                                <p className="mt-3 text-sm leading-6 text-foreground/68">{description}</p>
-                            </div>
+                            </StaggerItem>
                         ))}
-                    </div>
+                    </StaggerGroup>
 
                     <div className="mt-8 overflow-hidden rounded-[1.75rem] border border-black/8 bg-[#edf4f1] dark:border-white/10 dark:bg-[#122326]">
                         <Image
@@ -79,9 +82,9 @@ export default function ContactUsSection() {
                             height={520}
                         />
                     </div>
-                </div>
+                </Reveal>
 
-                <div className="glass-panel p-2 sm:p-3">
+                <Reveal className="glass-panel p-2 sm:p-3" delay={0.12}>
                     <form className="flex h-full flex-col gap-8 rounded-[1.7rem] bg-white/88 px-6 py-8 dark:bg-zinc-950/90 lg:px-8 lg:py-10"
                           onSubmit={handleSubmit}>
                         <LabelInputContainer>
@@ -138,7 +141,7 @@ export default function ContactUsSection() {
                             </button>
                         )}
                     </form>
-                </div>
+                </Reveal>
             </div>
         </section>
     );

@@ -1,6 +1,7 @@
 "use client";
 
 import {ServiceCard} from "@/components/ui/services-card";
+import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 
 export default function ServicesSection() {
     const services = [
@@ -35,7 +36,7 @@ export default function ServicesSection() {
 
     return (
         <section id="services" className="section-shell py-24" aria-labelledby="services-heading">
-            <div className="max-w-3xl">
+            <Reveal className="max-w-3xl">
                 <p className="section-kicker">Services</p>
                 <h2 id="services-heading" className="section-title">
                     Design and development services built to convert interest into action.
@@ -46,24 +47,25 @@ export default function ServicesSection() {
                 </p>
 
                 <div className="mt-6 flex flex-wrap gap-3">
-                    <span className="feature-chip">Landing pages</span>
-                    <span className="feature-chip">Marketing websites</span>
-                    <span className="feature-chip">Product interfaces</span>
-                    <span className="feature-chip">Cross-platform mobile apps</span>
+                    <span className="feature-chip feature-chip-animated">Landing pages</span>
+                    <span className="feature-chip feature-chip-animated">Marketing websites</span>
+                    <span className="feature-chip feature-chip-animated">Product interfaces</span>
+                    <span className="feature-chip feature-chip-animated">Cross-platform mobile apps</span>
                 </div>
-            </div>
+            </Reveal>
 
-            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <StaggerGroup className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {services.map((service) => (
-                    <ServiceCard
-                        key={service.title}
-                        title={service.title}
-                        description={service.description}
-                        image={service.image}
-                        techStack={service.techStack}
-                    />
+                    <StaggerItem key={service.title}>
+                        <ServiceCard
+                            title={service.title}
+                            description={service.description}
+                            image={service.image}
+                            techStack={service.techStack}
+                        />
+                    </StaggerItem>
                 ))}
-            </div>
+            </StaggerGroup>
         </section>
     );
 }
