@@ -3,7 +3,7 @@
 import {BackgroundRippleEffect} from "@/components/ui/background-ripple-effect";
 import {DotLottieReact} from "@lottiefiles/dotlottie-react";
 import Link from "next/link";
-import {ArrowRight, Sparkles} from "lucide-react";
+import {ArrowRight, LayoutTemplate, Search, Sparkles, Zap} from "lucide-react";
 import {motion} from "motion/react";
 
 const smoothEase = [0.22, 1, 0.36, 1] as const;
@@ -18,15 +18,36 @@ export default function HeroSection() {
     const featureCards = [
         {
             title: "Attention-first design",
-            description: "Strong hierarchy, sharp copy, and confident visuals that pull users deeper into the page.",
+            description: "Hierarchy, contrast, and motion that guide the eye fast.",
+            icon: LayoutTemplate,
         },
         {
             title: "SEO foundations",
-            description: "Metadata, crawlable headings, FAQ content, and keyword-rich sections baked in from the start.",
+            description: "Metadata, semantic sections, and search-readable copy.",
+            icon: Search,
         },
         {
             title: "Fast-moving execution",
-            description: "From concept to launch-ready build without bloated layouts or vague messaging.",
+            description: "Launch momentum without bloated layouts or vague messaging.",
+            icon: Zap,
+        },
+    ];
+
+    const floatingBadges = [
+        {
+            label: "Modern motion",
+            className: "-left-3 top-6 hidden md:flex",
+            animation: {y: [0, -8, 0], x: [0, 5, 0]},
+        },
+        {
+            label: "Search-ready",
+            className: "right-4 top-5 hidden sm:flex",
+            animation: {y: [0, 8, 0], x: [0, -4, 0]},
+        },
+        {
+            label: "Conversion-led",
+            className: "bottom-5 left-5 hidden lg:flex",
+            animation: {y: [0, -10, 0]},
         },
     ];
 
@@ -112,7 +133,7 @@ export default function HeroSection() {
                 transition={{duration: 0.85, delay: 0.2, ease: smoothEase}}
             >
                 <motion.div
-                    className="glass-panel relative overflow-hidden p-5 sm:p-6"
+                    className="hero-preview-panel relative overflow-hidden p-5 sm:p-6"
                     whileHover={{y: -6}}
                     transition={{duration: 0.3, ease: "easeOut"}}
                 >
@@ -128,28 +149,48 @@ export default function HeroSection() {
                         <span>Strategy to shipping</span>
                     </div>
 
-                    <div className="mt-6 overflow-hidden rounded-[1.75rem] border border-black/10 bg-[#d7ede8]/70 dark:border-white/10 dark:bg-[#103233]/60">
+                    <div className="hero-visual-shell mt-6">
+                        <div className="hero-visual-grid"/>
+                        <div className="hero-visual-glow"/>
+                        <div className="hero-visual-ring"/>
+                        {floatingBadges.map((badge, index) => (
+                            <motion.div
+                                key={badge.label}
+                                className={`hero-floating-chip ${badge.className}`}
+                                animate={badge.animation}
+                                transition={{duration: 5.5 + index, repeat: Infinity, ease: "easeInOut"}}
+                            >
+                                {badge.label}
+                            </motion.div>
+                        ))}
                         <DotLottieReact
                             src="/animations/tech-sphere.lottie"
                             loop
                             autoplay
-                            className="h-[320px] w-full animate-float"
+                            className="relative z-10 h-[320px] w-full animate-float"
                         />
                     </div>
 
-                    <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                        {featureCards.map((card, index) => (
+                    <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                        {featureCards.map((card, index) => {
+                            const Icon = card.icon;
+
+                            return (
                             <motion.div
                                 key={card.title}
-                                className="rounded-[1.5rem] border border-black/8 bg-white/70 p-4 dark:border-white/10 dark:bg-white/5"
+                                className="hero-mini-card lift-card"
                                 initial={{opacity: 0, y: 18}}
                                 animate={{opacity: 1, y: 0}}
                                 transition={{delay: 0.45 + index * 0.12, duration: 0.55, ease: smoothEase}}
                             >
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background dark:bg-primary dark:text-primary-foreground">
+                                    <Icon className="h-4.5 w-4.5"/>
+                                </div>
                                 <p className="text-sm font-semibold text-foreground">{card.title}</p>
                                 <p className="mt-2 text-sm leading-6 text-foreground/68">{card.description}</p>
                             </motion.div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </motion.div>
             </motion.div>
