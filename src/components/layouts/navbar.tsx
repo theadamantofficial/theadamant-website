@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/resizable-navbar";
 import {IconMoon, IconSun} from "@tabler/icons-react";
 import Link from "next/link";
+import {LanguageSwitcher} from "@/components/ui/language-switcher";
 
 export function Navbar() {
     const navItems = [
@@ -93,6 +94,8 @@ export function Navbar() {
                 <AppLogo className="mr-4 px-2"/>
                 <NavItems items={navItems}/>
                 <div className="flex items-center gap-3">
+                    <LanguageSwitcher/>
+
                     <button
                         type="button"
                         aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
@@ -133,6 +136,7 @@ export function Navbar() {
                             <span className="block">{item.name}</span>
                         </Link>
                     ))}
+                    <LanguageSwitcher mobile/>
                     <button
                         type="button"
                         aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}

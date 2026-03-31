@@ -3,6 +3,7 @@ import "../styles/globals.css";
 import {ReactNode} from "react";
 import {Manrope, Space_Grotesk} from "next/font/google";
 import {Toaster} from "react-hot-toast";
+import {SiteTranslateProvider} from "@/components/providers/site-translate-provider";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
@@ -65,14 +66,14 @@ export default function RootLayout({children}: Readonly<{
     return (
         <html lang="en" suppressHydrationWarning>
         <body className={`${manrope.variable} ${spaceGrotesk.variable}`}>
+        <SiteTranslateProvider>
+            <Toaster
+                position="top-right"
+                reverseOrder={false}
+                containerClassName="mt-14"/>
 
-        <Toaster
-            position="top-right"
-            reverseOrder={false}
-            containerClassName="mt-14"/>
-
-        {children}
-
+            {children}
+        </SiteTranslateProvider>
         </body>
         </html>
     );
