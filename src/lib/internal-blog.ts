@@ -25,6 +25,16 @@ export interface CreateInternalBlogPostInput {
     authorName?: string;
 }
 
+export interface UpdateInternalBlogPostInput {
+    id: string;
+    title: string;
+    excerpt?: string;
+    content: string;
+    coverImage?: string;
+    tags?: string[] | string;
+    authorName?: string;
+}
+
 interface BlogAdminCredentials {
     emails: string[];
     password: string;
@@ -189,6 +199,39 @@ export async function createInternalBlogPost(input: CreateInternalBlogPostInput)
     await writeInternalBlogPosts(posts);
 
     return post;
+}
+
+export async function updateInternalBlogPost(input: UpdateInternalBlogPostInput) {
+    const title = input.title.trim();
+    const content = input.content.trim();
+
+    if (!title || !content) {
+        throw new Error("Title and content are required.");
+    }
+
+    const posts = await readInternalBlogPosts();
+    const existingPostIndex = posts.findIndex((post) => post.id === input.id);
+
+    if (existingPostIndex === -1) {
+        throw new Error("Blog post not found.");
+    }
+
+    const existingPost = posts[existingPostIndex];
+    const nextPost: InternalBlogPost = {
+        ...existingPost,
+        title,
+        excerpt: input.excerpt?.trim() || buildExcerptFromContent(content),
+        content,
+        coverImage: normalizeCoverImage(input.coverImage),
+        tags: normalizeTags(input.tags),
+        authorName: input.authorName?.trim() || existingPost.authorName,
+        updatedAt: new Date().toISOString(),
+    };
+
+    posts.splice(existingPostIndex, 1, nextPost);
+    await writeInternalBlogPosts(posts);
+
+    return nextPost;
 }
 
 function signSessionPayload(payload: string) {

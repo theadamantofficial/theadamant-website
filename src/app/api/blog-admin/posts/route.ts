@@ -3,6 +3,7 @@ import {
     BLOG_ADMIN_COOKIE_NAME,
     createInternalBlogPost,
     listInternalBlogPosts,
+    updateInternalBlogPost,
     verifyBlogAdminSessionToken,
 } from "@/lib/internal-blog";
 
@@ -56,6 +57,45 @@ export async function POST(request: NextRequest) {
             },
             {status: 500},
         );
+    }
+}
+
+export async function PUT(request: NextRequest) {
+    if (!isAuthenticated(request)) {
+        return NextResponse.json({error: "Unauthorized."}, {status: 401});
+    }
+
+    let payload: {
+        id?: string;
+        title?: string;
+        excerpt?: string;
+        content?: string;
+        coverImage?: string;
+        tags?: string[] | string;
+        authorName?: string;
+    };
+
+    try {
+        payload = await request.json();
+    } catch {
+        return NextResponse.json({error: "Invalid blog post payload."}, {status: 400});
+    }
+
+    try {
+        const post = await updateInternalBlogPost({
+            id: payload.id || "",
+            title: payload.title || "",
+            excerpt: payload.excerpt,
+            content: payload.content || "",
+            coverImage: payload.coverImage,
+            tags: payload.tags,
+            authorName: payload.authorName,
+        });
+
+        return NextResponse.json({post});
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "Could not update the blog post.";
+        return NextResponse.json({error: message}, {status: message === "Blog post not found." ? 404 : 500});
     }
 }
 
