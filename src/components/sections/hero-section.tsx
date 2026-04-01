@@ -1,14 +1,21 @@
 "use client";
 
 import {BackgroundRippleEffect} from "@/components/ui/background-ripple-effect";
-import {DotLottieReact} from "@lottiefiles/dotlottie-react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {ArrowRight, LayoutTemplate, Search, Sparkles, Zap} from "lucide-react";
 import {motion} from "motion/react";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 
 const smoothEase = [0.22, 1, 0.36, 1] as const;
+const DotLottieReact = dynamic(
+    () => import("@lottiefiles/dotlottie-react").then((module) => module.DotLottieReact),
+    {
+        ssr: false,
+        loading: () => <div className="relative z-10 h-[320px] w-full animate-pulse rounded-full bg-primary/8 dark:bg-primary/10"/>,
+    },
+);
 
 export default function HeroSection({
     copy,

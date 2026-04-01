@@ -6,9 +6,13 @@ import ServicesSection from "@/components/sections/services-section";
 import ValuePropsSection from "@/components/sections/value-props-section";
 import ProcessSection from "@/components/sections/process-section";
 import FaqSection from "@/components/sections/faq-section";
-import {WebsiteAuditFab} from "@/components/ui/website-audit-fab";
+import dynamic from "next/dynamic";
 import {SiteCopy} from "@/lib/site-copy";
 import {SiteLocale} from "@/lib/site-locale";
+
+const WebsiteAuditFab = dynamic(
+    () => import("@/components/ui/website-audit-fab").then((module) => module.WebsiteAuditFab),
+);
 
 export default function HomePage({
     copy,
