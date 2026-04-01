@@ -275,10 +275,10 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                 body: uploadPayload,
             });
 
-            const payload = await response.json() as { error?: string; url?: string };
+            const payload = await safeJson<{ error?: string; detail?: string; url?: string }>(response);
 
             if (!response.ok || !payload.url) {
-                throw new Error(payload.error || "Could not upload the cover image.");
+                throw new Error(payload.detail || payload.error || "Could not upload the cover image.");
             }
 
             setFormState((current) => ({...current, coverImage: payload.url!}));
@@ -626,4 +626,18 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
             </div>
         </div>
     );
+}
+
+async function safeJson<T>(response: Response) {
+    const raw = await response.text();
+
+    if (!raw) {
+        return {} as T;
+    }
+
+    try {
+        return JSON.parse(raw) as T;
+    } catch {
+        return {error: raw} as T;
+    }
 }
