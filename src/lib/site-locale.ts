@@ -100,13 +100,44 @@ export function localeToHtmlLang(locale: SiteLocale) {
     }
 }
 
-export function getLocalizedPath(locale: SiteLocale, hash = "") {
-    const normalizedHash = hash ? (hash.startsWith("#") ? hash : `#${hash}`) : "";
+export function getLocalizedPagePath(locale: SiteLocale, pathname = "") {
+    const normalizedPath = pathname.replace(/^\/+|\/+$/g, "");
+
     if (locale === DEFAULT_SITE_LOCALE) {
-        return `/${normalizedHash}`;
+        return normalizedPath ? `/${normalizedPath}` : "/";
     }
 
-    return `/${locale}${normalizedHash}`;
+    return normalizedPath ? `/${locale}/${normalizedPath}` : `/${locale}`;
+}
+
+export function getLocalizedPath(locale: SiteLocale, hash = "") {
+    const normalizedHash = hash ? (hash.startsWith("#") ? hash : `#${hash}`) : "";
+    const basePath = getLocalizedPagePath(locale);
+
+    if (!normalizedHash) {
+        return basePath;
+    }
+
+    return `${basePath}${normalizedHash}`;
+}
+
+export function getLanguageAlternates(pathname = "") {
+    const normalizedPath = pathname.replace(/^\/+|\/+$/g, "");
+
+    return {
+        en: getLocalizedPagePath("en", normalizedPath),
+        hi: getLocalizedPagePath("hi", normalizedPath),
+        gu: getLocalizedPagePath("gu", normalizedPath),
+        mr: getLocalizedPagePath("mr", normalizedPath),
+        bn: getLocalizedPagePath("bn", normalizedPath),
+        ta: getLocalizedPagePath("ta", normalizedPath),
+        es: getLocalizedPagePath("es", normalizedPath),
+        fr: getLocalizedPagePath("fr", normalizedPath),
+        de: getLocalizedPagePath("de", normalizedPath),
+        pt: getLocalizedPagePath("pt", normalizedPath),
+        ja: getLocalizedPagePath("ja", normalizedPath),
+        "x-default": getLocalizedPagePath("en", normalizedPath),
+    };
 }
 
 export function detectSiteLocaleFromCountry(countryCode?: string | null): SiteLocale | null {
@@ -147,23 +178,6 @@ export function detectSiteLocaleFromAcceptLanguage(headerValue?: string | null):
 
 export function getLocaleLabel(locale: SiteLocale) {
     return SITE_LOCALE_OPTIONS.find((option) => option.code === locale)?.nativeLabel ?? locale;
-}
-
-export function getLanguageAlternates() {
-    return {
-        en: "/",
-        hi: "/hi",
-        gu: "/gu",
-        mr: "/mr",
-        bn: "/bn",
-        ta: "/ta",
-        es: "/es",
-        fr: "/fr",
-        de: "/de",
-        pt: "/pt",
-        ja: "/ja",
-        "x-default": "/",
-    };
 }
 
 export function getLocaleFromPathname(pathname: string): SiteLocale {

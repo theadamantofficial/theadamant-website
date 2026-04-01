@@ -12,22 +12,8 @@ import {IconMoon, IconSun} from "@tabler/icons-react";
 import Link from "next/link";
 import {LanguageSwitcher} from "@/components/ui/language-switcher";
 import {SiteCopy} from "@/lib/site-copy";
-import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
-
-const MEDIUM_URL = "https://medium.com/@theadamant";
-const BLOG_LABELS: Record<SiteLocale, string> = {
-    en: "Blog",
-    hi: "ब्लॉग",
-    gu: "બ્લોગ",
-    mr: "ब्लॉग",
-    bn: "ব্লগ",
-    ta: "வலைப்பதிவு",
-    es: "Blog",
-    fr: "Blog",
-    de: "Blog",
-    pt: "Blog",
-    ja: "ブログ",
-};
+import {getLocalizedPagePath, getLocalizedPath, SiteLocale} from "@/lib/site-locale";
+import {BLOG_LABELS} from "@/lib/blog-config";
 
 export function Navbar({
     copy,
@@ -43,8 +29,7 @@ export function Navbar({
         })),
         {
             name: BLOG_LABELS[locale],
-            link: MEDIUM_URL,
-            external: true,
+            link: getLocalizedPagePath(locale, "blog"),
         },
     ];
     const homeHref = getLocalizedPath(locale);
