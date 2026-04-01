@@ -1,6 +1,7 @@
 import {createHmac, randomUUID, timingSafeEqual} from "node:crypto";
 import {mkdir, readFile, writeFile} from "node:fs/promises";
 import path from "node:path";
+import {get, put} from "@vercel/blob";
 
 export interface InternalBlogPost {
     id: string;
@@ -47,7 +48,10 @@ interface BlogAdminSession {
     email: string | null;
 }
 
+export type BlogStorageMode = "blob" | "filesystem";
+
 const BLOG_POSTS_FILE = path.join(process.cwd(), "src/content/internal-blog-posts.json");
+const BLOG_POSTS_BLOB_PATH = "blog/internal-blog-posts.json";
 const BLOG_ADMIN_EMAIL_FALLBACK = "team@theadamant.local";
 const BLOG_ADMIN_PASSWORD_FALLBACK = "theadamant-admin";
 const BLOG_ADMIN_SECRET_FALLBACK = "theadamant-blog-local-secret";
@@ -93,6 +97,14 @@ export function getBlogAdminSessionCookieOptions() {
         sameSite: "lax" as const,
         secure: process.env.NODE_ENV === "production",
     };
+}
+
+export function getBlogStorageMode(): BlogStorageMode {
+    return isBlobStorageConfigured() ? "blob" : "filesystem";
+}
+
+export function isBlobStorageConfigured() {
+    return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 }
 
 export function createBlogAdminSessionToken(email: string) {
@@ -262,10 +274,42 @@ function safeEqual(left: string, right: string) {
 }
 
 async function readInternalBlogPosts() {
+    if (isBlobStorageConfigured()) {
+        const blobPosts = await readBlobInternalBlogPosts();
+
+        if (blobPosts !== null) {
+            return blobPosts;
+        }
+    }
+
+    return readLocalInternalBlogPosts();
+}
+
+async function readBlobInternalBlogPosts() {
+    try {
+        const result = await get(BLOG_POSTS_BLOB_PATH, {
+            access: "public",
+        });
+
+        if (!result || result.statusCode !== 200 || !result.stream) {
+            return null as InternalBlogPost[] | null;
+        }
+
+        const raw = await new Response(result.stream).text();
+        return parseInternalBlogPosts(raw);
+    } catch {
+        return null as InternalBlogPost[] | null;
+    }
+}
+
+async function readLocalInternalBlogPosts() {
     await ensureInternalBlogStorage();
 
     const raw = await readFile(BLOG_POSTS_FILE, "utf8");
+    return parseInternalBlogPosts(raw);
+}
 
+function parseInternalBlogPosts(raw: string) {
     try {
         const parsed = JSON.parse(raw) as unknown;
 
@@ -282,6 +326,25 @@ async function readInternalBlogPosts() {
 }
 
 async function writeInternalBlogPosts(posts: InternalBlogPost[]) {
+    if (isBlobStorageConfigured()) {
+        await writeBlobInternalBlogPosts(posts);
+        return;
+    }
+
+    await writeLocalInternalBlogPosts(posts);
+}
+
+async function writeBlobInternalBlogPosts(posts: InternalBlogPost[]) {
+    await put(BLOG_POSTS_BLOB_PATH, `${JSON.stringify(posts, null, 2)}\n`, {
+        access: "public",
+        addRandomSuffix: false,
+        allowOverwrite: true,
+        cacheControlMaxAge: 60,
+        contentType: "application/json; charset=utf-8",
+    });
+}
+
+async function writeLocalInternalBlogPosts(posts: InternalBlogPost[]) {
     await ensureInternalBlogStorage();
     await writeFile(BLOG_POSTS_FILE, `${JSON.stringify(posts, null, 2)}\n`, "utf8");
 }
@@ -391,6 +454,10 @@ function normalizeCoverImage(value?: string) {
     const trimmed = value.trim();
     if (!trimmed) {
         return null;
+    }
+
+    if (trimmed.startsWith("/")) {
+        return trimmed;
     }
 
     try {
