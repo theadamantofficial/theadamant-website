@@ -1,10 +1,14 @@
+import bnCopy from "@/locales/bn.json";
 import deCopy from "@/locales/de.json";
 import enCopy from "@/locales/en.json";
 import esCopy from "@/locales/es.json";
 import frCopy from "@/locales/fr.json";
+import guCopy from "@/locales/gu.json";
 import hiCopy from "@/locales/hi.json";
 import jaCopy from "@/locales/ja.json";
+import mrCopy from "@/locales/mr.json";
 import ptCopy from "@/locales/pt.json";
+import taCopy from "@/locales/ta.json";
 import {
     DEFAULT_SITE_LOCALE,
     SiteLocale,
@@ -132,6 +136,10 @@ export interface SiteCopy {
 const siteCopyMap: Record<SiteLocale, SiteCopy> = {
     en: enCopy as SiteCopy,
     hi: hiCopy as SiteCopy,
+    gu: guCopy as SiteCopy,
+    mr: mrCopy as SiteCopy,
+    bn: bnCopy as SiteCopy,
+    ta: taCopy as SiteCopy,
     es: esCopy as SiteCopy,
     fr: frCopy as SiteCopy,
     de: deCopy as SiteCopy,
