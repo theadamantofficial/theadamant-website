@@ -71,6 +71,13 @@ interface PageSpeedPayload {
 
 const PAGE_SPEED_ENDPOINT = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed";
 const REQUESTED_CATEGORIES = ["performance", "seo", "accessibility", "best-practices"] as const;
+const IGNORED_AUDIT_IDS = new Set([
+    "lcp-breakdown-insight",
+    "legacy-javascript-insight",
+    "network-dependency-tree-insight",
+    "valid-source-maps",
+    "max-potential-fid",
+]);
 
 export async function POST(request: NextRequest) {
     let payload: { url?: string };
@@ -268,6 +275,10 @@ function collectCategoryIssues({
 
     return auditRefs
         .map((ref) => {
+            if (IGNORED_AUDIT_IDS.has(ref.id)) {
+                return null;
+            }
+
             const audit = audits?.[ref.id];
             if (!audit || !isFailingAudit(audit)) {
                 return null;
