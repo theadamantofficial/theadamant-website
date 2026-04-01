@@ -4,6 +4,7 @@ import {
     createBlogAdminSessionToken,
     getBlogAdminCredentials,
     getBlogAdminSessionCookieOptions,
+    isAllowedBlogAdminEmail,
 } from "@/lib/internal-blog";
 
 export const runtime = "nodejs";
@@ -30,19 +31,19 @@ export async function POST(request: NextRequest) {
     const email = payload.email?.trim().toLowerCase() || "";
     const password = payload.password?.trim() || "";
 
-    if (email !== credentials.email || password !== credentials.password) {
+    if (!isAllowedBlogAdminEmail(email, credentials) || password !== credentials.password) {
         return NextResponse.json({error: "Incorrect email or password."}, {status: 401});
     }
 
     const response = NextResponse.json({
         authenticated: true,
-        email: credentials.email,
+        email,
         usesDefaults: credentials.usesDefaults,
     });
 
     response.cookies.set(
         BLOG_ADMIN_COOKIE_NAME,
-        createBlogAdminSessionToken(credentials.email),
+        createBlogAdminSessionToken(email),
         getBlogAdminSessionCookieOptions(),
     );
 

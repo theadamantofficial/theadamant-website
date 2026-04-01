@@ -231,7 +231,7 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                                 autoComplete="email"
                                 value={loginEmail}
                                 onChange={(event) => setLoginEmail(event.target.value)}
-                                placeholder="team@theadamant.local"
+                                placeholder="yashverma@theadamant.com"
                                 required
                             />
                         </div>
@@ -262,8 +262,8 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
 
                         <p className="text-xs leading-6 text-foreground/58">
                             {session?.usesDefaults
-                                ? "Development fallback credentials are active. Set BLOG_ADMIN_EMAIL, BLOG_ADMIN_PASSWORD, and BLOG_ADMIN_SESSION_SECRET before production use."
-                                : "Production credentials are controlled through BLOG_ADMIN_EMAIL, BLOG_ADMIN_PASSWORD, and BLOG_ADMIN_SESSION_SECRET."}
+                                ? "Development fallback credentials are active. Set BLOG_ADMIN_EMAILS, BLOG_ADMIN_PASSWORD, and BLOG_ADMIN_SESSION_SECRET before production use."
+                                : "Production credentials are controlled through BLOG_ADMIN_EMAILS, BLOG_ADMIN_PASSWORD, and BLOG_ADMIN_SESSION_SECRET."}
                         </p>
                     </div>
                 </form>

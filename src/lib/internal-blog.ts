@@ -26,10 +26,15 @@ export interface CreateInternalBlogPostInput {
 }
 
 interface BlogAdminCredentials {
-    email: string;
+    emails: string[];
     password: string;
     configured: boolean;
     usesDefaults: boolean;
+}
+
+interface BlogAdminSession {
+    authenticated: boolean;
+    email: string | null;
 }
 
 const BLOG_POSTS_FILE = path.join(process.cwd(), "src/content/internal-blog-posts.json");
@@ -41,12 +46,12 @@ const BLOG_ADMIN_SESSION_MAX_AGE = 60 * 60 * 24 * 14;
 export const BLOG_ADMIN_COOKIE_NAME = "theadamant-blog-admin";
 
 export function getBlogAdminCredentials(): BlogAdminCredentials {
-    const envEmail = process.env.BLOG_ADMIN_EMAIL?.trim().toLowerCase();
+    const envEmails = parseBlogAdminEmails(process.env.BLOG_ADMIN_EMAILS || process.env.BLOG_ADMIN_EMAIL);
     const envPassword = process.env.BLOG_ADMIN_PASSWORD?.trim();
 
-    if (envEmail && envPassword) {
+    if (envEmails.length > 0 && envPassword) {
         return {
-            email: envEmail,
+            emails: envEmails,
             password: envPassword,
             configured: true,
             usesDefaults: false,
@@ -55,7 +60,7 @@ export function getBlogAdminCredentials(): BlogAdminCredentials {
 
     if (process.env.NODE_ENV !== "production") {
         return {
-            email: BLOG_ADMIN_EMAIL_FALLBACK,
+            emails: [BLOG_ADMIN_EMAIL_FALLBACK],
             password: BLOG_ADMIN_PASSWORD_FALLBACK,
             configured: true,
             usesDefaults: true,
@@ -63,7 +68,7 @@ export function getBlogAdminCredentials(): BlogAdminCredentials {
     }
 
     return {
-        email: "",
+        emails: [],
         password: "",
         configured: false,
         usesDefaults: false,
@@ -92,8 +97,12 @@ export function createBlogAdminSessionToken(email: string) {
 }
 
 export function verifyBlogAdminSessionToken(token?: string | null) {
+    return getBlogAdminSessionFromToken(token).authenticated;
+}
+
+export function getBlogAdminSessionFromToken(token?: string | null): BlogAdminSession {
     if (!token) {
-        return false;
+        return {authenticated: false, email: null};
     }
 
     try {
@@ -101,29 +110,40 @@ export function verifyBlogAdminSessionToken(token?: string | null) {
         const parsed = JSON.parse(decoded) as { payload?: string; signature?: string };
 
         if (!parsed.payload || !parsed.signature) {
-            return false;
+            return {authenticated: false, email: null};
         }
 
         const expectedSignature = signSessionPayload(parsed.payload);
         if (!safeEqual(parsed.signature, expectedSignature)) {
-            return false;
+            return {authenticated: false, email: null};
         }
 
         const payload = JSON.parse(parsed.payload) as { email?: string; expiresAt?: number };
         const credentials = getBlogAdminCredentials();
 
         if (!payload.email || !payload.expiresAt || !credentials.configured) {
-            return false;
+            return {authenticated: false, email: null};
         }
 
         if (Date.now() > payload.expiresAt) {
-            return false;
+            return {authenticated: false, email: null};
         }
 
-        return payload.email === credentials.email;
+        if (!credentials.emails.includes(payload.email)) {
+            return {authenticated: false, email: null};
+        }
+
+        return {
+            authenticated: true,
+            email: payload.email,
+        };
     } catch {
-        return false;
+        return {authenticated: false, email: null};
     }
+}
+
+export function isAllowedBlogAdminEmail(email: string, credentials = getBlogAdminCredentials()) {
+    return credentials.emails.includes(email.trim().toLowerCase());
 }
 
 export async function listInternalBlogPosts() {
@@ -174,6 +194,17 @@ export async function createInternalBlogPost(input: CreateInternalBlogPostInput)
 function signSessionPayload(payload: string) {
     const secret = process.env.BLOG_ADMIN_SESSION_SECRET || BLOG_ADMIN_SECRET_FALLBACK;
     return createHmac("sha256", secret).update(payload).digest("hex");
+}
+
+function parseBlogAdminEmails(value?: string) {
+    if (!value) {
+        return [] as string[];
+    }
+
+    return value
+        .split(",")
+        .map((email) => email.trim().toLowerCase())
+        .filter(Boolean);
 }
 
 function safeEqual(left: string, right: string) {
