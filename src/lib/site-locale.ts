@@ -1,5 +1,5 @@
 export const DEFAULT_SITE_LOCALE = "en";
-export const SEO_SITE_LOCALES = ["en", "hi", "es", "fr", "de", "pt", "ja"] as const;
+export const SEO_SITE_LOCALES = ["en", "hi", "gu", "mr", "bn", "ta", "es", "fr", "de", "pt", "ja"] as const;
 export const INDEXABLE_SITE_LOCALES = SEO_SITE_LOCALES.filter((locale) => locale !== DEFAULT_SITE_LOCALE);
 export const SITE_LOCALE_COOKIE = "site-locale";
 
@@ -14,6 +14,10 @@ export interface SiteLocaleOption {
 export const SITE_LOCALE_OPTIONS: SiteLocaleOption[] = [
     {code: "en", label: "English", nativeLabel: "English"},
     {code: "hi", label: "Hindi", nativeLabel: "हिन्दी"},
+    {code: "gu", label: "Gujarati", nativeLabel: "ગુજરાતી"},
+    {code: "mr", label: "Marathi", nativeLabel: "मराठी"},
+    {code: "bn", label: "Bengali", nativeLabel: "বাংলা"},
+    {code: "ta", label: "Tamil", nativeLabel: "தமிழ்"},
     {code: "es", label: "Spanish", nativeLabel: "Español"},
     {code: "fr", label: "French", nativeLabel: "Français"},
     {code: "de", label: "German", nativeLabel: "Deutsch"},
@@ -24,6 +28,7 @@ export const SITE_LOCALE_OPTIONS: SiteLocaleOption[] = [
 const COUNTRY_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
     AT: "de",
     AR: "es",
+    BD: "bn",
     BO: "es",
     BR: "pt",
     CH: "de",
@@ -37,7 +42,7 @@ const COUNTRY_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
     FR: "fr",
     GT: "es",
     HN: "es",
-    IN: "hi",
+    IN: "en",
     JP: "ja",
     MX: "es",
     NI: "es",
@@ -51,13 +56,17 @@ const COUNTRY_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
 };
 
 const LANGUAGE_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
+    bn: "bn",
     de: "de",
     en: "en",
     es: "es",
     fr: "fr",
+    gu: "gu",
     hi: "hi",
     ja: "ja",
+    mr: "mr",
     pt: "pt",
+    ta: "ta",
 };
 
 export function isSiteLocale(value: string): value is SiteLocale {
@@ -68,6 +77,14 @@ export function localeToHtmlLang(locale: SiteLocale) {
     switch (locale) {
         case "hi":
             return "hi";
+        case "gu":
+            return "gu";
+        case "mr":
+            return "mr";
+        case "bn":
+            return "bn";
+        case "ta":
+            return "ta";
         case "es":
             return "es";
         case "fr":
@@ -136,6 +153,10 @@ export function getLanguageAlternates() {
     return {
         en: "/",
         hi: "/hi",
+        gu: "/gu",
+        mr: "/mr",
+        bn: "/bn",
+        ta: "/ta",
         es: "/es",
         fr: "/fr",
         de: "/de",
