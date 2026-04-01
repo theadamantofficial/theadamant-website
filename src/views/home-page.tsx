@@ -29,7 +29,7 @@ export default function HomePage({
             description: copy.schema.organizationDescription,
             inLanguage: locale,
             sameAs: [
-                "https://www.instagram.com/theadamantofficial",
+                "https://www.instagram.com/theadamantofficial/",
                 "https://www.linkedin.com/company/the-adamant",
                 "https://x.com/theadamantofc",
                 "https://medium.com/@theadamant",

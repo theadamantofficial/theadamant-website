@@ -1,13 +1,16 @@
 "use client";
 
+import emailjs from "@emailjs/browser";
 import {AnimatePresence, motion} from "motion/react";
 import Link from "next/link";
 import {useEffect, useMemo, useState} from "react";
+import toast from "react-hot-toast";
 import {
     ArrowRight,
     Gauge,
     Globe,
     LoaderCircle,
+    Mail,
     Search,
     Sparkles,
     WandSparkles,
@@ -58,15 +61,24 @@ const loadingMessages = [
     "Running PageSpeed and technical checks...",
     "Turning Lighthouse output into a usable audit...",
     "Preparing the fixes that matter most...",
+    "Packaging the audit summary for email delivery...",
 ];
+
+const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "default_service";
+const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+const EMAILJS_AUDIT_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_AUDIT_TEMPLATE_ID || "template_1c1pps9";
 
 export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
     const [isOpen, setIsOpen] = useState(false);
+    const [visitorName, setVisitorName] = useState("");
+    const [visitorEmail, setVisitorEmail] = useState("");
     const [websiteUrl, setWebsiteUrl] = useState("");
     const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
     const [errorMessage, setErrorMessage] = useState("");
     const [report, setReport] = useState<AuditReport | null>(null);
     const [loadingIndex, setLoadingIndex] = useState(0);
+    const [deliveryStatus, setDeliveryStatus] = useState<"idle" | "sending" | "sent" | "failed">("idle");
+    const [deliveryMessage, setDeliveryMessage] = useState("");
 
     useEffect(() => {
         if (!isOpen) {
@@ -108,8 +120,20 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
+        if (!visitorEmail.trim()) {
+            setErrorMessage("Enter your email address to unlock the audit.");
+            setStatus("error");
+            return;
+        }
+
         if (!websiteUrl.trim()) {
             setErrorMessage("Enter a website URL to generate the audit.");
+            setStatus("error");
+            return;
+        }
+
+        if (!EMAILJS_PUBLIC_KEY || !EMAILJS_AUDIT_TEMPLATE_ID) {
+            setErrorMessage("Audit email delivery is not configured yet. Add the EmailJS audit template and public key.");
             setStatus("error");
             return;
         }
@@ -117,6 +141,8 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
         setStatus("loading");
         setErrorMessage("");
         setLoadingIndex(0);
+        setDeliveryStatus("idle");
+        setDeliveryMessage("");
 
         const startedAt = Date.now();
 
@@ -140,8 +166,34 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
                 throw new Error(payload?.error ?? "Audit failed.");
             }
 
-            setWebsiteUrl(payload?.normalizedUrl ?? websiteUrl);
-            setReport(payload?.report ?? null);
+            const normalizedUrl = payload?.normalizedUrl ?? websiteUrl;
+            const nextReport = payload?.report ?? null;
+
+            if (!nextReport) {
+                throw new Error("Audit report was empty.");
+            }
+
+            setWebsiteUrl(normalizedUrl);
+            setReport(nextReport);
+            setDeliveryStatus("sending");
+
+            try {
+                await sendAuditEmail({
+                    email: visitorEmail,
+                    name: visitorName,
+                    report: nextReport,
+                    website: normalizedUrl,
+                });
+                setDeliveryStatus("sent");
+                setDeliveryMessage(`Audit summary sent to ${visitorEmail}.`);
+                toast.success(`Audit sent to ${visitorEmail}`);
+            } catch (error) {
+                console.error("Audit EmailJS delivery failed", error);
+                setDeliveryStatus("failed");
+                setDeliveryMessage("The audit is ready here, but the email copy could not be sent.");
+                toast.error("Audit email could not be sent.");
+            }
+
             setStatus("done");
         } catch (error) {
             setErrorMessage(error instanceof Error ? error.message : "Audit failed.");
@@ -153,6 +205,8 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
         setStatus("idle");
         setErrorMessage("");
         setReport(null);
+        setDeliveryStatus("idle");
+        setDeliveryMessage("");
     }
 
     return (
@@ -204,10 +258,10 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
                                             Free audit
                                         </p>
                                         <h2 id="website-audit-title" className="mt-4 text-2xl font-semibold text-foreground">
-                                            Enter your website and get a fast audit.
+                                            Enter your email and website to unlock a fast audit.
                                         </h2>
                                         <p className="mt-2 text-sm leading-6 text-foreground/70">
-                                            Performance, SEO, and UX signals pulled into one practical report you can act on.
+                                            Performance, SEO, and UX signals pulled into one practical report you can act on and send to your inbox.
                                         </p>
                                     </div>
 
@@ -224,9 +278,41 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
                                     {(status === "idle" || status === "error") && (
                                         <div className="space-y-5">
                                             <form className="space-y-4" onSubmit={handleSubmit}>
-                                                <label className="block text-sm font-medium text-foreground" htmlFor="audit-url">
-                                                    Enter your website
-                                                </label>
+                                                <div className="grid gap-3 sm:grid-cols-2">
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-foreground" htmlFor="audit-name">
+                                                            Name
+                                                        </label>
+                                                        <input
+                                                            id="audit-name"
+                                                            type="text"
+                                                            placeholder="Your name"
+                                                            value={visitorName}
+                                                            onChange={(event) => setVisitorName(event.target.value)}
+                                                            className="mt-2 h-13 w-full rounded-full border border-black/10 bg-white/82 px-5 text-sm text-foreground shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-white/10 dark:bg-white/[0.05]"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-foreground" htmlFor="audit-email">
+                                                            Email
+                                                        </label>
+                                                        <input
+                                                            id="audit-email"
+                                                            type="email"
+                                                            placeholder="you@company.com"
+                                                            value={visitorEmail}
+                                                            onChange={(event) => setVisitorEmail(event.target.value)}
+                                                            className="mt-2 h-13 w-full rounded-full border border-black/10 bg-white/82 px-5 text-sm text-foreground shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-white/10 dark:bg-white/[0.05]"
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-foreground" htmlFor="audit-url">
+                                                        Enter your website
+                                                    </label>
+                                                </div>
                                                 <div className="flex flex-col gap-3 sm:flex-row">
                                                     <input
                                                         id="audit-url"
@@ -312,6 +398,12 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
                                                         <Globe className="h-3.5 w-3.5"/>
                                                         {report.url.replace(/^https?:\/\//, "").replace(/\/$/, "")}
                                                     </span>
+                                                    {deliveryStatus === "sent" && (
+                                                        <span className="feature-chip !rounded-full !px-3 !py-1">
+                                                            <Mail className="h-3.5 w-3.5"/>
+                                                            Sent to {visitorEmail}
+                                                        </span>
+                                                    )}
                                                     {report.aiEnhanced && (
                                                         <span className="feature-chip !rounded-full !px-3 !py-1">
                                                             <WandSparkles className="h-3.5 w-3.5"/>
@@ -325,6 +417,15 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
                                                 <p className="mt-3 text-sm leading-6 text-foreground/72">
                                                     {report.narrative.summary}
                                                 </p>
+                                                {deliveryMessage && (
+                                                    <div className={`mt-4 rounded-[1.15rem] px-4 py-3 text-sm ${
+                                                        deliveryStatus === "failed"
+                                                            ? "border border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                                                            : "border border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                                                    }`}>
+                                                        {deliveryMessage}
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <div className="grid gap-3 sm:grid-cols-3">
@@ -424,6 +525,56 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
             </AnimatePresence>
         </>
     );
+}
+
+async function sendAuditEmail({
+    name,
+    email,
+    website,
+    report,
+}: {
+    name: string;
+    email: string;
+    website: string;
+    report: AuditReport;
+}) {
+    if (!EMAILJS_PUBLIC_KEY) {
+        throw new Error("EmailJS public key is missing.");
+    }
+
+    await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_AUDIT_TEMPLATE_ID,
+        {
+            name: name.trim() || "Website visitor",
+            email,
+            website,
+            time: new Date(report.analyzedAt).toLocaleString(),
+            performance_score: String(report.scores.performance),
+            seo_issues: summarizeIssues(report.seoIssues, "No major SEO issues were flagged."),
+            ux_issues: summarizeIssues(report.uxIssues, "No major UX issues were flagged."),
+            additional_notes: buildAdditionalNotes(report),
+        },
+        {
+            publicKey: EMAILJS_PUBLIC_KEY,
+        },
+    );
+}
+
+function summarizeIssues(items: AuditIssue[], fallback: string) {
+    if (items.length === 0) {
+        return fallback;
+    }
+
+    return items
+        .slice(0, 3)
+        .map((item) => item.title)
+        .join(", ");
+}
+
+function buildAdditionalNotes(report: AuditReport) {
+    const nextSteps = report.narrative.nextSteps.slice(0, 3).join(" | ");
+    return `${report.narrative.summary} Next steps: ${nextSteps}`;
 }
 
 function MetricRow({label, value}: { label: string; value: string }) {
