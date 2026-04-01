@@ -100,11 +100,21 @@ export function getBlogAdminSessionCookieOptions() {
 }
 
 export function getBlogStorageMode(): BlogStorageMode {
-    return isBlobStorageConfigured() ? "blob" : "filesystem";
+    return getBlobReadWriteToken() ? "blob" : "filesystem";
 }
 
 export function isBlobStorageConfigured() {
-    return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+    return Boolean(getBlobReadWriteToken());
+}
+
+export function getBlobReadWriteToken() {
+    const rawToken = process.env.BLOB_READ_WRITE_TOKEN?.trim();
+
+    if (!rawToken) {
+        return "";
+    }
+
+    return rawToken.replace(/^['"]|['"]$/g, "");
 }
 
 export function createBlogAdminSessionToken(email: string) {
@@ -289,6 +299,7 @@ async function readBlobInternalBlogPosts() {
     try {
         const result = await get(BLOG_POSTS_BLOB_PATH, {
             access: "public",
+            token: getBlobReadWriteToken(),
         });
 
         if (!result || result.statusCode !== 200 || !result.stream) {
@@ -341,6 +352,7 @@ async function writeBlobInternalBlogPosts(posts: InternalBlogPost[]) {
         allowOverwrite: true,
         cacheControlMaxAge: 60,
         contentType: "application/json; charset=utf-8",
+        token: getBlobReadWriteToken(),
     });
 }
 
