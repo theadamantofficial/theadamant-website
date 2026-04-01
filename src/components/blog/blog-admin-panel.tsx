@@ -7,14 +7,15 @@ import {ArrowRight, ImagePlus, LockKeyhole, LogOut, PenSquare, PencilLine, Shiel
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/text-area";
+import {BlogStorageMode, InternalBlogPost} from "@/lib/internal-blog";
 import {getLocalizedPagePath, SiteLocale} from "@/lib/site-locale";
-import {InternalBlogPost} from "@/lib/internal-blog";
 
 interface SessionPayload {
     authenticated: boolean;
     email: string | null;
     configured: boolean;
     usesDefaults: boolean;
+    storageMode: BlogStorageMode;
 }
 
 interface BlogFormState {
@@ -297,6 +298,7 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
     }
 
     if (sessionStatus === "guest") {
+        const storageMode = session?.storageMode || "filesystem";
         return (
             <div className="glass-panel grid gap-6 p-8 lg:grid-cols-[0.88fr_1.12fr]">
                 <div>
@@ -313,12 +315,21 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                     </p>
 
                     <div className="mt-6 rounded-[1.5rem] border border-black/8 bg-black/[0.03] p-5 text-sm leading-7 text-foreground/68 dark:border-white/10 dark:bg-white/[0.03]">
-                        <p className="font-semibold text-foreground">Free local media option</p>
-                        <p className="mt-2">
-                            Cover images can be uploaded for free into `public/uploads/blog-covers`. This works now in
-                            local development and keeps costs at zero. For Vercel persistence later, you&apos;ll need
-                            storage or a CMS.
+                        <p className="font-semibold text-foreground">
+                            {storageMode === "blob" ? "Vercel Blob is active" : "Free local fallback is active"}
                         </p>
+                        {storageMode === "blob" ? (
+                            <p className="mt-2">
+                                Internal posts and cover images are now stored through Vercel Blob, so publishing and
+                                uploads can persist on production deployments.
+                            </p>
+                        ) : (
+                            <p className="mt-2">
+                                Cover images upload for free into `public/uploads/blog-covers`, and posts stay in the
+                                local JSON file. This is fine in local development. Connect Vercel Blob to make the
+                                same workflow production-safe.
+                            </p>
+                        )}
                     </div>
                 </div>
 
@@ -374,6 +385,7 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
 
     const coverPreview = coverPreviewUrl || formState.coverImage;
     const isEditing = Boolean(editingPostId);
+    const storageMode = session?.storageMode || "filesystem";
 
     return (
         <div className="grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
@@ -529,7 +541,11 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                     </div>
                     <div>
                         <p className="text-sm font-semibold text-foreground">Published internally</p>
-                        <p className="text-sm text-foreground/62">All approved company logins can publish and edit</p>
+                        <p className="text-sm text-foreground/62">
+                            {storageMode === "blob"
+                                ? "All approved company logins can publish and edit with Blob-backed persistence"
+                                : "All approved company logins can publish and edit with local fallback storage"}
+                        </p>
                     </div>
                 </div>
 
@@ -589,13 +605,22 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                     <div className="rounded-[1.4rem] border border-black/8 bg-black/[0.03] p-5 text-sm leading-7 text-foreground/65 dark:border-white/10 dark:bg-white/[0.03]">
                         <div className="flex items-center gap-3 text-foreground">
                             <ImagePlus className="h-4 w-4"/>
-                            <span className="font-semibold">Free upload path right now</span>
+                            <span className="font-semibold">
+                                {storageMode === "blob" ? "Production-safe uploads enabled" : "Free upload path right now"}
+                            </span>
                         </div>
-                        <p className="mt-2">
-                            Cover images are stored under `public/uploads/blog-covers`, so there is no paid image
-                            service involved for local use. If you later want deployed persistence, move this to a
-                            storage provider or CMS.
-                        </p>
+                        {storageMode === "blob" ? (
+                            <p className="mt-2">
+                                Cover images and internal blog data are stored in Vercel Blob, so the admin workflow
+                                now survives production deployments instead of relying on the local filesystem.
+                            </p>
+                        ) : (
+                            <p className="mt-2">
+                                Cover images are stored under `public/uploads/blog-covers`, so there is no paid image
+                                service involved for local use. Connect Vercel Blob when you want this to persist in
+                                production.
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>

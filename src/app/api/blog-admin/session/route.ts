@@ -3,6 +3,7 @@ import {
     BLOG_ADMIN_COOKIE_NAME,
     getBlogAdminCredentials,
     getBlogAdminSessionFromToken,
+    getBlogStorageMode,
 } from "@/lib/internal-blog";
 
 export const runtime = "nodejs";
@@ -18,5 +19,6 @@ export async function GET(request: NextRequest) {
         email: session.email,
         configured: credentials.configured,
         usesDefaults: credentials.usesDefaults,
+        storageMode: getBlogStorageMode(),
     });
 }

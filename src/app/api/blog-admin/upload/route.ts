@@ -1,8 +1,13 @@
 import {randomUUID} from "node:crypto";
 import {mkdir, writeFile} from "node:fs/promises";
 import path from "node:path";
+import {put} from "@vercel/blob";
 import {NextRequest, NextResponse} from "next/server";
-import {BLOG_ADMIN_COOKIE_NAME, verifyBlogAdminSessionToken} from "@/lib/internal-blog";
+import {
+    BLOG_ADMIN_COOKIE_NAME,
+    isBlobStorageConfigured,
+    verifyBlogAdminSessionToken,
+} from "@/lib/internal-blog";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -45,13 +50,30 @@ export async function POST(request: NextRequest) {
     }
 
     const fileName = `${Date.now()}-${randomUUID()}.${extension}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
 
+    if (isBlobStorageConfigured()) {
+        const blob = await put(`blog/covers/${fileName}`, file, {
+            access: "public",
+            addRandomSuffix: false,
+            allowOverwrite: true,
+            cacheControlMaxAge: 60 * 60 * 24 * 365,
+            contentType: file.type,
+        });
+
+        return NextResponse.json({
+            url: blob.url,
+            name: file.name,
+            storageMode: "blob",
+        });
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
     await mkdir(UPLOAD_DIRECTORY, {recursive: true});
     await writeFile(path.join(UPLOAD_DIRECTORY, fileName), buffer);
 
     return NextResponse.json({
         url: `/uploads/blog-covers/${fileName}`,
         name: file.name,
+        storageMode: "filesystem",
     });
 }
