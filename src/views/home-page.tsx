@@ -10,6 +10,8 @@ import dynamic from "next/dynamic";
 import {SiteCopy} from "@/lib/site-copy";
 import {SiteLocale} from "@/lib/site-locale";
 
+const MEDIUM_URL = "https://medium.com/@theadamant";
+
 const WebsiteAuditFab = dynamic(
     () => import("@/components/ui/website-audit-fab").then((module) => module.WebsiteAuditFab),
 );
@@ -47,6 +49,19 @@ export default function HomePage({
                     text: item.answer,
                 },
             })),
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            name: "The Adamant on Medium",
+            url: MEDIUM_URL,
+            inLanguage: locale,
+            description: "Articles and insights from The Adamant about web design, UX, website development, SEO, and digital products.",
+            publisher: {
+                "@type": "Organization",
+                name: "The Adamant",
+                url: MEDIUM_URL,
+            },
         },
     ];
 

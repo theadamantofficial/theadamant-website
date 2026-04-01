@@ -9,6 +9,81 @@ import Link from "next/link";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 
+const MEDIUM_URL = "https://medium.com/@theadamant";
+const MEDIUM_COPY: Record<SiteLocale, {
+    kicker: string;
+    title: string;
+    description: string;
+    button: string;
+}> = {
+    en: {
+        kicker: "Insights",
+        title: "Read our web design and SEO articles on Medium.",
+        description: "Follow The Adamant on Medium for articles on website strategy, UX, SEO foundations, and digital product thinking.",
+        button: "Visit Medium blog",
+    },
+    hi: {
+        kicker: "Insights",
+        title: "Medium पर हमारे web design और SEO लेख पढ़ें।",
+        description: "The Adamant के Medium ब्लॉग पर website strategy, UX, SEO foundations और digital product insights पढ़ें।",
+        button: "Medium ब्लॉग देखें",
+    },
+    gu: {
+        kicker: "Insights",
+        title: "Medium પર અમારા web design અને SEO લેખો વાંચો.",
+        description: "The Adamant ના Medium બ્લોગ પર website strategy, UX, SEO foundations અને digital product insights મેળવો.",
+        button: "Medium બ્લોગ જુઓ",
+    },
+    mr: {
+        kicker: "Insights",
+        title: "Medium वर आमचे web design आणि SEO लेख वाचा.",
+        description: "The Adamant च्या Medium ब्लॉगवर website strategy, UX, SEO foundations आणि digital product insights वाचा.",
+        button: "Medium ब्लॉग पहा",
+    },
+    bn: {
+        kicker: "Insights",
+        title: "Medium-এ আমাদের web design এবং SEO আর্টিকেল পড়ুন।",
+        description: "The Adamant-এর Medium ব্লগে website strategy, UX, SEO foundations এবং digital product insights পড়ুন।",
+        button: "Medium ব্লগ দেখুন",
+    },
+    ta: {
+        kicker: "Insights",
+        title: "Medium-ல் எங்களின் web design மற்றும் SEO கட்டுரைகளை படிக்கவும்.",
+        description: "The Adamant Medium பக்கத்தில் website strategy, UX, SEO foundations மற்றும் digital product insights படிக்கலாம்.",
+        button: "Medium வலைப்பதிவை திறக்கவும்",
+    },
+    es: {
+        kicker: "Insights",
+        title: "Lee nuestros artículos de diseño web y SEO en Medium.",
+        description: "Sigue a The Adamant en Medium para leer sobre estrategia web, UX, SEO y producto digital.",
+        button: "Visitar blog en Medium",
+    },
+    fr: {
+        kicker: "Insights",
+        title: "Lisez nos articles sur le design web et le SEO sur Medium.",
+        description: "Suivez The Adamant sur Medium pour des articles sur la stratégie web, l'UX, le SEO et le produit digital.",
+        button: "Voir le blog Medium",
+    },
+    de: {
+        kicker: "Insights",
+        title: "Lesen Sie unsere Artikel zu Webdesign und SEO auf Medium.",
+        description: "Folgen Sie The Adamant auf Medium für Beiträge zu Webstrategie, UX, SEO-Grundlagen und digitalen Produkten.",
+        button: "Medium-Blog öffnen",
+    },
+    pt: {
+        kicker: "Insights",
+        title: "Leia nossos artigos de web design e SEO no Medium.",
+        description: "Acompanhe a The Adamant no Medium para conteúdos sobre estratégia web, UX, SEO e produto digital.",
+        button: "Visitar blog no Medium",
+    },
+    ja: {
+        kicker: "Insights",
+        title: "MediumでWebデザインとSEOの記事を読む。",
+        description: "The AdamantのMediumでは、Web戦略、UX、SEO基盤、デジタルプロダクトに関する記事を公開しています。",
+        button: "Mediumブログを見る",
+    },
+};
+
 export default function Footer({
     copy,
     locale,
@@ -16,6 +91,8 @@ export default function Footer({
     copy: SiteCopy["footer"];
     locale: SiteLocale;
 }) {
+    const mediumCopy = MEDIUM_COPY[locale];
+
     return <footer className="section-shell pb-12 pt-6">
         <div className="glass-panel overflow-hidden px-6 py-10 sm:px-8">
             <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr_0.9fr]">
@@ -40,6 +117,26 @@ export default function Footer({
                         </a>
                         <a href="https://medium.com/@theadamant" className="social-link" target="_blank" rel="noreferrer" aria-label="The Adamant on Medium">
                             <IconBrandMedium className="social-icon"/>
+                        </a>
+                    </div>
+
+                    <div className="mt-6 rounded-[1.6rem] border border-black/10 bg-white/68 p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/52">
+                            {mediumCopy.kicker}
+                        </p>
+                        <h3 className="mt-3 text-lg font-semibold text-foreground">
+                            {mediumCopy.title}
+                        </h3>
+                        <p className="mt-3 text-sm leading-7 text-foreground/68">
+                            {mediumCopy.description}
+                        </p>
+                        <a
+                            href={MEDIUM_URL}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="button-secondary mt-4"
+                        >
+                            {mediumCopy.button}
                         </a>
                     </div>
                 </div>

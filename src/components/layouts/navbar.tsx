@@ -14,6 +14,21 @@ import {LanguageSwitcher} from "@/components/ui/language-switcher";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 
+const MEDIUM_URL = "https://medium.com/@theadamant";
+const BLOG_LABELS: Record<SiteLocale, string> = {
+    en: "Blog",
+    hi: "ब्लॉग",
+    gu: "બ્લોગ",
+    mr: "ब्लॉग",
+    bn: "ব্লগ",
+    ta: "வலைப்பதிவு",
+    es: "Blog",
+    fr: "Blog",
+    de: "Blog",
+    pt: "Blog",
+    ja: "ブログ",
+};
+
 export function Navbar({
     copy,
     locale,
@@ -21,10 +36,17 @@ export function Navbar({
     copy: SiteCopy["navbar"];
     locale: SiteLocale;
 }) {
-    const navItems = copy.navItems.map((item) => ({
-        name: item.name,
-        link: getLocalizedPath(locale, item.anchor),
-    }));
+    const navItems: Array<{ name: string; link: string; external?: boolean }> = [
+        ...copy.navItems.map((item) => ({
+            name: item.name,
+            link: getLocalizedPath(locale, item.anchor),
+        })),
+        {
+            name: BLOG_LABELS[locale],
+            link: MEDIUM_URL,
+            external: true,
+        },
+    ];
     const homeHref = getLocalizedPath(locale);
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -122,14 +144,27 @@ export function Navbar({
                     onClose={() => setIsMobileMenuOpen(false)}
                 >
                     {navItems.map((item, idx) => (
-                        <Link
-                            key={`mobile-link-${idx}`}
-                            href={item.link}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="relative text-neutral-600 dark:text-neutral-300"
-                        >
-                            <span className="block">{item.name}</span>
-                        </Link>
+                        item.external ? (
+                            <a
+                                key={`mobile-link-${idx}`}
+                                href={item.link}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="relative text-neutral-600 dark:text-neutral-300"
+                            >
+                                <span className="block">{item.name}</span>
+                            </a>
+                        ) : (
+                            <Link
+                                key={`mobile-link-${idx}`}
+                                href={item.link}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="relative text-neutral-600 dark:text-neutral-300"
+                            >
+                                <span className="block">{item.name}</span>
+                            </Link>
+                        )
                     ))}
                     <LanguageSwitcher mobile/>
                     <button
