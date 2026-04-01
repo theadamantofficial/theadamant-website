@@ -67,6 +67,7 @@ const loadingMessages = [
 const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "default_service";
 const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 const EMAILJS_AUDIT_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_AUDIT_TEMPLATE_ID || "template_1c1pps9";
+const AUDIT_NOTIFICATION_EMAIL = process.env.NEXT_PUBLIC_AUDIT_NOTIFICATION_EMAIL || "admin@theadamant.com";
 
 export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -185,13 +186,13 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
                     website: normalizedUrl,
                 });
                 setDeliveryStatus("sent");
-                setDeliveryMessage(`Audit summary sent to ${visitorEmail}.`);
-                toast.success(`Audit sent to ${visitorEmail}`);
+                setDeliveryMessage("Audit lead details were shared with The Adamant team.");
+                toast.success("Audit lead sent to The Adamant team");
             } catch (error) {
                 console.error("Audit EmailJS delivery failed", error);
                 setDeliveryStatus("failed");
-                setDeliveryMessage("The audit is ready here, but the email copy could not be sent.");
-                toast.error("Audit email could not be sent.");
+                setDeliveryMessage("The audit is ready here, but the team notification could not be sent.");
+                toast.error("Audit team notification could not be sent.");
             }
 
             setStatus("done");
@@ -261,7 +262,7 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
                                             Enter your email and website to unlock a fast audit.
                                         </h2>
                                         <p className="mt-2 text-sm leading-6 text-foreground/70">
-                                            Performance, SEO, and UX signals pulled into one practical report you can act on and send to your inbox.
+                                            Performance, SEO, and UX signals pulled into one practical report you can act on while sharing the lead with our team.
                                         </p>
                                     </div>
 
@@ -401,7 +402,7 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
                                                     {deliveryStatus === "sent" && (
                                                         <span className="feature-chip !rounded-full !px-3 !py-1">
                                                             <Mail className="h-3.5 w-3.5"/>
-                                                            Sent to {visitorEmail}
+                                                            Team notified
                                                         </span>
                                                     )}
                                                     {report.aiEnhanced && (
@@ -547,13 +548,17 @@ async function sendAuditEmail({
         EMAILJS_AUDIT_TEMPLATE_ID,
         {
             name: name.trim() || "Website visitor",
-            email,
+            email: AUDIT_NOTIFICATION_EMAIL,
+            to_email: AUDIT_NOTIFICATION_EMAIL,
+            lead_email: email,
+            submitted_email: email,
+            reply_to: email,
             website,
             time: new Date(report.analyzedAt).toLocaleString(),
             performance_score: String(report.scores.performance),
             seo_issues: summarizeIssues(report.seoIssues, "No major SEO issues were flagged."),
             ux_issues: summarizeIssues(report.uxIssues, "No major UX issues were flagged."),
-            additional_notes: buildAdditionalNotes(report),
+            additional_notes: buildAdditionalNotes(report, email),
         },
         {
             publicKey: EMAILJS_PUBLIC_KEY,
@@ -572,9 +577,9 @@ function summarizeIssues(items: AuditIssue[], fallback: string) {
         .join(", ");
 }
 
-function buildAdditionalNotes(report: AuditReport) {
+function buildAdditionalNotes(report: AuditReport, email: string) {
     const nextSteps = report.narrative.nextSteps.slice(0, 3).join(" | ");
-    return `${report.narrative.summary} Next steps: ${nextSteps}`;
+    return `Lead email: ${email}. ${report.narrative.summary} Next steps: ${nextSteps}`;
 }
 
 function MetricRow({label, value}: { label: string; value: string }) {
