@@ -3,9 +3,12 @@ import {ArrowRight, ExternalLink, PenSquare} from "lucide-react";
 import {Navbar} from "@/components/layouts/navbar";
 import Footer from "@/components/layouts/footer";
 import {MEDIUM_URL} from "@/lib/blog-config";
+import {InternalBlogPost} from "@/lib/internal-blog";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPagePath, getLocalizedPath, localeToHtmlLang, SiteLocale} from "@/lib/site-locale";
 import {MediumPost} from "@/lib/medium";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
 const BLOG_COPY: Record<SiteLocale, {
     kicker: string;
@@ -20,8 +23,8 @@ const BLOG_COPY: Record<SiteLocale, {
 }> = {
     en: {
         kicker: "Blog hub",
-        title: "Articles from The Adamant, published on Medium.",
-        description: "This page keeps your content discoverable on your own domain while your publishing workflow stays on Medium. Read the latest insights on web design, UX, SEO, and digital product strategy.",
+        title: "Insights from The Adamant, published on-site and distributed through Medium.",
+        description: "This blog keeps your content discoverable on your own domain while still letting Medium support wider reach. Read internal articles and linked insights on web design, UX, SEO, and digital product strategy.",
         latestLabel: "Latest articles",
         emptyTitle: "New articles will appear here as soon as they are published on Medium.",
         emptyDescription: "This page is ready to become your on-site blog hub. Publish on Medium, and the latest posts can be surfaced here for better internal linking and content discovery.",
@@ -141,25 +144,43 @@ const BLOG_COPY: Record<SiteLocale, {
     },
 };
 
+const INTERFACE_COPY = {
+    sectionTitle: "Articles on The Adamant",
+    sectionDescription: "Internal articles published on your site appear here first. Medium posts can still sit alongside them for discovery and internal linking.",
+    adminAccess: "Company member login",
+    internalTitle: "Published on The Adamant",
+    internalEmptyTitle: "No internal blog posts yet.",
+    internalEmptyDescription: "Use the company member login to publish your first on-site article. It will appear in this section immediately.",
+    mediumTitle: "From Medium",
+    mediumEmptyTitle: "No Medium posts available right now.",
+    mediumEmptyDescription: "The Medium feed is still connected here, so published posts can continue to strengthen discovery from your own domain.",
+    readArticle: "Read article",
+    readOnMedium: "Read on Medium",
+    mediumSourceLabel: "Medium",
+    internalSourceLabel: "The Adamant",
+};
+
 export default function BlogPage({
     copy,
     locale,
-    posts,
+    mediumPosts,
+    internalPosts,
 }: {
     copy: SiteCopy;
     locale: SiteLocale;
-    posts: MediumPost[];
+    mediumPosts: MediumPost[];
+    internalPosts: InternalBlogPost[];
 }) {
     const blogCopy = BLOG_COPY[locale];
-    const hasPosts = posts.length > 0;
     const formattedLocale = localeToHtmlLang(locale);
+    const pathname = getLocalizedPagePath(locale, "blog");
 
     const schemas = [
         {
             "@context": "https://schema.org",
             "@type": "Blog",
             name: "The Adamant Blog",
-            url: getLocalizedPagePath(locale, "blog"),
+            url: siteUrl ? `${siteUrl}${pathname}` : pathname,
             inLanguage: locale,
             description: blogCopy.description,
             publisher: {
@@ -167,13 +188,28 @@ export default function BlogPage({
                 name: "The Adamant",
                 sameAs: [MEDIUM_URL],
             },
-            blogPost: posts.map((post) => ({
-                "@type": "BlogPosting",
-                headline: post.title,
-                url: post.link,
-                datePublished: post.publishedAt,
-                description: post.excerpt,
-            })),
+            blogPost: [
+                ...internalPosts.map((post) => ({
+                    "@type": "BlogPosting",
+                    headline: post.title,
+                    url: siteUrl
+                        ? `${siteUrl}${getLocalizedPagePath(locale, `blog/${post.slug}`)}`
+                        : getLocalizedPagePath(locale, `blog/${post.slug}`),
+                    datePublished: post.publishedAt,
+                    description: post.excerpt,
+                    author: {
+                        "@type": "Person",
+                        name: post.authorName,
+                    },
+                })),
+                ...mediumPosts.map((post) => ({
+                    "@type": "BlogPosting",
+                    headline: post.title,
+                    url: post.link,
+                    datePublished: post.publishedAt,
+                    description: post.excerpt,
+                })),
+            ],
         },
     ];
 
@@ -203,6 +239,10 @@ export default function BlogPage({
                             {blogCopy.visitMedium}
                             <ExternalLink className="h-4 w-4"/>
                         </a>
+                        <Link href={getLocalizedPagePath(locale, "blog/admin")} className="button-secondary">
+                            {INTERFACE_COPY.adminAccess}
+                            <ArrowRight className="h-4 w-4"/>
+                        </Link>
                         <Link href={getLocalizedPath(locale, "contact")} className="button-primary">
                             {blogCopy.startProject}
                             <ArrowRight className="h-4 w-4"/>
@@ -212,94 +252,206 @@ export default function BlogPage({
             </section>
 
             <section className="section-shell pb-16">
-                <div className="flex items-center justify-between gap-4">
-                    <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">{blogCopy.latestLabel}</h2>
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                        <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">{INTERFACE_COPY.sectionTitle}</h2>
+                        <p className="mt-2 max-w-3xl text-sm leading-7 text-foreground/66">
+                            {INTERFACE_COPY.sectionDescription}
+                        </p>
+                    </div>
                     <p className="text-sm text-foreground/58">{blogCopy.freshness}</p>
                 </div>
 
-                {hasPosts ? (
-                    <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                        {posts.map((post) => (
-                            <article key={post.guid} className="glass-panel lift-card flex h-full flex-col overflow-hidden">
-                                {post.thumbnailUrl ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img
-                                        src={post.thumbnailUrl}
-                                        alt={post.title}
-                                        className="h-52 w-full object-cover"
-                                        loading="lazy"
-                                    />
-                                ) : (
-                                    <div className="h-52 bg-[radial-gradient(circle_at_top_left,rgba(13,92,99,0.18),transparent_45%),linear-gradient(180deg,rgba(255,255,255,0.72),rgba(234,223,206,0.7))] dark:bg-[radial-gradient(circle_at_top_left,rgba(88,183,179,0.18),transparent_45%),linear-gradient(180deg,rgba(24,28,31,0.92),rgba(14,17,19,0.94))]"/>
-                                )}
+                <div className="mt-8">
+                    <SectionHeader title={INTERFACE_COPY.internalTitle} badge={INTERFACE_COPY.internalSourceLabel}/>
+                    {internalPosts.length > 0 ? (
+                        <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                            {internalPosts.map((post) => (
+                                <article key={post.id} className="glass-panel lift-card flex h-full flex-col overflow-hidden">
+                                    {post.coverImage ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img
+                                            src={post.coverImage}
+                                            alt={post.title}
+                                            className="h-52 w-full object-cover"
+                                            loading="lazy"
+                                        />
+                                    ) : (
+                                        <div className="h-52 bg-[radial-gradient(circle_at_top_left,rgba(13,92,99,0.18),transparent_45%),linear-gradient(180deg,rgba(255,255,255,0.72),rgba(234,223,206,0.7))] dark:bg-[radial-gradient(circle_at_top_left,rgba(88,183,179,0.18),transparent_45%),linear-gradient(180deg,rgba(24,28,31,0.92),rgba(14,17,19,0.94))]"/>
+                                    )}
 
-                                <div className="flex flex-1 flex-col p-6">
-                                    <div className="flex flex-wrap gap-2">
-                                        {post.categories.slice(0, 3).map((category) => (
-                                            <span key={category} className="feature-chip !px-3 !py-1 text-xs">
-                                                {category}
-                                            </span>
-                                        ))}
-                                    </div>
-
-                                    <h3 className="mt-4 text-xl font-semibold leading-8 text-foreground">
-                                        {post.title}
-                                    </h3>
-
-                                    <p className="mt-3 text-sm leading-7 text-foreground/70">
-                                        {post.excerpt}
-                                    </p>
-
-                                    <div className="mt-auto pt-6">
-                                        <div className="text-sm text-foreground/55">
-                                            {new Intl.DateTimeFormat(formattedLocale, {
-                                                day: "numeric",
-                                                month: "short",
-                                                year: "numeric",
-                                            }).format(new Date(post.publishedAt))}
+                                    <div className="flex flex-1 flex-col p-6">
+                                        <div className="flex flex-wrap gap-2">
+                                            {post.tags.slice(0, 3).map((tag) => (
+                                                <span key={tag} className="feature-chip !px-3 !py-1 text-xs">
+                                                    {tag}
+                                                </span>
+                                            ))}
                                         </div>
-                                        <a
-                                            href={post.link}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-foreground transition hover:text-primary"
-                                        >
-                                            Read on Medium
-                                            <ExternalLink className="h-4 w-4"/>
-                                        </a>
+
+                                        <h3 className="mt-4 text-xl font-semibold leading-8 text-foreground">
+                                            {post.title}
+                                        </h3>
+
+                                        <p className="mt-3 text-sm leading-7 text-foreground/70">
+                                            {post.excerpt}
+                                        </p>
+
+                                        <div className="mt-auto pt-6">
+                                            <div className="text-sm text-foreground/55">
+                                                {formatPublishedDate(post.publishedAt, formattedLocale)}
+                                            </div>
+                                            <Link
+                                                href={getLocalizedPagePath(locale, `blog/${post.slug}`)}
+                                                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-foreground transition hover:text-primary"
+                                            >
+                                                {INTERFACE_COPY.readArticle}
+                                                <ArrowRight className="h-4 w-4"/>
+                                            </Link>
+                                        </div>
                                     </div>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="glass-panel mt-8 grid gap-6 p-8 lg:grid-cols-[1.1fr_0.9fr]">
-                        <div>
-                            <h3 className="text-2xl font-semibold text-foreground">{blogCopy.emptyTitle}</h3>
-                            <p className="mt-4 max-w-2xl text-base leading-8 text-foreground/72">
-                                {blogCopy.emptyDescription}
-                            </p>
+                                </article>
+                            ))}
                         </div>
-                        <div className="rounded-[1.75rem] border border-black/10 bg-white/68 p-6 dark:border-white/10 dark:bg-white/[0.04]">
-                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/52">
-                                Medium
-                            </p>
-                            <h3 className="mt-3 text-lg font-semibold text-foreground">
-                                {MEDIUM_URL.replace("https://", "")}
-                            </h3>
-                            <p className="mt-3 text-sm leading-7 text-foreground/68">
-                                Publish new articles on Medium and this page can surface them here as an indexable content hub on your own domain.
-                            </p>
-                            <a href={MEDIUM_URL} target="_blank" rel="noreferrer" className="button-secondary mt-5">
-                                {blogCopy.visitMedium}
-                                <ExternalLink className="h-4 w-4"/>
-                            </a>
+                    ) : (
+                        <EmptySectionCard
+                            title={INTERFACE_COPY.internalEmptyTitle}
+                            description={INTERFACE_COPY.internalEmptyDescription}
+                            actionHref={getLocalizedPagePath(locale, "blog/admin")}
+                            actionLabel={INTERFACE_COPY.adminAccess}
+                        />
+                    )}
+                </div>
+
+                <div className="mt-12">
+                    <SectionHeader title={INTERFACE_COPY.mediumTitle} badge={INTERFACE_COPY.mediumSourceLabel}/>
+                    {mediumPosts.length > 0 ? (
+                        <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                            {mediumPosts.map((post) => (
+                                <article key={post.guid} className="glass-panel lift-card flex h-full flex-col overflow-hidden">
+                                    {post.thumbnailUrl ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img
+                                            src={post.thumbnailUrl}
+                                            alt={post.title}
+                                            className="h-52 w-full object-cover"
+                                            loading="lazy"
+                                        />
+                                    ) : (
+                                        <div className="h-52 bg-[radial-gradient(circle_at_top_left,rgba(13,92,99,0.18),transparent_45%),linear-gradient(180deg,rgba(255,255,255,0.72),rgba(234,223,206,0.7))] dark:bg-[radial-gradient(circle_at_top_left,rgba(88,183,179,0.18),transparent_45%),linear-gradient(180deg,rgba(24,28,31,0.92),rgba(14,17,19,0.94))]"/>
+                                    )}
+
+                                    <div className="flex flex-1 flex-col p-6">
+                                        <div className="flex flex-wrap gap-2">
+                                            {post.categories.slice(0, 3).map((category) => (
+                                                <span key={category} className="feature-chip !px-3 !py-1 text-xs">
+                                                    {category}
+                                                </span>
+                                            ))}
+                                        </div>
+
+                                        <h3 className="mt-4 text-xl font-semibold leading-8 text-foreground">
+                                            {post.title}
+                                        </h3>
+
+                                        <p className="mt-3 text-sm leading-7 text-foreground/70">
+                                            {post.excerpt}
+                                        </p>
+
+                                        <div className="mt-auto pt-6">
+                                            <div className="text-sm text-foreground/55">
+                                                {formatPublishedDate(post.publishedAt, formattedLocale)}
+                                            </div>
+                                            <a
+                                                href={post.link}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-foreground transition hover:text-primary"
+                                            >
+                                                {INTERFACE_COPY.readOnMedium}
+                                                <ExternalLink className="h-4 w-4"/>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
                         </div>
-                    </div>
-                )}
+                    ) : (
+                        <EmptySectionCard
+                            title={INTERFACE_COPY.mediumEmptyTitle}
+                            description={INTERFACE_COPY.mediumEmptyDescription}
+                            actionHref={MEDIUM_URL}
+                            actionLabel={blogCopy.visitMedium}
+                            external
+                        />
+                    )}
+                </div>
             </section>
 
             <Footer copy={copy.footer} locale={locale}/>
         </main>
     );
+}
+
+function SectionHeader({title, badge}: { title: string; badge: string }) {
+    return (
+        <div className="flex items-center justify-between gap-4">
+            <h3 className="text-xl font-semibold text-foreground sm:text-2xl">{title}</h3>
+            <span className="feature-chip !px-3 !py-1 text-xs">{badge}</span>
+        </div>
+    );
+}
+
+function EmptySectionCard({
+    title,
+    description,
+    actionHref,
+    actionLabel,
+    external = false,
+}: {
+    title: string;
+    description: string;
+    actionHref: string;
+    actionLabel: string;
+    external?: boolean;
+}) {
+    return (
+        <div className="glass-panel mt-5 grid gap-6 p-8 lg:grid-cols-[1.1fr_0.9fr]">
+            <div>
+                <h3 className="text-2xl font-semibold text-foreground">{title}</h3>
+                <p className="mt-4 max-w-2xl text-base leading-8 text-foreground/72">
+                    {description}
+                </p>
+            </div>
+            <div className="rounded-[1.75rem] border border-black/10 bg-white/68 p-6 dark:border-white/10 dark:bg-white/[0.04]">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/52">
+                    {external ? "Medium" : "Internal publisher"}
+                </p>
+                <p className="mt-3 text-sm leading-7 text-foreground/68">
+                    {external
+                        ? "This section stays ready for Medium distribution whenever new feed items are available."
+                        : "The company admin page lets your team publish articles directly into the site blog with a cookie-based sign-in."}
+                </p>
+                {external ? (
+                    <a href={actionHref} target="_blank" rel="noreferrer" className="button-secondary mt-5">
+                        {actionLabel}
+                        <ExternalLink className="h-4 w-4"/>
+                    </a>
+                ) : (
+                    <Link href={actionHref} className="button-secondary mt-5">
+                        {actionLabel}
+                        <ArrowRight className="h-4 w-4"/>
+                    </Link>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function formatPublishedDate(value: string, locale: string) {
+    return new Intl.DateTimeFormat(locale, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    }).format(new Date(value));
 }
