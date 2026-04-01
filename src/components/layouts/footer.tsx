@@ -125,7 +125,7 @@ export default function Footer({
                     </div>
 
                     <div className="mt-6 flex gap-3">
-                        <a href="https://www.instagram.com/theadamantofficial" className="social-link" target="_blank" rel="noreferrer" aria-label="The Adamant on Instagram">
+                        <a href="https://www.instagram.com/theadamantofficial/" className="social-link" target="_blank" rel="noreferrer" aria-label="The Adamant on Instagram">
                             <IconBrandInstagram className="social-icon"/>
                         </a>
                         <a href="https://www.linkedin.com/company/the-adamant" className="social-link" target="_blank" rel="noreferrer" aria-label="The Adamant on LinkedIn">
