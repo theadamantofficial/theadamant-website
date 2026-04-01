@@ -329,6 +329,26 @@
     .social-icon {
         @apply h-5 w-5;
     }
+
+    .audit-fab {
+        @apply fixed bottom-5 right-5 z-[70] inline-flex items-center gap-3 rounded-full border border-black/10 bg-white/86 px-4 py-3 text-sm font-semibold text-foreground shadow-[0_24px_60px_-30px_rgba(15,23,42,0.55)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 dark:border-white/10 dark:bg-[#11181c]/88;
+    }
+
+    .audit-fab-pulse {
+        @apply h-2.5 w-2.5 rounded-full bg-accent shadow-[0_0_0_8px_rgba(214,106,69,0.16)];
+    }
+
+    .audit-sheet {
+        @apply fixed inset-x-4 bottom-4 top-24 z-[80] overflow-hidden rounded-[2rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.97),rgba(246,240,229,0.94))] shadow-[0_45px_120px_-55px_rgba(15,23,42,0.7)] backdrop-blur-2xl dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(15,19,20,0.98),rgba(10,13,14,0.94))] md:left-auto md:right-6 md:top-28 md:w-[min(34rem,calc(100vw-3rem))];
+    }
+
+    .audit-score-card {
+        @apply rounded-[1.35rem] border border-black/10 bg-white/78 p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04];
+    }
+
+    .audit-issue-card {
+        @apply rounded-[1.2rem] border border-black/10 bg-white/70 p-4 dark:border-white/10 dark:bg-white/[0.04];
+    }
 }
 
 @layer base {

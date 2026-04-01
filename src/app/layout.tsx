@@ -4,7 +4,7 @@ import {ReactNode} from "react";
 import {Manrope, Space_Grotesk} from "next/font/google";
 import {Toaster} from "react-hot-toast";
 import {headers} from "next/headers";
-import {DEFAULT_SITE_LOCALE, isSiteLocale, localeToHtmlLang} from "@/lib/site-locale";
+import {DEFAULT_SITE_LOCALE, isSiteLocale, localeToHtmlLang, SiteLocale} from "@/lib/site-locale";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
@@ -64,7 +64,7 @@ export default async function RootLayout({children}: Readonly<{
     const requestHeaders = await headers();
     const siteLocaleHeader = requestHeaders.get("x-site-locale");
     const siteLocale = isSiteLocale(siteLocaleHeader ?? "")
-        ? siteLocaleHeader as "en" | "hi" | "es" | "fr"
+        ? siteLocaleHeader as SiteLocale
         : DEFAULT_SITE_LOCALE;
 
     return (

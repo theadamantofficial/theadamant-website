@@ -6,6 +6,7 @@ import ServicesSection from "@/components/sections/services-section";
 import ValuePropsSection from "@/components/sections/value-props-section";
 import ProcessSection from "@/components/sections/process-section";
 import FaqSection from "@/components/sections/faq-section";
+import {WebsiteAuditFab} from "@/components/ui/website-audit-fab";
 import {SiteCopy} from "@/lib/site-copy";
 import {SiteLocale} from "@/lib/site-locale";
 
@@ -55,6 +56,8 @@ export default function HomePage({
         ))}
 
         <Navbar copy={copy.navbar} locale={locale}/>
+
+        <WebsiteAuditFab locale={locale}/>
 
         <HeroSection copy={copy.hero} locale={locale}/>
 
