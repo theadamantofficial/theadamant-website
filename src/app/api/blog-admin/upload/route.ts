@@ -1,12 +1,12 @@
 import {randomUUID} from "node:crypto";
 import {mkdir, writeFile} from "node:fs/promises";
 import path from "node:path";
-import {put} from "@vercel/blob";
 import {NextRequest, NextResponse} from "next/server";
 import {
     BLOG_ADMIN_COOKIE_NAME,
-    getBlobReadWriteToken,
+    buildBlogMediaProxyPath,
     isBlobStorageConfigured,
+    uploadBlogCoverToBlob,
     verifyBlogAdminSessionToken,
 } from "@/lib/internal-blog";
 
@@ -54,19 +54,13 @@ export async function POST(request: NextRequest) {
         const fileName = `${Date.now()}-${randomUUID()}.${extension}`;
 
         if (isBlobStorageConfigured()) {
-            const blob = await put(`blog/covers/${fileName}`, file, {
-                access: "public",
-                addRandomSuffix: false,
-                allowOverwrite: true,
-                cacheControlMaxAge: 60 * 60 * 24 * 365,
-                contentType: file.type,
-                token: getBlobReadWriteToken(),
-            });
+            const {result: blob, access} = await uploadBlogCoverToBlob(file, `blog/covers/${fileName}`);
 
             return NextResponse.json({
-                url: blob.url,
+                url: access === "private" ? buildBlogMediaProxyPath(blob.pathname) : blob.url,
                 name: file.name,
                 storageMode: "blob",
+                access,
             });
         }
 

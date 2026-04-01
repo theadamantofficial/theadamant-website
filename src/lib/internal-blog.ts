@@ -2,6 +2,7 @@ import {createHmac, randomUUID, timingSafeEqual} from "node:crypto";
 import {mkdir, readFile, writeFile} from "node:fs/promises";
 import path from "node:path";
 import {get, put} from "@vercel/blob";
+import type {BlobAccessType, GetBlobResult, PutBlobResult} from "@vercel/blob";
 
 export interface InternalBlogPost {
     id: string;
@@ -115,6 +116,13 @@ export function getBlobReadWriteToken() {
     }
 
     return rawToken.replace(/^['"]|['"]$/g, "");
+}
+
+export function buildBlogMediaProxyPath(blobPathname: string) {
+    return `/api/blog-media/${blobPathname
+        .split("/")
+        .map((segment) => encodeURIComponent(segment))
+        .join("/")}`;
 }
 
 export function createBlogAdminSessionToken(email: string) {
@@ -297,10 +305,12 @@ async function readInternalBlogPosts() {
 
 async function readBlobInternalBlogPosts() {
     try {
-        const result = await get(BLOG_POSTS_BLOB_PATH, {
-            access: "public",
-            token: getBlobReadWriteToken(),
-        });
+        const {result} = await executeBlobOperation((access) => (
+            get(BLOG_POSTS_BLOB_PATH, {
+                access,
+                token: getBlobReadWriteToken(),
+            })
+        ));
 
         if (!result || result.statusCode !== 200 || !result.stream) {
             return null as InternalBlogPost[] | null;
@@ -346,14 +356,16 @@ async function writeInternalBlogPosts(posts: InternalBlogPost[]) {
 }
 
 async function writeBlobInternalBlogPosts(posts: InternalBlogPost[]) {
-    await put(BLOG_POSTS_BLOB_PATH, `${JSON.stringify(posts, null, 2)}\n`, {
-        access: "public",
-        addRandomSuffix: false,
-        allowOverwrite: true,
-        cacheControlMaxAge: 60,
-        contentType: "application/json; charset=utf-8",
-        token: getBlobReadWriteToken(),
-    });
+    await executeBlobOperation((access) => (
+        put(BLOG_POSTS_BLOB_PATH, `${JSON.stringify(posts, null, 2)}\n`, {
+            access,
+            addRandomSuffix: false,
+            allowOverwrite: true,
+            cacheControlMaxAge: 60,
+            contentType: "application/json; charset=utf-8",
+            token: getBlobReadWriteToken(),
+        })
+    ));
 }
 
 async function writeLocalInternalBlogPosts(posts: InternalBlogPost[]) {
@@ -478,4 +490,57 @@ function normalizeCoverImage(value?: string) {
     } catch {
         return null;
     }
+}
+
+export async function uploadBlogCoverToBlob(file: File, pathname: string) {
+    return executeBlobOperation((access) => (
+        put(pathname, file, {
+            access,
+            addRandomSuffix: false,
+            allowOverwrite: true,
+            cacheControlMaxAge: 60 * 60 * 24 * 365,
+            contentType: file.type,
+            token: getBlobReadWriteToken(),
+        })
+    ));
+}
+
+export async function getBlogBlob(pathname: string) {
+    return executeBlobOperation((access) => (
+        get(pathname, {
+            access,
+            token: getBlobReadWriteToken(),
+        })
+    ));
+}
+
+async function executeBlobOperation<T extends GetBlobResult | PutBlobResult | null>(
+    operation: (access: BlobAccessType) => Promise<T>,
+) {
+    const preferredAccess = getPreferredBlobAccess();
+
+    try {
+        return {
+            access: preferredAccess,
+            result: await operation(preferredAccess),
+        };
+    } catch (error) {
+        if (preferredAccess === "public" && isPrivateStoreAccessError(error)) {
+            return {
+                access: "private" as const,
+                result: await operation("private"),
+            };
+        }
+
+        throw error;
+    }
+}
+
+function getPreferredBlobAccess(): BlobAccessType {
+    const configuredAccess = process.env.BLOB_STORE_ACCESS?.trim().toLowerCase();
+    return configuredAccess === "private" ? "private" : "public";
+}
+
+function isPrivateStoreAccessError(error: unknown) {
+    return error instanceof Error && /private store/i.test(error.message);
 }
