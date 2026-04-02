@@ -3,84 +3,25 @@ import {NextRequest, NextResponse} from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type ScoreKey = "performance" | "seo" | "ux" | "accessibility" | "bestPractices";
-type AuditIssueCategory = "performance" | "seo" | "ux";
+const N8N_AUDIT_WEBHOOK_URL = process.env.N8N_AUDIT_WEBHOOK_URL ?? "https://n8n-production-4e87.up.railway.app/webhook/audit";
+const FALLBACK_ERROR_MESSAGE = "We could not start the audit right now.";
+const ERROR_DETAIL_LIMIT = 240;
 
-interface AuditIssue {
-    id: string;
-    title: string;
-    detail: string;
-    category: AuditIssueCategory;
+type JsonRecord = Record<string, unknown>;
+
+interface AuditRequestBody {
+    url?: string;
+    email?: string;
 }
 
-interface AuditNarrative {
-    headline: string;
-    summary: string;
-    performanceTakeaway: string;
-    seoTakeaway: string;
-    uxTakeaway: string;
-    nextSteps: string[];
-    ctaLabel: string;
-}
-
-interface AuditReport {
+interface AuditResult {
     url: string;
-    analyzedAt: string;
-    scores: Record<ScoreKey, number>;
-    metrics: {
-        largestContentfulPaint: string;
-        cumulativeLayoutShift: string;
-        totalBlockingTime: string;
-        speedIndex: string;
-    };
-    performanceIssues: AuditIssue[];
-    seoIssues: AuditIssue[];
-    uxIssues: AuditIssue[];
-    narrative: AuditNarrative;
-    aiEnhanced: boolean;
+    score?: number | string;
+    report?: unknown;
 }
-
-interface PageSpeedAudit {
-    title?: string;
-    description?: string;
-    displayValue?: string;
-    score?: number | null;
-    scoreDisplayMode?: string;
-}
-
-interface PageSpeedAuditRef {
-    id: string;
-}
-
-interface PageSpeedCategory {
-    score?: number | null;
-    auditRefs?: PageSpeedAuditRef[];
-}
-
-interface PageSpeedPayload {
-    lighthouseResult?: {
-        categories?: {
-            performance?: PageSpeedCategory;
-            seo?: PageSpeedCategory;
-            accessibility?: PageSpeedCategory;
-            "best-practices"?: PageSpeedCategory;
-        };
-        audits?: Record<string, PageSpeedAudit>;
-    };
-}
-
-const PAGE_SPEED_ENDPOINT = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed";
-const REQUESTED_CATEGORIES = ["performance", "seo", "accessibility", "best-practices"] as const;
-const IGNORED_AUDIT_IDS = new Set([
-    "lcp-breakdown-insight",
-    "legacy-javascript-insight",
-    "network-dependency-tree-insight",
-    "valid-source-maps",
-    "max-potential-fid",
-]);
 
 export async function POST(request: NextRequest) {
-    let payload: { url?: string };
+    let payload: AuditRequestBody;
 
     try {
         payload = await request.json();
@@ -89,70 +30,53 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedUrl = normalizeWebsiteUrl(payload.url);
+    const normalizedEmail = normalizeEmail(payload.email);
+
     if (!normalizedUrl) {
-        return NextResponse.json({error: "Enter a valid website URL to audit."}, {status: 400});
+        return NextResponse.json({error: "Enter a valid website URL."}, {status: 400});
+    }
+
+    if (!normalizedEmail) {
+        return NextResponse.json({error: "Enter a valid email address."}, {status: 400});
     }
 
     try {
-        const pageSpeedResponse = await fetch(buildPageSpeedUrl(normalizedUrl), {
+        const webhookResponse = await fetch(N8N_AUDIT_WEBHOOK_URL, {
+            method: "POST",
             headers: {
-                Accept: "application/json",
+                "Content-Type": "application/json",
+                Accept: "application/json, text/plain;q=0.9, */*;q=0.8",
             },
+            body: JSON.stringify({
+                url: normalizedUrl,
+                email: normalizedEmail,
+            }),
             cache: "no-store",
         });
 
-        if (!pageSpeedResponse.ok) {
-            const errorText = await pageSpeedResponse.text();
-            const quotaExceeded = pageSpeedResponse.status === 429 || /quota/i.test(errorText);
+        const webhookPayload = await parseWebhookResponse(webhookResponse);
+
+        if (!webhookResponse.ok) {
             return NextResponse.json(
                 {
-                    error: quotaExceeded
-                        ? "PageSpeed quota is unavailable right now. Add GOOGLE_PAGESPEED_API_KEY to use your own free Google quota."
-                        : "Could not analyze that website right now.",
-                    detail: errorText.slice(0, 240),
+                    error: extractErrorMessage(webhookPayload) ?? FALLBACK_ERROR_MESSAGE,
                 },
-                {status: quotaExceeded ? 429 : 502},
+                {status: normalizeErrorStatus(webhookResponse.status)},
             );
         }
 
-        const pageSpeedPayload = await pageSpeedResponse.json() as PageSpeedPayload;
-        const report = buildAuditReport(normalizedUrl, pageSpeedPayload);
-        const aiNarrative = await generateAiNarrative(report);
-
-        if (aiNarrative) {
-            report.narrative = aiNarrative;
-            report.aiEnhanced = true;
-        }
-
         return NextResponse.json({
-            normalizedUrl,
-            report,
+            message: "Report sent to your email",
+            result: extractAuditResult(webhookPayload, normalizedUrl),
         });
     } catch (error) {
         return NextResponse.json(
             {
-                error: "The audit service hit an unexpected error.",
-                detail: error instanceof Error ? error.message : "Unknown error",
+                error: error instanceof Error ? error.message : FALLBACK_ERROR_MESSAGE,
             },
-            {status: 500},
+            {status: 502},
         );
     }
-}
-
-function buildPageSpeedUrl(url: string) {
-    const requestUrl = new URL(PAGE_SPEED_ENDPOINT);
-    requestUrl.searchParams.set("url", url);
-    requestUrl.searchParams.set("strategy", "mobile");
-
-    for (const category of REQUESTED_CATEGORIES) {
-        requestUrl.searchParams.append("category", category);
-    }
-
-    if (process.env.GOOGLE_PAGESPEED_API_KEY) {
-        requestUrl.searchParams.set("key", process.env.GOOGLE_PAGESPEED_API_KEY);
-    }
-
-    return requestUrl;
 }
 
 function normalizeWebsiteUrl(input?: string) {
@@ -169,6 +93,7 @@ function normalizeWebsiteUrl(input?: string) {
 
     try {
         const parsed = new URL(withProtocol);
+
         if (!["http:", "https:"].includes(parsed.protocol)) {
             return null;
         }
@@ -179,280 +104,199 @@ function normalizeWebsiteUrl(input?: string) {
     }
 }
 
-function buildAuditReport(url: string, pageSpeedPayload: PageSpeedPayload): AuditReport {
-    const lighthouse = pageSpeedPayload?.lighthouseResult ?? {};
-    const categories = lighthouse?.categories ?? {};
-    const audits = lighthouse?.audits ?? {};
-
-    const scores = {
-        performance: normalizeScore(categories?.performance?.score),
-        seo: normalizeScore(categories?.seo?.score),
-        accessibility: normalizeScore(categories?.accessibility?.score),
-        bestPractices: normalizeScore(categories?.["best-practices"]?.score),
-        ux: 0,
-    };
-
-    scores.ux = Math.round((scores.accessibility + scores.bestPractices) / 2);
-
-    const performanceIssues = collectCategoryIssues({
-        audits,
-        auditRefs: categories?.performance?.auditRefs,
-        category: "performance",
-        maxItems: 4,
-    });
-
-    const seoIssues = collectCategoryIssues({
-        audits,
-        auditRefs: categories?.seo?.auditRefs,
-        category: "seo",
-        maxItems: 4,
-    });
-
-    const uxIssues = [
-        ...collectCategoryIssues({
-            audits,
-            auditRefs: categories?.accessibility?.auditRefs,
-            category: "ux",
-            maxItems: 2,
-        }),
-        ...collectCategoryIssues({
-            audits,
-            auditRefs: categories?.["best-practices"]?.auditRefs,
-            category: "ux",
-            maxItems: 2,
-        }),
-    ].slice(0, 4);
-
-    return {
-        url,
-        analyzedAt: new Date().toISOString(),
-        scores,
-        metrics: {
-            largestContentfulPaint: metricDisplay(audits?.["largest-contentful-paint"]),
-            cumulativeLayoutShift: metricDisplay(audits?.["cumulative-layout-shift"]),
-            totalBlockingTime: metricDisplay(audits?.["total-blocking-time"]),
-            speedIndex: metricDisplay(audits?.["speed-index"]),
-        },
-        performanceIssues,
-        seoIssues,
-        uxIssues,
-        narrative: buildFallbackNarrative({
-            scores,
-            performanceIssues,
-            seoIssues,
-            uxIssues,
-        }),
-        aiEnhanced: false,
-    };
-}
-
-function normalizeScore(score?: number | null) {
-    if (typeof score !== "number" || Number.isNaN(score)) {
-        return 0;
-    }
-
-    return Math.round(score * 100);
-}
-
-function metricDisplay(audit?: PageSpeedAudit) {
-    return audit?.displayValue ?? "Not available";
-}
-
-function collectCategoryIssues({
-    audits,
-    auditRefs,
-    category,
-    maxItems,
-}: {
-    audits: Record<string, PageSpeedAudit>;
-    auditRefs?: PageSpeedAuditRef[];
-    category: AuditIssueCategory;
-    maxItems: number;
-}) {
-    if (!Array.isArray(auditRefs)) {
-        return [] as AuditIssue[];
-    }
-
-    return auditRefs
-        .map((ref) => {
-            if (IGNORED_AUDIT_IDS.has(ref.id)) {
-                return null;
-            }
-
-            const audit = audits?.[ref.id];
-            if (!audit || !isFailingAudit(audit)) {
-                return null;
-            }
-
-            return {
-                id: ref.id,
-                title: sanitizeText(audit?.title ?? ref.id),
-                detail: buildIssueDetail(audit),
-                category,
-            } satisfies AuditIssue;
-        })
-        .filter((issue): issue is AuditIssue => Boolean(issue))
-        .slice(0, maxItems);
-}
-
-function isFailingAudit(audit: PageSpeedAudit) {
-    const displayMode = audit?.scoreDisplayMode;
-    const score = typeof audit?.score === "number" ? audit.score : null;
-
-    if (displayMode === "notApplicable" || displayMode === "informative" || displayMode === "manual") {
-        return false;
-    }
-
-    if (displayMode === "error") {
-        return true;
-    }
-
-    if (score === null) {
-        return false;
-    }
-
-    return score < 0.9;
-}
-
-function buildIssueDetail(audit: PageSpeedAudit) {
-    const description = sanitizeText(audit?.description ?? "");
-    const displayValue = sanitizeText(audit?.displayValue ?? "");
-
-    if (displayValue && description) {
-        return `${displayValue}. ${description}`;
-    }
-
-    return displayValue || description || "This area needs attention.";
-}
-
-function sanitizeText(text: string) {
-    return text
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-        .replace(/\s+/g, " ")
-        .trim();
-}
-
-function buildFallbackNarrative({
-    scores,
-    performanceIssues,
-    seoIssues,
-    uxIssues,
-}: {
-    scores: AuditReport["scores"];
-    performanceIssues: AuditIssue[];
-    seoIssues: AuditIssue[];
-    uxIssues: AuditIssue[];
-}): AuditNarrative {
-    const weakestArea = [
-        {label: "performance", score: scores.performance},
-        {label: "SEO", score: scores.seo},
-        {label: "UX", score: scores.ux},
-    ].sort((left, right) => left.score - right.score)[0];
-
-    return {
-        headline: weakestArea.score >= 85
-            ? "The site has a solid base, but there is still room to tighten conversion and search signals."
-            : `The biggest lift right now is ${weakestArea.label}.`,
-        summary: `This audit found practical issues that can affect load speed, search visibility, and trust on the page. Fixing the highest-impact items should make the site feel sharper and easier to rank.`,
-        performanceTakeaway: performanceIssues[0]?.title
-            ? `${performanceIssues[0].title} is one of the main reasons the page feels heavier than it should.`
-            : "Performance can improve by tightening assets, scripts, and render-blocking work.",
-        seoTakeaway: seoIssues[0]?.title
-            ? `${seoIssues[0].title} is limiting how clearly search engines can understand the page.`
-            : "SEO signals can be stronger with better metadata, structure, and content clarity.",
-        uxTakeaway: uxIssues[0]?.title
-            ? `${uxIssues[0].title} is creating friction in the user experience.`
-            : "The page can feel more trustworthy and easier to use with clearer interaction patterns.",
-        nextSteps: [
-            performanceIssues[0]?.title ? `Fix ${performanceIssues[0].title.toLowerCase()}.` : "Reduce load-time friction above the fold.",
-            seoIssues[0]?.title ? `Resolve ${seoIssues[0].title.toLowerCase()}.` : "Strengthen page structure and SEO signals.",
-            uxIssues[0]?.title ? `Improve ${uxIssues[0].title.toLowerCase()}.` : "Tighten clarity and conversion paths for users.",
-        ],
-        ctaLabel: "Fix these issues",
-    };
-}
-
-async function generateAiNarrative(report: AuditReport) {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
+function normalizeEmail(input?: string) {
+    if (!input) {
         return null;
     }
 
-    const model = process.env.OPENAI_AUDIT_MODEL ?? "gpt-4o-mini";
-    const completionResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-            model,
-            response_format: {
-                type: "json_object",
-            },
-            messages: [
-                {
-                    role: "system",
-                    content: "You are a premium website auditor. Return valid JSON only.",
-                },
-                {
-                    role: "user",
-                    content: JSON.stringify({
-                        task: "Convert this website audit into concise, client-facing insights.",
-                        instructions: {
-                            tone: "confident, clear, premium, actionable",
-                            output: {
-                                headline: "short sentence",
-                                summary: "2 sentence summary",
-                                performanceTakeaway: "1 sentence",
-                                seoTakeaway: "1 sentence",
-                                uxTakeaway: "1 sentence",
-                                nextSteps: ["3 concise action steps"],
-                                ctaLabel: "short CTA label",
-                            },
-                        },
-                        audit: report,
-                    }),
-                },
-            ],
-        }),
-    });
-
-    if (!completionResponse.ok) {
+    const trimmed = input.trim().toLowerCase();
+    if (!trimmed) {
         return null;
     }
 
-    const payload = await completionResponse.json();
-    const content = payload?.choices?.[0]?.message?.content;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(trimmed) ? trimmed : null;
+}
 
-    if (typeof content !== "string") {
+async function parseWebhookResponse(response: Response): Promise<unknown> {
+    const contentType = response.headers.get("content-type") ?? "";
+
+    if (contentType.includes("application/json")) {
+        try {
+            return await response.json();
+        } catch {
+            return null;
+        }
+    }
+
+    const text = await response.text();
+    if (!text) {
         return null;
     }
 
     try {
-        const parsed = JSON.parse(content);
-        if (
-            typeof parsed?.headline === "string"
-            && typeof parsed?.summary === "string"
-            && typeof parsed?.performanceTakeaway === "string"
-            && typeof parsed?.seoTakeaway === "string"
-            && typeof parsed?.uxTakeaway === "string"
-            && Array.isArray(parsed?.nextSteps)
-            && typeof parsed?.ctaLabel === "string"
-        ) {
-            return {
-                headline: parsed.headline,
-                summary: parsed.summary,
-                performanceTakeaway: parsed.performanceTakeaway,
-                seoTakeaway: parsed.seoTakeaway,
-                uxTakeaway: parsed.uxTakeaway,
-                nextSteps: parsed.nextSteps.slice(0, 3).map((step: unknown) => String(step)),
-                ctaLabel: parsed.ctaLabel,
-            } satisfies AuditNarrative;
-        }
+        return JSON.parse(text);
     } catch {
+        return text;
+    }
+}
+
+function extractAuditResult(payload: unknown, fallbackUrl: string): AuditResult {
+    const candidates = collectCandidates(payload);
+    const url = findStringValue(candidates, ["url", "website", "websiteUrl", "auditedUrl"]) ?? fallbackUrl;
+    const report = findReportValue(payload, candidates);
+    const score = findScoreValue(candidates) ?? extractScoreFromReport(report);
+
+    return {
+        url,
+        ...(score !== undefined ? {score} : {}),
+        ...(report !== undefined ? {report} : {}),
+    };
+}
+
+function collectCandidates(payload: unknown) {
+    const candidates: JsonRecord[] = [];
+
+    if (isRecord(payload)) {
+        candidates.push(payload);
+    }
+
+    for (const key of ["data", "result", "body", "audit"]) {
+        if (!isRecord(payload)) {
+            continue;
+        }
+
+        const nestedValue = payload[key];
+
+        if (isRecord(nestedValue)) {
+            candidates.push(nestedValue);
+        }
+    }
+
+    return candidates;
+}
+
+function findStringValue(candidates: JsonRecord[], keys: string[]) {
+    for (const candidate of candidates) {
+        for (const key of keys) {
+            const value = candidate[key];
+
+            if (typeof value === "string" && value.trim()) {
+                return value.trim();
+            }
+        }
+    }
+
+    return undefined;
+}
+
+function findScoreValue(candidates: JsonRecord[]) {
+    for (const candidate of candidates) {
+        for (const key of ["score", "performanceScore", "pageSpeedScore", "pagespeedScore"]) {
+            const value = candidate[key];
+
+            if (typeof value === "number" || typeof value === "string") {
+                return value;
+            }
+        }
+    }
+
+    return undefined;
+}
+
+function findReportValue(payload: unknown, candidates: JsonRecord[]) {
+    if (typeof payload === "string" && payload.trim()) {
+        return payload.trim();
+    }
+
+    for (const candidate of candidates) {
+        for (const key of ["report", "summary", "analysis", "details"]) {
+            const value = candidate[key];
+
+            if (value !== undefined && value !== null && value !== "") {
+                return value;
+            }
+        }
+    }
+
+    return undefined;
+}
+
+function extractScoreFromReport(report: unknown): number | string | undefined {
+    const reportText = flattenReportText(report);
+    if (!reportText) {
+        return undefined;
+    }
+
+    const scorePatterns = [
+        /\bperformance score of\s+(\d{1,3})\b/i,
+        /\bcurrent performance score of\s+(\d{1,3})\b/i,
+        /\bscore[:\s]+(\d{1,3})\b/i,
+    ];
+
+    for (const pattern of scorePatterns) {
+        const match = reportText.match(pattern);
+        if (!match) {
+            continue;
+        }
+
+        const parsedScore = Number.parseInt(match[1], 10);
+        if (!Number.isNaN(parsedScore)) {
+            return parsedScore;
+        }
+    }
+
+    return undefined;
+}
+
+function flattenReportText(report: unknown): string {
+    if (typeof report === "string") {
+        return report;
+    }
+
+    if (typeof report === "number") {
+        return String(report);
+    }
+
+    if (Array.isArray(report)) {
+        return report.map((item) => flattenReportText(item)).join(" ");
+    }
+
+    if (isRecord(report)) {
+        return Object.values(report).map((value) => flattenReportText(value)).join(" ");
+    }
+
+    return "";
+}
+
+function extractErrorMessage(payload: unknown) {
+    if (typeof payload === "string" && payload.trim()) {
+        return payload.trim().slice(0, ERROR_DETAIL_LIMIT);
+    }
+
+    if (!isRecord(payload)) {
         return null;
     }
 
+    for (const key of ["error", "message", "detail", "details"]) {
+        const value = payload[key];
+
+        if (typeof value === "string" && value.trim()) {
+            return value.trim().slice(0, ERROR_DETAIL_LIMIT);
+        }
+    }
+
     return null;
+}
+
+function normalizeErrorStatus(status: number) {
+    if (status >= 500) {
+        return 502;
+    }
+
+    return status || 502;
+}
+
+function isRecord(value: unknown): value is JsonRecord {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
 }
