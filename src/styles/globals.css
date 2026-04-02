@@ -415,7 +415,11 @@
     }
 
     .seo-chat-sheet {
-        @apply fixed inset-x-4 bottom-4 top-24 z-[80] overflow-hidden rounded-[2rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.97),rgba(246,240,229,0.94))] shadow-[0_45px_120px_-55px_rgba(15,23,42,0.7)] backdrop-blur-2xl dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(15,19,20,0.98),rgba(10,13,14,0.94))] md:right-auto md:left-6 md:top-28 md:w-[min(38rem,calc(100vw-3rem))];
+        @apply fixed inset-x-4 bottom-4 top-20 z-[80] overflow-hidden rounded-[2rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.97),rgba(246,240,229,0.94))] shadow-[0_45px_120px_-55px_rgba(15,23,42,0.7)] backdrop-blur-2xl dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(15,19,20,0.98),rgba(10,13,14,0.94))] md:right-auto md:left-6 md:top-24 md:w-[min(42rem,calc(100vw-3rem))];
+    }
+
+    .seo-chat-sheet-expanded {
+        @apply md:top-8 md:right-6 md:bottom-6 md:left-6 md:w-auto xl:left-10 xl:right-10;
     }
 
     .audit-score-card {
@@ -436,6 +440,10 @@
 
     .seo-chat-transcript {
         @apply bg-[linear-gradient(180deg,rgba(255,255,255,0.24),transparent)] dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent)];
+    }
+
+    .seo-chat-transcript-expanded {
+        @apply md:px-7 md:py-6 lg:px-8;
     }
 
     .seo-chat-bubble {
