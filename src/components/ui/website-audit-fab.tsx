@@ -335,14 +335,14 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
                                                         </p>
                                                     </div>
 
-                                                    <div className="grid gap-3 md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+                                                    <div className="grid gap-3">
                                                         <ResultCard
                                                             icon={<Globe className="h-5 w-5 text-primary"/>}
                                                             label="URL"
                                                             value={result.url}
                                                         />
 
-                                                        <div className="grid gap-3 sm:grid-cols-2">
+                                                        <div className="grid gap-3 min-[540px]:grid-cols-2">
                                                             <ScoreMeterCard
                                                                 label="Performance"
                                                                 score={displayScore}
@@ -361,7 +361,7 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
                                                     </div>
 
                                                     {(issues.length > 0 || improvements.length > 0) && (
-                                                        <div className="grid gap-3 sm:grid-cols-2">
+                                                        <div className="grid gap-3 min-[540px]:grid-cols-2">
                                                             <InsightListCard
                                                                 icon={<TriangleAlert className="h-5 w-5 text-accent"/>}
                                                                 title="Top issues"
@@ -626,12 +626,12 @@ function ScoreMeterCard({
 
     return (
         <div className="audit-score-card">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col gap-4 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
                 <div>
                     <p className="text-sm font-semibold text-foreground">{label}</p>
                     <p className="mt-2 text-xs leading-5 text-foreground/60">{helper}</p>
                 </div>
-                <div className="audit-meter-ring" style={meterStyle}>
+                <div className="audit-meter-ring self-start min-[420px]:self-auto" style={meterStyle}>
                     <div className="audit-meter-core">
                         <span className="text-2xl font-semibold text-foreground">
                             {normalizedScore ?? "--"}
