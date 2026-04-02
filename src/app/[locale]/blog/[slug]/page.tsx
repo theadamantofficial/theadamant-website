@@ -13,7 +13,7 @@ import {
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+export const revalidate = 1800;
 
 export async function generateMetadata({
     params,

@@ -1,4 +1,5 @@
 import {NextRequest, NextResponse} from "next/server";
+import {extractAuditResult} from "@/lib/website-audit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -7,17 +8,9 @@ const N8N_AUDIT_WEBHOOK_URL = process.env.N8N_AUDIT_WEBHOOK_URL ?? "https://n8n-
 const FALLBACK_ERROR_MESSAGE = "We could not start the audit right now.";
 const ERROR_DETAIL_LIMIT = 240;
 
-type JsonRecord = Record<string, unknown>;
-
 interface AuditRequestBody {
     url?: string;
     email?: string;
-}
-
-interface AuditResult {
-    url: string;
-    score?: number | string;
-    report?: unknown;
 }
 
 export async function POST(request: NextRequest) {
@@ -141,134 +134,6 @@ async function parseWebhookResponse(response: Response): Promise<unknown> {
     }
 }
 
-function extractAuditResult(payload: unknown, fallbackUrl: string): AuditResult {
-    const candidates = collectCandidates(payload);
-    const url = findStringValue(candidates, ["url", "website", "websiteUrl", "auditedUrl"]) ?? fallbackUrl;
-    const report = findReportValue(payload, candidates);
-    const score = findScoreValue(candidates) ?? extractScoreFromReport(report);
-
-    return {
-        url,
-        ...(score !== undefined ? {score} : {}),
-        ...(report !== undefined ? {report} : {}),
-    };
-}
-
-function collectCandidates(payload: unknown) {
-    const candidates: JsonRecord[] = [];
-
-    if (isRecord(payload)) {
-        candidates.push(payload);
-    }
-
-    for (const key of ["data", "result", "body", "audit"]) {
-        if (!isRecord(payload)) {
-            continue;
-        }
-
-        const nestedValue = payload[key];
-
-        if (isRecord(nestedValue)) {
-            candidates.push(nestedValue);
-        }
-    }
-
-    return candidates;
-}
-
-function findStringValue(candidates: JsonRecord[], keys: string[]) {
-    for (const candidate of candidates) {
-        for (const key of keys) {
-            const value = candidate[key];
-
-            if (typeof value === "string" && value.trim()) {
-                return value.trim();
-            }
-        }
-    }
-
-    return undefined;
-}
-
-function findScoreValue(candidates: JsonRecord[]) {
-    for (const candidate of candidates) {
-        for (const key of ["score", "performanceScore", "pageSpeedScore", "pagespeedScore"]) {
-            const value = candidate[key];
-
-            if (typeof value === "number" || typeof value === "string") {
-                return value;
-            }
-        }
-    }
-
-    return undefined;
-}
-
-function findReportValue(payload: unknown, candidates: JsonRecord[]) {
-    if (typeof payload === "string" && payload.trim()) {
-        return payload.trim();
-    }
-
-    for (const candidate of candidates) {
-        for (const key of ["report", "summary", "analysis", "details"]) {
-            const value = candidate[key];
-
-            if (value !== undefined && value !== null && value !== "") {
-                return value;
-            }
-        }
-    }
-
-    return undefined;
-}
-
-function extractScoreFromReport(report: unknown): number | string | undefined {
-    const reportText = flattenReportText(report);
-    if (!reportText) {
-        return undefined;
-    }
-
-    const scorePatterns = [
-        /\bperformance score of\s+(\d{1,3})\b/i,
-        /\bcurrent performance score of\s+(\d{1,3})\b/i,
-        /\bscore[:\s]+(\d{1,3})\b/i,
-    ];
-
-    for (const pattern of scorePatterns) {
-        const match = reportText.match(pattern);
-        if (!match) {
-            continue;
-        }
-
-        const parsedScore = Number.parseInt(match[1], 10);
-        if (!Number.isNaN(parsedScore)) {
-            return parsedScore;
-        }
-    }
-
-    return undefined;
-}
-
-function flattenReportText(report: unknown): string {
-    if (typeof report === "string") {
-        return report;
-    }
-
-    if (typeof report === "number") {
-        return String(report);
-    }
-
-    if (Array.isArray(report)) {
-        return report.map((item) => flattenReportText(item)).join(" ");
-    }
-
-    if (isRecord(report)) {
-        return Object.values(report).map((value) => flattenReportText(value)).join(" ");
-    }
-
-    return "";
-}
-
 function extractErrorMessage(payload: unknown) {
     if (typeof payload === "string" && payload.trim()) {
         return payload.trim().slice(0, ERROR_DETAIL_LIMIT);
@@ -297,6 +162,6 @@ function normalizeErrorStatus(status: number) {
     return status || 502;
 }
 
-function isRecord(value: unknown): value is JsonRecord {
+function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }

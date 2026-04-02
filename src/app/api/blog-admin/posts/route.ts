@@ -1,4 +1,5 @@
 import {NextRequest, NextResponse} from "next/server";
+import {revalidatePath} from "next/cache";
 import {
     BLOG_ADMIN_COOKIE_NAME,
     createInternalBlogPost,
@@ -8,6 +9,7 @@ import {
     updateInternalBlogPost,
     verifyBlogAdminSessionToken,
 } from "@/lib/internal-blog";
+import {SEO_SITE_LOCALES, getLocalizedPagePath} from "@/lib/site-locale";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -52,6 +54,7 @@ export async function POST(request: NextRequest) {
         });
 
         await notifyManualBlogChange("published", post);
+        revalidateBlogPaths(post.slug);
 
         return NextResponse.json({post}, {status: 201});
     } catch (error) {
@@ -97,6 +100,7 @@ export async function PUT(request: NextRequest) {
         });
 
         await notifyManualBlogChange("updated", post);
+        revalidateBlogPaths(post.slug);
 
         return NextResponse.json({post});
     } catch (error) {
@@ -126,6 +130,7 @@ export async function DELETE(request: NextRequest) {
         });
 
         await notifyManualBlogChange("deleted", post);
+        revalidateBlogPaths(post.slug);
 
         return NextResponse.json({success: true});
     } catch (error) {
@@ -136,4 +141,11 @@ export async function DELETE(request: NextRequest) {
 
 function isAuthenticated(request: NextRequest) {
     return verifyBlogAdminSessionToken(request.cookies.get(BLOG_ADMIN_COOKIE_NAME)?.value);
+}
+
+function revalidateBlogPaths(slug: string) {
+    for (const locale of SEO_SITE_LOCALES) {
+        revalidatePath(getLocalizedPagePath(locale, "blog"));
+        revalidatePath(getLocalizedPagePath(locale, `blog/${slug}`));
+    }
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import React, {useEffect, useState} from "react";
-import emailjs from "@emailjs/browser";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {cn} from "@/lib/utils";
@@ -11,6 +10,7 @@ import {Textarea} from "@/components/ui/text-area";
 import {Calendar, CheckCircle2, Clock3, FileText, Mail, MessageSquareText, Target} from "lucide-react";
 import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 import toast from "react-hot-toast";
+import {loadEmailJs} from "@/lib/load-emailjs";
 import {SiteCopy} from "@/lib/site-copy";
 
 const SUCCESS_RESET_MS = 4000;
@@ -51,6 +51,7 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
         setIsSubmitting(true);
 
         try {
+            const emailjs = await loadEmailJs();
             await emailjs.sendForm(
                 EMAILJS_SERVICE_ID,
                 EMAILJS_TEMPLATE_ID,

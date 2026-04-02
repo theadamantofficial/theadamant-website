@@ -25,9 +25,42 @@ export const CardContainer = ({
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isMouseEntered, setIsMouseEntered] = useState(false);
+    const [isInteractive, setIsInteractive] = useState(false);
+
+    useEffect(() => {
+        const hoverMediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+        const reducedMotionMediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+        const updateInteractivity = () => {
+            setIsInteractive(hoverMediaQuery.matches && !reducedMotionMediaQuery.matches);
+        };
+
+        updateInteractivity();
+
+        if (
+            typeof hoverMediaQuery.addEventListener === "function"
+            && typeof reducedMotionMediaQuery.addEventListener === "function"
+        ) {
+            hoverMediaQuery.addEventListener("change", updateInteractivity);
+            reducedMotionMediaQuery.addEventListener("change", updateInteractivity);
+
+            return () => {
+                hoverMediaQuery.removeEventListener("change", updateInteractivity);
+                reducedMotionMediaQuery.removeEventListener("change", updateInteractivity);
+            };
+        }
+
+        hoverMediaQuery.addListener(updateInteractivity);
+        reducedMotionMediaQuery.addListener(updateInteractivity);
+
+        return () => {
+            hoverMediaQuery.removeListener(updateInteractivity);
+            reducedMotionMediaQuery.removeListener(updateInteractivity);
+        };
+    }, []);
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!containerRef.current) return;
+        if (!containerRef.current || !isInteractive) return;
         const {left, top, width, height} =
             containerRef.current.getBoundingClientRect();
         const x = (e.clientX - left - width / 2) / 25;
@@ -36,6 +69,10 @@ export const CardContainer = ({
     };
 
     const handleMouseEnter = () => {
+        if (!isInteractive) {
+            return;
+        }
+
         setIsMouseEntered(true);
         if (!containerRef.current) return;
     };
@@ -58,9 +95,9 @@ export const CardContainer = ({
             >
                 <div
                     ref={containerRef}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseMove={handleMouseMove}
-                    onMouseLeave={handleMouseLeave}
+                    onMouseEnter={isInteractive ? handleMouseEnter : undefined}
+                    onMouseMove={isInteractive ? handleMouseMove : undefined}
+                    onMouseLeave={isInteractive ? handleMouseLeave : undefined}
                     className={cn(
                         "flex items-center justify-center relative transition-all duration-200 ease-linear",
                         className

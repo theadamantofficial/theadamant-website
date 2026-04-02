@@ -1,15 +1,15 @@
-import HeroSection from "@/components/sections/hero-section";
 import {Navbar} from "@/components/layouts/navbar";
 import Footer from "@/components/layouts/footer";
-import ContactUsSection from "@/components/sections/contact-us-section";
-import ServicesSection from "@/components/sections/services-section";
-import ValuePropsSection from "@/components/sections/value-props-section";
-import ProcessSection from "@/components/sections/process-section";
-import FaqSection from "@/components/sections/faq-section";
 import dynamic from "next/dynamic";
 import {SiteCopy} from "@/lib/site-copy";
 import {SiteLocale} from "@/lib/site-locale";
 
+const HeroSection = dynamic(() => import("@/components/sections/hero-section"));
+const ValuePropsSection = dynamic(() => import("@/components/sections/value-props-section"));
+const ServicesSection = dynamic(() => import("@/components/sections/services-section"));
+const ProcessSection = dynamic(() => import("@/components/sections/process-section"));
+const FaqSection = dynamic(() => import("@/components/sections/faq-section"));
+const ContactUsSection = dynamic(() => import("@/components/sections/contact-us-section"));
 const WebsiteAuditFab = dynamic(
     () => import("@/components/ui/website-audit-fab").then((module) => module.WebsiteAuditFab),
 );

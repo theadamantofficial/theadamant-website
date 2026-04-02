@@ -16,7 +16,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
 export const dynamicParams = false;
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+export const revalidate = 1800;
 
 export function generateStaticParams() {
     return INDEXABLE_SITE_LOCALES.map((locale) => ({locale}));
