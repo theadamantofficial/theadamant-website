@@ -41,6 +41,8 @@ export interface DeleteInternalBlogPostInput {
     id: string;
 }
 
+export type ManualBlogChangeAction = "published" | "updated" | "deleted";
+
 interface BlogAdminCredentials {
     emails: string[];
     password: string;
@@ -286,16 +288,22 @@ export async function deleteInternalBlogPost(input: DeleteInternalBlogPostInput)
     }
 
     const posts = await readInternalBlogPosts();
-    const nextPosts = posts.filter((post) => post.id !== id);
+    const deletedPost = posts.find((post) => post.id === id);
 
-    if (nextPosts.length === posts.length) {
+    if (!deletedPost) {
         throw new Error("Blog post not found.");
     }
 
+    const nextPosts = posts.filter((post) => post.id !== id);
     await writeInternalBlogPosts(nextPosts);
+
+    return deletedPost;
 }
 
-export async function notifyManualBlogPublish(post: Pick<InternalBlogPost, "title" | "slug" | "authorName" | "publishedAt">) {
+export async function notifyManualBlogChange(
+    action: ManualBlogChangeAction,
+    post: Pick<InternalBlogPost, "title" | "slug" | "authorName" | "publishedAt" | "updatedAt">,
+) {
     const webhookUrl = getBlogDeployWebhookUrl();
 
     if (!webhookUrl) {
@@ -304,6 +312,12 @@ export async function notifyManualBlogPublish(post: Pick<InternalBlogPost, "titl
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/g, "");
     const postUrl = siteUrl ? `${siteUrl}/blog/${post.slug}` : `/blog/${post.slug}`;
+    const labels: Record<ManualBlogChangeAction, string> = {
+        published: "Manual blog published on website",
+        updated: "Manual blog updated on website",
+        deleted: "Manual blog deleted on website",
+    };
+    const actionTimestamp = action === "published" ? post.publishedAt : post.updatedAt;
 
     try {
         await fetch(webhookUrl, {
@@ -313,10 +327,11 @@ export async function notifyManualBlogPublish(post: Pick<InternalBlogPost, "titl
             },
             body: JSON.stringify({
                 content: [
-                    "**Manual blog published on website**",
+                    `**${labels[action]}**`,
+                    `Action: ${action}`,
                     `Title: ${post.title}`,
                     `Author: ${post.authorName}`,
-                    `Published: ${post.publishedAt}`,
+                    `When: ${actionTimestamp}`,
                     `URL: ${postUrl}`,
                 ].join("\n"),
             }),

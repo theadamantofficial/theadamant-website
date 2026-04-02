@@ -60,6 +60,8 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
                 }
             );
 
+            void notifyQueryWebhook(form);
+
             form.reset();
             setIsSubmitted(true);
             toast.success(copy.form.successToast);
@@ -230,6 +232,28 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
             </div>
         </section>
     );
+}
+
+async function notifyQueryWebhook(form: HTMLFormElement) {
+    const formData = new FormData(form);
+
+    try {
+        await fetch("/api/contact-query", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: String(formData.get("user_name") || ""),
+                email: String(formData.get("user_email") || ""),
+                inquiryType: String(formData.get("inquiry_type") || ""),
+                message: String(formData.get("message") || ""),
+                submittedAt: String(formData.get("submitted_at") || new Date().toISOString()),
+            }),
+        });
+    } catch (error) {
+        console.error("Contact query webhook failed", error);
+    }
 }
 
 const LabelInputContainer = ({

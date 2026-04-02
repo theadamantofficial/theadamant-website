@@ -4,7 +4,7 @@ import {
     createInternalBlogPost,
     deleteInternalBlogPost,
     listInternalBlogPosts,
-    notifyManualBlogPublish,
+    notifyManualBlogChange,
     updateInternalBlogPost,
     verifyBlogAdminSessionToken,
 } from "@/lib/internal-blog";
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
             authorName: payload.authorName,
         });
 
-        await notifyManualBlogPublish(post);
+        await notifyManualBlogChange("published", post);
 
         return NextResponse.json({post}, {status: 201});
     } catch (error) {
@@ -96,6 +96,8 @@ export async function PUT(request: NextRequest) {
             authorName: payload.authorName,
         });
 
+        await notifyManualBlogChange("updated", post);
+
         return NextResponse.json({post});
     } catch (error) {
         const message = error instanceof Error ? error.message : "Could not update the blog post.";
@@ -119,9 +121,11 @@ export async function DELETE(request: NextRequest) {
     }
 
     try {
-        await deleteInternalBlogPost({
+        const post = await deleteInternalBlogPost({
             id: payload.id || "",
         });
+
+        await notifyManualBlogChange("deleted", post);
 
         return NextResponse.json({success: true});
     } catch (error) {
