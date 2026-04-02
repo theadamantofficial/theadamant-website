@@ -12,6 +12,15 @@ import {
 
 export function middleware(request: NextRequest) {
     const {pathname} = request.nextUrl;
+    const host = request.headers.get("host");
+    const forwardedProto = request.headers.get("x-forwarded-proto");
+
+    if (host === "www.theadamant.com" || (host === "theadamant.com" && forwardedProto === "http")) {
+        const redirectUrl = request.nextUrl.clone();
+        redirectUrl.protocol = "https";
+        redirectUrl.hostname = "theadamant.com";
+        return NextResponse.redirect(redirectUrl, 308);
+    }
 
     const requestHeaders = new Headers(request.headers);
     const currentPathLocale = getLocaleFromPathname(pathname);

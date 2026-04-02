@@ -10,8 +10,6 @@ import {
     SiteLocale,
 } from "@/lib/site-locale";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-
 export const runtime = "nodejs";
 export const revalidate = 1800;
 
@@ -48,14 +46,10 @@ export async function generateMetadata({
             title: post.title,
             description: post.excerpt,
         },
-        ...(siteUrl
-            ? {
-                alternates: {
-                    canonical: getLocalizedPagePath(locale, pathname),
-                    languages: getLanguageAlternates(pathname),
-                },
-            }
-            : {}),
+        alternates: {
+            canonical: getLocalizedPagePath(locale, pathname),
+            languages: getLanguageAlternates(pathname),
+        },
     };
 }
 

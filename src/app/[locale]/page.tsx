@@ -10,8 +10,6 @@ import {
     SiteLocale,
 } from "@/lib/site-locale";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -46,14 +44,10 @@ export function generateMetadata({
             title: copy.metadata.title,
             description: copy.metadata.description,
         },
-        ...(siteUrl
-            ? {
-                alternates: {
-                    canonical: localizedPath,
-                    languages: getLanguageAlternates(),
-                },
-            }
-            : {}),
+        alternates: {
+            canonical: localizedPath,
+            languages: getLanguageAlternates(),
+        },
     };
 }
 
