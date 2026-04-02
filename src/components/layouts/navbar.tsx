@@ -72,9 +72,13 @@ export function Navbar({
                 }
             }
         };
-        darkModeMediaQuery.addEventListener("change", handler);
+        if (typeof darkModeMediaQuery.addEventListener === "function") {
+            darkModeMediaQuery.addEventListener("change", handler);
+            return () => darkModeMediaQuery.removeEventListener("change", handler);
+        }
 
-        return () => darkModeMediaQuery.removeEventListener("change", handler);
+        darkModeMediaQuery.addListener(handler);
+        return () => darkModeMediaQuery.removeListener(handler);
     }, []);
 
     const toggleTheme = () => {

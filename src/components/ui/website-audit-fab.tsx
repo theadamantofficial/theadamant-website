@@ -1,9 +1,8 @@
 "use client";
 
-import emailjs from "@emailjs/browser";
 import {AnimatePresence, motion} from "motion/react";
 import Link from "next/link";
-import {Fragment, useEffect, useState, type ReactNode} from "react";
+import {Fragment, useEffect, useState, type CSSProperties, type ReactNode} from "react";
 import {
     ArrowRight,
     CheckCircle2,
@@ -15,15 +14,16 @@ import {
     TriangleAlert,
     X,
 } from "lucide-react";
+import {loadEmailJs} from "@/lib/load-emailjs";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
+import {
+    type AuditResult,
+    extractMetricFromReportText,
+    formatAuditReport,
+    normalizeAuditScore,
+} from "@/lib/website-audit";
 
 type AuditStatus = "idle" | "loading" | "success" | "error";
-
-interface AuditResult {
-    url: string;
-    score?: number | string;
-    report?: unknown;
-}
 
 interface AuditApiResponse {
     error?: string;
@@ -135,8 +135,11 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
         setNotificationStatus("idle");
     }
 
-    const reportText = formatReport(result?.report);
-    const displayScore = result?.score ?? extractScoreFromText(reportText);
+    const reportText = formatAuditReport(result?.report);
+    const displayScore = result?.score ?? extractMetricFromReportText(reportText, "performance");
+    const seoScore = result?.seoScore ?? extractMetricFromReportText(reportText, "seo");
+    const issues = result?.issues ?? [];
+    const improvements = result?.improvements ?? [];
 
     return (
         <>
@@ -332,19 +335,47 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
                                                         </p>
                                                     </div>
 
-                                                    <div className="grid gap-3 sm:grid-cols-2">
+                                                    <div className="grid gap-3 md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
                                                         <ResultCard
                                                             icon={<Globe className="h-5 w-5 text-primary"/>}
                                                             label="URL"
                                                             value={result.url}
                                                         />
 
-                                                        <ResultCard
-                                                            icon={<Gauge className="h-5 w-5 text-accent"/>}
-                                                            label="Score"
-                                                            value={displayScore !== undefined ? String(displayScore) : "Not returned"}
-                                                        />
+                                                        <div className="grid gap-3 sm:grid-cols-2">
+                                                            <ScoreMeterCard
+                                                                label="Performance"
+                                                                score={displayScore}
+                                                                accent="var(--color-accent)"
+                                                                helper="Load speed and runtime efficiency"
+                                                            />
+                                                            <ScoreMeterCard
+                                                                label="SEO"
+                                                                score={seoScore}
+                                                                accent="var(--color-primary)"
+                                                                helper={result.seoScoreSource === "estimated"
+                                                                    ? "Estimated from the returned audit summary"
+                                                                    : "Search visibility and technical SEO"}
+                                                            />
+                                                        </div>
                                                     </div>
+
+                                                    {(issues.length > 0 || improvements.length > 0) && (
+                                                        <div className="grid gap-3 sm:grid-cols-2">
+                                                            <InsightListCard
+                                                                icon={<TriangleAlert className="h-5 w-5 text-accent"/>}
+                                                                title="Top issues"
+                                                                emptyLabel="The audit summary did not include a structured issue list."
+                                                                items={issues}
+                                                            />
+                                                            <InsightListCard
+                                                                icon={<CheckCircle2 className="h-5 w-5 text-primary"/>}
+                                                                title="Recommended fixes"
+                                                                emptyLabel="The audit summary did not include explicit recommendations."
+                                                                items={improvements}
+                                                            />
+                                                        </div>
+                                                    )}
 
                                                     <div className="audit-issue-card">
                                                         <div className="flex items-center gap-3">
@@ -406,8 +437,10 @@ async function sendAuditEmail({
         throw new Error("EmailJS template id is not configured.");
     }
 
-    const reportText = formatReport(result.report) ?? "No report body was returned.";
-    const score = result.score ?? extractScoreFromText(reportText) ?? "Not returned";
+    const emailjs = await loadEmailJs();
+    const reportText = formatAuditReport(result.report) ?? "No report body was returned.";
+    const score = result.score ?? extractMetricFromReportText(reportText, "performance") ?? "Not returned";
+    const seoIssues = result.issues?.join("\n") || "Audit request completed via n8n workflow.";
 
     await emailjs.send(
         EMAILJS_SERVICE_ID,
@@ -423,7 +456,7 @@ async function sendAuditEmail({
             time: new Date().toLocaleString(),
             performance_score: String(score),
             performance_report: buildAuditNotificationNotes(reportText),
-            seo_issues: "Audit request completed via n8n workflow.",
+            seo_issues: buildAuditNotificationNotes(seoIssues),
             ux_issues: "Review the generated report in additional notes.",
             additional_notes: buildAuditNotificationNotes(reportText),
         },
@@ -466,65 +499,6 @@ function normalizeEmail(input: string) {
 
 function stripProtocol(url: string) {
     return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
-}
-
-function formatReport(report: unknown): string | null {
-    if (typeof report === "string") {
-        return report.trim() || null;
-    }
-
-    if (typeof report === "number") {
-        return String(report);
-    }
-
-    if (Array.isArray(report)) {
-        const formattedItems = report
-            .map((item) => formatReport(item))
-            .filter((item): item is string => Boolean(item));
-
-        return formattedItems.join("\n\n") || null;
-    }
-
-    if (isRecord(report)) {
-        for (const key of ["summary", "content", "text", "analysis", "details"]) {
-            const value = report[key];
-            const formattedValue: string | null = formatReport(value);
-
-            if (formattedValue) {
-                return formattedValue;
-            }
-        }
-
-        return JSON.stringify(report, null, 2);
-    }
-
-    return null;
-}
-
-function extractScoreFromText(reportText: string | null): number | undefined {
-    if (!reportText) {
-        return undefined;
-    }
-
-    const patterns = [
-        /\bperformance score of\s+(\d{1,3})\b/i,
-        /\bcurrent performance score of\s+(\d{1,3})\b/i,
-        /\bscore[:\s]+(\d{1,3})\b/i,
-    ];
-
-    for (const pattern of patterns) {
-        const match = reportText.match(pattern);
-        if (!match) {
-            continue;
-        }
-
-        const parsedScore = Number.parseInt(match[1], 10);
-        if (!Number.isNaN(parsedScore)) {
-            return parsedScore;
-        }
-    }
-
-    return undefined;
 }
 
 function buildAuditNotificationNotes(reportText: string) {
@@ -614,10 +588,6 @@ function renderInlineFormatting(text: string): ReactNode {
     });
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 function ResultCard({
     icon,
     label,
@@ -632,6 +602,78 @@ function ResultCard({
             {icon}
             <p className="mt-3 text-sm font-semibold text-foreground">{label}</p>
             <p className="mt-2 break-words text-sm leading-6 text-foreground/68">{value}</p>
+        </div>
+    );
+}
+
+function ScoreMeterCard({
+    label,
+    score,
+    accent,
+    helper,
+}: {
+    label: string;
+    score?: number | string;
+    accent: string;
+    helper: string;
+}) {
+    const normalizedScore = normalizeAuditScore(score);
+    const meterStyle = {
+        background: normalizedScore === null
+            ? "linear-gradient(135deg, rgba(13,92,99,0.16), rgba(214,106,69,0.12))"
+            : `conic-gradient(${accent} ${normalizedScore}%, rgba(125,125,125,0.14) ${normalizedScore}% 100%)`,
+    } satisfies CSSProperties;
+
+    return (
+        <div className="audit-score-card">
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <p className="text-sm font-semibold text-foreground">{label}</p>
+                    <p className="mt-2 text-xs leading-5 text-foreground/60">{helper}</p>
+                </div>
+                <div className="audit-meter-ring" style={meterStyle}>
+                    <div className="audit-meter-core">
+                        <span className="text-2xl font-semibold text-foreground">
+                            {normalizedScore ?? "--"}
+                        </span>
+                        <span className="text-[0.65rem] uppercase tracking-[0.16em] text-foreground/54">
+                            {normalizedScore === null ? "Pending" : "Score"}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function InsightListCard({
+    icon,
+    title,
+    emptyLabel,
+    items,
+}: {
+    icon: ReactNode;
+    title: string;
+    emptyLabel: string;
+    items: string[];
+}) {
+    return (
+        <div className="audit-issue-card">
+            <div className="flex items-center gap-3">
+                {icon}
+                <p className="text-sm font-semibold text-foreground">{title}</p>
+            </div>
+            {items.length > 0 ? (
+                <ul className="mt-4 space-y-3 text-sm leading-6 text-foreground/72">
+                    {items.map((item) => (
+                        <li key={item} className="rounded-2xl border border-black/8 bg-white/70 px-4 py-3 dark:border-white/10 dark:bg-white/[0.03]">
+                            {item}
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p className="mt-3 text-sm leading-6 text-foreground/68">{emptyLabel}</p>
+            )}
         </div>
     );
 }

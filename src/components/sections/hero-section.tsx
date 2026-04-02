@@ -5,6 +5,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import {ArrowRight, LayoutTemplate, Search, Sparkles, Zap} from "lucide-react";
 import {motion} from "motion/react";
+import {useEffect, useState} from "react";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 
@@ -24,6 +25,7 @@ export default function HeroSection({
     copy: SiteCopy["hero"];
     locale: SiteLocale;
 }) {
+    const [showEnhancedVisuals, setShowEnhancedVisuals] = useState(false);
     const featureCardIcons = [LayoutTemplate, Search, Zap];
     const floatingBadgeLayouts = [
         {
@@ -39,6 +41,37 @@ export default function HeroSection({
             animation: {y: [0, -10, 0]},
         },
     ];
+
+    useEffect(() => {
+        const reducedMotionMediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const navigatorWithConnection = navigator as Navigator & {
+            connection?: {
+                effectiveType?: string;
+                saveData?: boolean;
+            };
+            deviceMemory?: number;
+        };
+
+        const updateVisualMode = () => {
+            const saveDataEnabled = Boolean(navigatorWithConnection.connection?.saveData);
+            const lowMemoryDevice = typeof navigatorWithConnection.deviceMemory === "number"
+                && navigatorWithConnection.deviceMemory <= 4;
+            const slowConnection = ["slow-2g", "2g"].includes(navigatorWithConnection.connection?.effectiveType ?? "");
+
+            setShowEnhancedVisuals(!reducedMotionMediaQuery.matches && !saveDataEnabled && !lowMemoryDevice && !slowConnection);
+        };
+
+        updateVisualMode();
+
+        if (typeof reducedMotionMediaQuery.addEventListener === "function") {
+            reducedMotionMediaQuery.addEventListener("change", updateVisualMode);
+
+            return () => reducedMotionMediaQuery.removeEventListener("change", updateVisualMode);
+        }
+
+        reducedMotionMediaQuery.addListener(updateVisualMode);
+        return () => reducedMotionMediaQuery.removeListener(updateVisualMode);
+    }, []);
 
     return <section className="hero-section px-6 pb-20 pt-28 sm:px-8 lg:px-12" aria-labelledby="hero-heading">
         <BackgroundRippleEffect/>
@@ -123,7 +156,7 @@ export default function HeroSection({
             >
                 <motion.div
                     className="hero-preview-panel relative overflow-hidden p-5 sm:p-6"
-                    whileHover={{y: -6}}
+                    whileHover={showEnhancedVisuals ? {y: -6} : undefined}
                     transition={{duration: 0.3, ease: "easeOut"}}
                 >
                     <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-foreground/25 to-transparent"/>
@@ -141,18 +174,24 @@ export default function HeroSection({
                             <motion.div
                                 key={badgeLabel}
                                 className={`hero-floating-chip ${floatingBadgeLayouts[index]?.className ?? ""}`}
-                                animate={floatingBadgeLayouts[index]?.animation}
-                                transition={{duration: 5.5 + index, repeat: Infinity, ease: "easeInOut"}}
+                                animate={showEnhancedVisuals ? floatingBadgeLayouts[index]?.animation : undefined}
+                                transition={showEnhancedVisuals
+                                    ? {duration: 5.5 + index, repeat: Infinity, ease: "easeInOut"}
+                                    : undefined}
                             >
                                 {badgeLabel}
                             </motion.div>
                         ))}
-                        <DotLottieReact
-                            src="/animations/tech-sphere.lottie"
-                            loop
-                            autoplay
-                            className="relative z-10 h-[320px] w-full animate-float"
-                        />
+                        {showEnhancedVisuals ? (
+                            <DotLottieReact
+                                src="/animations/tech-sphere.lottie"
+                                loop
+                                autoplay
+                                className="relative z-10 h-[320px] w-full animate-float"
+                            />
+                        ) : (
+                            <StaticHeroVisual featureCards={copy.featureCards}/>
+                        )}
                     </div>
 
                     <div className="mt-6 grid gap-3 md:grid-cols-2">
@@ -180,6 +219,30 @@ export default function HeroSection({
             </motion.div>
         </div>
     </section>;
+}
+
+function StaticHeroVisual({
+    featureCards,
+}: {
+    featureCards: SiteCopy["hero"]["featureCards"];
+}) {
+    return (
+        <div className="relative z-10 flex h-[320px] w-full items-center justify-center px-6">
+            <div className="hero-lite-sphere">
+                <div className="hero-lite-core"/>
+                <div className="hero-lite-ring hero-lite-ring-primary"/>
+                <div className="hero-lite-ring hero-lite-ring-accent"/>
+                <div className="hero-lite-panel hero-lite-panel-top">
+                    <span className="hero-lite-label">Lean build</span>
+                    <span className="hero-lite-value">Fast first load</span>
+                </div>
+                <div className="hero-lite-panel hero-lite-panel-bottom">
+                    <span className="hero-lite-label">Focus</span>
+                    <span className="hero-lite-value">{featureCards[0]?.title ?? "SEO-ready UX"}</span>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 const heroItemVariants = {
