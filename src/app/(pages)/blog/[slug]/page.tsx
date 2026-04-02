@@ -8,6 +8,7 @@ import {
     getLanguageAlternates,
     getLocalizedPagePath,
 } from "@/lib/site-locale";
+import {getSiteUrl} from "@/lib/site-url";
 const copy = getSiteCopy(DEFAULT_SITE_LOCALE);
 
 export const runtime = "nodejs";
@@ -25,20 +26,31 @@ export async function generateMetadata({
     }
 
     const pathname = `blog/${post.slug}`;
+    const siteUrl = getSiteUrl();
+    const url = `${siteUrl}${getLocalizedPagePath(DEFAULT_SITE_LOCALE, pathname)}`;
 
     return {
         title: {
             absolute: `${post.title} | The Adamant`,
         },
         description: post.excerpt,
+        keywords: post.tags,
         openGraph: {
             title: post.title,
             description: post.excerpt,
+            type: "article",
+            url,
+            publishedTime: post.publishedAt,
+            modifiedTime: post.updatedAt,
+            authors: [post.authorName],
+            tags: post.tags,
+            images: post.coverImage ? [{url: post.coverImage.startsWith("http") ? post.coverImage : `${siteUrl}${post.coverImage}`}] : undefined,
         },
         twitter: {
             card: "summary_large_image",
             title: post.title,
             description: post.excerpt,
+            images: post.coverImage ? [post.coverImage.startsWith("http") ? post.coverImage : `${siteUrl}${post.coverImage}`] : undefined,
         },
         alternates: {
             canonical: getLocalizedPagePath(DEFAULT_SITE_LOCALE, pathname),

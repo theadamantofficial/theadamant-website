@@ -2,11 +2,11 @@
   "locale": "en",
   "dir": "ltr",
   "metadata": {
-    "title": "The Adamant",
-    "description": "The Adamant designs websites, UX systems, and mobile experiences with a stronger first impression, sharper messaging, and SEO-ready foundations."
+    "title": "Website Development Company in India | The Adamant",
+    "description": "The Adamant builds SEO-friendly websites, UX systems, and mobile experiences for brands that need sharper messaging, faster performance, and stronger search foundations."
   },
   "schema": {
-    "organizationDescription": "The Adamant designs websites, product interfaces, and mobile experiences with clear messaging, fast performance, and SEO-ready foundations."
+    "organizationDescription": "The Adamant builds SEO-friendly websites, product interfaces, and mobile experiences with clear messaging, fast performance, and stronger search foundations."
   },
   "navbar": {
     "navItems": [
@@ -21,10 +21,10 @@
     "languageAriaLabel": "Change website language"
   },
   "hero": {
-    "kicker": "Design, development, and SEO-ready structure",
-    "title": "Make the first screen impossible to ignore.",
-    "description": "The Adamant creates websites, UX systems, and mobile experiences that look premium, explain your offer clearly, and give search engines the structure they need from day one.",
-    "primaryCta": "Start your project",
+    "kicker": "Website development company in India for growth-focused brands",
+    "title": "Website Development Company in India for SEO-Friendly Websites and Apps",
+    "description": "The Adamant works as a website development company and app development company for brands that want clearer messaging, stronger UX, and launch-ready digital products.",
+    "primaryCta": "Book a consultation",
     "secondaryCta": "Explore services",
     "positioningPoints": [
       "Clear messaging that explains value in seconds",
@@ -71,7 +71,7 @@
   "services": {
     "kicker": "Services",
     "title": "Design and development services built to convert interest into action.",
-    "description": "From UI/UX design to SEO-friendly website development and mobile app delivery, each service is shaped to help you look credible quickly and keep momentum after launch.",
+    "description": "From SEO-friendly websites to mobile product delivery, we support brands that need a website development company or app development company with sharper execution and cleaner strategy.",
     "chips": ["Landing pages", "Marketing websites", "Product interfaces", "Cross-platform mobile apps"],
     "items": [
       {
@@ -147,7 +147,7 @@
   "contact": {
     "kicker": "Contact",
     "title": "Tell us what you want to build.",
-    "description": "If the goal is to make a stronger first impression, improve clarity, or build a search-friendly foundation, this is the right place to start. Share your scope, timeline, and what success should look like.",
+    "description": "If you need a stronger first impression, clearer messaging, or an app development company that can move from concept to launch without bloated execution, share your scope, timeline, and business goal here.",
     "highlights": [
       {
         "title": "Share the real goal",

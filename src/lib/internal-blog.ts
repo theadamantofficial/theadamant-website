@@ -3,6 +3,7 @@ import {mkdir, readFile, writeFile} from "node:fs/promises";
 import path from "node:path";
 import {get, put} from "@vercel/blob";
 import type {BlobAccessType, GetBlobResult, PutBlobResult} from "@vercel/blob";
+import {generateAiBlogCoverSvg} from "@/lib/ai-blog-cover";
 import {getSiteUrl} from "@/lib/site-url";
 
 export interface InternalBlogPost {
@@ -57,9 +58,15 @@ interface BlogAdminSession {
 }
 
 export type BlogStorageMode = "blob" | "filesystem";
+export interface GenerateMissingBlogCoversResult {
+    updatedCount: number;
+    failedCount: number;
+    updatedSlugs: string[];
+}
 
 const BLOG_POSTS_FILE = path.join(process.cwd(), "src/content/internal-blog-posts.json");
 const BLOG_POSTS_BLOB_PATH = "blog/internal-blog-posts.json";
+const BLOG_COVER_UPLOAD_DIRECTORY = path.join(process.cwd(), "public/uploads/blog-covers");
 const BLOG_ADMIN_EMAIL_FALLBACK = "team@theadamant.local";
 const BLOG_ADMIN_PASSWORD_FALLBACK = "theadamant-admin";
 const BLOG_ADMIN_SECRET_FALLBACK = "theadamant-blog-local-secret";
@@ -227,6 +234,13 @@ export async function createInternalBlogPost(input: CreateInternalBlogPostInput)
     const now = new Date().toISOString();
     const slug = createUniqueSlug(title, posts);
     const excerpt = input.excerpt?.trim() || buildExcerptFromContent(content);
+    const tags = normalizeTags(input.tags);
+    const coverImage = await resolveBlogCoverImage(input.coverImage, {
+        title,
+        excerpt,
+        tags,
+        slug,
+    });
 
     const post: InternalBlogPost = {
         id: randomUUID(),
@@ -234,8 +248,8 @@ export async function createInternalBlogPost(input: CreateInternalBlogPostInput)
         title,
         excerpt,
         content,
-        coverImage: normalizeCoverImage(input.coverImage),
-        tags: normalizeTags(input.tags),
+        coverImage,
+        tags,
         authorName: input.authorName?.trim() || "The Adamant Team",
         createdAt: now,
         updatedAt: now,
@@ -264,13 +278,21 @@ export async function updateInternalBlogPost(input: UpdateInternalBlogPostInput)
     }
 
     const existingPost = posts[existingPostIndex];
+    const excerpt = input.excerpt?.trim() || buildExcerptFromContent(content);
+    const tags = normalizeTags(input.tags);
+    const coverImage = await resolveBlogCoverImage(input.coverImage, {
+        title,
+        excerpt,
+        tags,
+        slug: existingPost.slug,
+    });
     const nextPost: InternalBlogPost = {
         ...existingPost,
         title,
-        excerpt: input.excerpt?.trim() || buildExcerptFromContent(content),
+        excerpt,
         content,
-        coverImage: normalizeCoverImage(input.coverImage),
-        tags: normalizeTags(input.tags),
+        coverImage,
+        tags,
         authorName: input.authorName?.trim() || existingPost.authorName,
         updatedAt: new Date().toISOString(),
     };
@@ -339,6 +361,50 @@ export async function notifyManualBlogChange(
     } catch (error) {
         console.error("Failed to notify blog deploy webhook.", error);
     }
+}
+
+export async function generateAiCoversForPostsMissingImages(): Promise<GenerateMissingBlogCoversResult> {
+    const posts = await readInternalBlogPosts();
+    let updatedCount = 0;
+    let failedCount = 0;
+    const updatedSlugs: string[] = [];
+
+    const nextPosts = await Promise.all(posts.map(async (post) => {
+        if (post.coverImage) {
+            return post;
+        }
+
+        const coverImage = await generateAndStoreBlogCover({
+            title: post.title,
+            excerpt: post.excerpt,
+            tags: post.tags,
+            slug: post.slug,
+        });
+
+        if (!coverImage) {
+            failedCount += 1;
+            return post;
+        }
+
+        updatedCount += 1;
+        updatedSlugs.push(post.slug);
+
+        return {
+            ...post,
+            coverImage,
+            updatedAt: new Date().toISOString(),
+        };
+    }));
+
+    if (updatedCount > 0) {
+        await writeInternalBlogPosts(nextPosts);
+    }
+
+    return {
+        updatedCount,
+        failedCount,
+        updatedSlugs,
+    };
 }
 
 function signSessionPayload(payload: string) {
@@ -565,6 +631,48 @@ function normalizeCoverImage(value?: string) {
         const parsed = new URL(trimmed);
         return ["http:", "https:"].includes(parsed.protocol) ? parsed.toString() : null;
     } catch {
+        return null;
+    }
+}
+
+async function resolveBlogCoverImage(
+    value: string | undefined,
+    post: Pick<InternalBlogPost, "title" | "excerpt" | "tags" | "slug">,
+) {
+    const normalized = normalizeCoverImage(value);
+
+    if (normalized) {
+        return normalized;
+    }
+
+    return await generateAndStoreBlogCover(post);
+}
+
+async function generateAndStoreBlogCover(post: Pick<InternalBlogPost, "title" | "excerpt" | "tags" | "slug">) {
+    try {
+        const svg = await generateAiBlogCoverSvg(post);
+        const fileName = `ai-${post.slug}.svg`;
+
+        if (isBlobStorageConfigured()) {
+            const {result: blob, access} = await executeBlobOperation((blobAccess) => (
+                put(`blog/covers/${fileName}`, svg, {
+                    access: blobAccess,
+                    addRandomSuffix: false,
+                    allowOverwrite: true,
+                    cacheControlMaxAge: 60 * 60 * 24 * 365,
+                    contentType: "image/svg+xml; charset=utf-8",
+                    token: getBlobReadWriteToken(),
+                })
+            ));
+
+            return access === "private" ? buildBlogMediaProxyPath(blob.pathname) : blob.url;
+        }
+
+        await mkdir(BLOG_COVER_UPLOAD_DIRECTORY, {recursive: true});
+        await writeFile(path.join(BLOG_COVER_UPLOAD_DIRECTORY, fileName), svg, "utf8");
+        return `/uploads/blog-covers/${fileName}`;
+    } catch (error) {
+        console.error(`Failed to generate AI blog cover for "${post.title}".`, error);
         return null;
     }
 }

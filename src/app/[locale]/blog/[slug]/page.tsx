@@ -9,6 +9,7 @@ import {
     isSiteLocale,
     SiteLocale,
 } from "@/lib/site-locale";
+import {getSiteUrl} from "@/lib/site-url";
 
 export const runtime = "nodejs";
 export const revalidate = 1800;
@@ -30,21 +31,32 @@ export async function generateMetadata({
 
     const locale = params.locale as SiteLocale;
     const pathname = `blog/${post.slug}`;
+    const siteUrl = getSiteUrl();
+    const url = `${siteUrl}${getLocalizedPagePath(locale, pathname)}`;
 
     return {
         title: {
             absolute: `${post.title} | The Adamant`,
         },
         description: post.excerpt,
+        keywords: post.tags,
         openGraph: {
             title: post.title,
             description: post.excerpt,
             locale,
+            type: "article",
+            url,
+            publishedTime: post.publishedAt,
+            modifiedTime: post.updatedAt,
+            authors: [post.authorName],
+            tags: post.tags,
+            images: post.coverImage ? [{url: post.coverImage.startsWith("http") ? post.coverImage : `${siteUrl}${post.coverImage}`}] : undefined,
         },
         twitter: {
             card: "summary_large_image",
             title: post.title,
             description: post.excerpt,
+            images: post.coverImage ? [post.coverImage.startsWith("http") ? post.coverImage : `${siteUrl}${post.coverImage}`] : undefined,
         },
         alternates: {
             canonical: getLocalizedPagePath(locale, pathname),

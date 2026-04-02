@@ -1,10 +1,21 @@
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {ArrowLeft, ArrowRight, Clock3, PenSquare} from "lucide-react";
 import {Navbar} from "@/components/layouts/navbar";
 import Footer from "@/components/layouts/footer";
 import {InternalBlogPost} from "@/lib/internal-blog";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPagePath, getLocalizedPath, localeToHtmlLang, SiteLocale} from "@/lib/site-locale";
+import {getSiteUrl} from "@/lib/site-url";
+import {OpenAuditButton} from "@/components/ui/open-audit-button";
+import {buildFallbackBlogCoverDataUrl} from "@/lib/ai-blog-cover";
+
+const WebsiteAuditFab = dynamic(
+    () => import("@/components/ui/website-audit-fab").then((module) => module.WebsiteAuditFab),
+);
+const SeoChatFab = dynamic(
+    () => import("@/components/ui/seo-chat-fab").then((module) => module.SeoChatFab),
+);
 
 export default function InternalBlogPostPage({
     copy,
@@ -22,10 +33,41 @@ export default function InternalBlogPostPage({
         month: "short",
         year: "numeric",
     }).format(new Date(post.publishedAt));
+    const siteUrl = getSiteUrl();
+    const articleUrl = `${siteUrl}${getLocalizedPagePath(locale, `blog/${post.slug}`)}`;
+    const articleSchema = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: post.title,
+        description: post.excerpt,
+        datePublished: post.publishedAt,
+        dateModified: post.updatedAt,
+        inLanguage: locale,
+        keywords: post.tags,
+        mainEntityOfPage: articleUrl,
+        url: articleUrl,
+        author: {
+            "@type": "Person",
+            name: post.authorName,
+        },
+        publisher: {
+            "@type": "Organization",
+            name: "The Adamant",
+            url: siteUrl,
+        },
+        image: resolveOptionalUrl(post.coverImage, siteUrl),
+    };
 
     return (
         <main className="relative min-h-screen overflow-hidden">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{__html: JSON.stringify(articleSchema)}}
+            />
+
             <Navbar copy={copy.navbar} locale={locale}/>
+            {locale === "en" && <WebsiteAuditFab locale={locale}/>}
+            {locale === "en" && <SeoChatFab/>}
 
             <section className="relative px-6 pb-12 pt-28 sm:px-8 lg:px-12">
                 <div className="section-shell">
@@ -68,14 +110,12 @@ export default function InternalBlogPostPage({
 
             <section className="section-shell pb-20">
                 <article className="glass-panel overflow-hidden">
-                    {post.coverImage ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                            src={post.coverImage}
-                            alt={post.title}
-                            className="h-[18rem] w-full object-cover sm:h-[24rem]"
-                        />
-                    ) : null}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                        src={post.coverImage || buildFallbackBlogCoverDataUrl(post)}
+                        alt={post.title}
+                        className="h-[18rem] w-full object-cover sm:h-[24rem]"
+                    />
 
                     <div className="mx-auto max-w-3xl px-6 py-8 sm:px-8 sm:py-10">
                         <div className="space-y-6 text-base leading-8 text-foreground/78 sm:text-lg">
@@ -90,10 +130,17 @@ export default function InternalBlogPostPage({
                                 The same team that writes these strategy notes can help you fix performance issues,
                                 tighten SEO fundamentals, and turn the site into a stronger conversion machine.
                             </p>
-                            <Link href={getLocalizedPath(locale, "contact")} className="button-primary mt-5">
-                                Start a project
-                                <ArrowRight className="h-4 w-4"/>
-                            </Link>
+                            <div className="mt-5 flex flex-wrap gap-3">
+                                <Link href={getLocalizedPath(locale, "contact")} className="button-primary">
+                                    Start a project
+                                    <ArrowRight className="h-4 w-4"/>
+                                </Link>
+                                {locale === "en" && (
+                                    <OpenAuditButton>
+                                        Get free audit
+                                    </OpenAuditButton>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </article>
@@ -184,4 +231,16 @@ function estimateReadTime(content: string) {
     const words = content.trim().split(/\s+/).filter(Boolean).length;
     const minutes = Math.max(1, Math.ceil(words / 220));
     return `${minutes} min read`;
+}
+
+function resolveOptionalUrl(value: string | null, siteUrl: string) {
+    if (!value) {
+        return undefined;
+    }
+
+    if (/^https?:\/\//.test(value)) {
+        return value;
+    }
+
+    return `${siteUrl}${value.startsWith("/") ? value : `/${value}`}`;
 }

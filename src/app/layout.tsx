@@ -20,9 +20,12 @@ export const metadata: Metadata = {
     keywords: [
         "web design",
         "website development",
+        "website development company in India",
+        "website development company in Noida",
         "SEO-friendly websites",
         "UI UX design",
         "mobile app development",
+        "app development company in Noida",
         "digital product studio",
     ],
     robots: {
