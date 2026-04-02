@@ -3,6 +3,7 @@ import {mkdir, readFile, writeFile} from "node:fs/promises";
 import path from "node:path";
 import {get, put} from "@vercel/blob";
 import type {BlobAccessType, GetBlobResult, PutBlobResult} from "@vercel/blob";
+import {getSiteUrl} from "@/lib/site-url";
 
 export interface InternalBlogPost {
     id: string;
@@ -310,8 +311,7 @@ export async function notifyManualBlogChange(
         return;
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/g, "");
-    const postUrl = siteUrl ? `${siteUrl}/blog/${post.slug}` : `/blog/${post.slug}`;
+    const postUrl = `${getSiteUrl()}/blog/${post.slug}`;
     const labels: Record<ManualBlogChangeAction, string> = {
         published: "Manual blog published on website",
         updated: "Manual blog updated on website",

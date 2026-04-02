@@ -6,9 +6,8 @@ import {MEDIUM_URL} from "@/lib/blog-config";
 import {InternalBlogPost} from "@/lib/internal-blog";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPagePath, getLocalizedPath, localeToHtmlLang, SiteLocale} from "@/lib/site-locale";
+import {getSiteUrl} from "@/lib/site-url";
 import {MediumPost} from "@/lib/medium";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
 const BLOG_COPY: Record<SiteLocale, {
     kicker: string;
@@ -171,6 +170,7 @@ export default function BlogPage({
     mediumPosts: MediumPost[];
     internalPosts: InternalBlogPost[];
 }) {
+    const siteUrl = getSiteUrl();
     const blogCopy = BLOG_COPY[locale];
     const formattedLocale = localeToHtmlLang(locale);
     const pathname = getLocalizedPagePath(locale, "blog");
@@ -180,7 +180,7 @@ export default function BlogPage({
             "@context": "https://schema.org",
             "@type": "Blog",
             name: "The Adamant Blog",
-            url: siteUrl ? `${siteUrl}${pathname}` : pathname,
+            url: `${siteUrl}${pathname}`,
             inLanguage: locale,
             description: blogCopy.description,
             publisher: {
@@ -192,9 +192,7 @@ export default function BlogPage({
                 ...internalPosts.map((post) => ({
                     "@type": "BlogPosting",
                     headline: post.title,
-                    url: siteUrl
-                        ? `${siteUrl}${getLocalizedPagePath(locale, `blog/${post.slug}`)}`
-                        : getLocalizedPagePath(locale, `blog/${post.slug}`),
+                    url: `${siteUrl}${getLocalizedPagePath(locale, `blog/${post.slug}`)}`,
                     datePublished: post.publishedAt,
                     description: post.excerpt,
                     author: {

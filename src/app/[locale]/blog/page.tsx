@@ -12,8 +12,6 @@ import {
     SiteLocale,
 } from "@/lib/site-locale";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-
 export const dynamicParams = false;
 export const runtime = "nodejs";
 export const revalidate = 1800;
@@ -49,14 +47,10 @@ export function generateMetadata({
             title: "The Adamant Blog",
             description: "Read The Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
         },
-        ...(siteUrl
-            ? {
-                alternates: {
-                    canonical: localizedPath,
-                    languages: getLanguageAlternates("blog"),
-                },
-            }
-            : {}),
+        alternates: {
+            canonical: localizedPath,
+            languages: getLanguageAlternates("blog"),
+        },
     };
 }
 

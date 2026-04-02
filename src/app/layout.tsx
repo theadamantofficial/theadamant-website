@@ -5,8 +5,7 @@ import {Manrope, Space_Grotesk} from "next/font/google";
 import {Toaster} from "react-hot-toast";
 import {headers} from "next/headers";
 import {DEFAULT_SITE_LOCALE, isSiteLocale, localeToHtmlLang, SiteLocale} from "@/lib/site-locale";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+import {getSiteMetadataBase} from "@/lib/site-url";
 
 export const metadata: Metadata = {
     title: {
@@ -41,11 +40,7 @@ export const metadata: Metadata = {
         title: "The Adamant | Digital Product Design and Development",
         description: "Design-forward websites, UX systems, and mobile experiences with clear messaging, fast performance, and SEO-ready structure.",
     },
-    ...(siteUrl
-        ? {
-            metadataBase: new URL(siteUrl),
-        }
-        : {}),
+    metadataBase: getSiteMetadataBase(),
 };
 
 const manrope = Manrope({
