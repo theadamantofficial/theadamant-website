@@ -4,6 +4,7 @@ import {
     createInternalBlogPost,
     deleteInternalBlogPost,
     listInternalBlogPosts,
+    notifyManualBlogPublish,
     updateInternalBlogPost,
     verifyBlogAdminSessionToken,
 } from "@/lib/internal-blog";
@@ -49,6 +50,8 @@ export async function POST(request: NextRequest) {
             tags: payload.tags,
             authorName: payload.authorName,
         });
+
+        await notifyManualBlogPublish(post);
 
         return NextResponse.json({post}, {status: 201});
     } catch (error) {

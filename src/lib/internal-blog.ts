@@ -122,6 +122,16 @@ export function getBlobReadWriteToken() {
     return rawToken.replace(/^['"]|['"]$/g, "");
 }
 
+export function getBlogDeployWebhookUrl() {
+    const rawUrl = process.env.BLOG_DEPLOY_WEBHOOK_URL?.trim();
+
+    if (!rawUrl) {
+        return "";
+    }
+
+    return rawUrl.replace(/^['"]|['"]$/g, "");
+}
+
 export function buildBlogMediaProxyPath(blobPathname: string) {
     return `/api/blog-media/${blobPathname
         .split("/")
@@ -283,6 +293,37 @@ export async function deleteInternalBlogPost(input: DeleteInternalBlogPostInput)
     }
 
     await writeInternalBlogPosts(nextPosts);
+}
+
+export async function notifyManualBlogPublish(post: Pick<InternalBlogPost, "title" | "slug" | "authorName" | "publishedAt">) {
+    const webhookUrl = getBlogDeployWebhookUrl();
+
+    if (!webhookUrl) {
+        return;
+    }
+
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/g, "");
+    const postUrl = siteUrl ? `${siteUrl}/blog/${post.slug}` : `/blog/${post.slug}`;
+
+    try {
+        await fetch(webhookUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                content: [
+                    "**Manual blog published on website**",
+                    `Title: ${post.title}`,
+                    `Author: ${post.authorName}`,
+                    `Published: ${post.publishedAt}`,
+                    `URL: ${postUrl}`,
+                ].join("\n"),
+            }),
+        });
+    } catch (error) {
+        console.error("Failed to notify blog deploy webhook.", error);
+    }
 }
 
 function signSessionPayload(payload: string) {
