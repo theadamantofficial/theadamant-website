@@ -11,6 +11,7 @@ import {
     isSiteLocale,
     SiteLocale,
 } from "@/lib/site-locale";
+import {getOpenGraphImages, getTwitterImages} from "@/lib/social-metadata";
 
 export const dynamicParams = false;
 export const runtime = "nodejs";
@@ -41,11 +42,13 @@ export function generateMetadata({
             title: "The Adamant Blog",
             description: "Read The Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
             locale,
+            images: getOpenGraphImages(),
         },
         twitter: {
             card: "summary_large_image",
             title: "The Adamant Blog",
             description: "Read The Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
+            images: getTwitterImages(),
         },
         alternates: {
             canonical: localizedPath,

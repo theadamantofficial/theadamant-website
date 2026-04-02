@@ -1,5 +1,6 @@
 import type {Metadata} from "next";
 import {getSiteUrl} from "@/lib/site-url";
+import {getOpenGraphImages, getTwitterImages} from "@/lib/social-metadata";
 
 interface LandingHighlight {
     title: string;
@@ -319,13 +320,13 @@ export function buildServiceLandingMetadata(page: ServiceLandingPageConfig): Met
             description: page.metaDescription,
             type: "website",
             url,
-            images: [{url: `${siteUrl}${page.image}`}],
+            images: getOpenGraphImages(page.image, page.title),
         },
         twitter: {
             card: "summary_large_image",
             title: page.metaTitle,
             description: page.metaDescription,
-            images: [`${siteUrl}${page.image}`],
+            images: getTwitterImages(page.image),
         },
     };
 }

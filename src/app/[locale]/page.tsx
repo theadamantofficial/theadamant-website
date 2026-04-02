@@ -9,6 +9,7 @@ import {
     isSiteLocale,
     SiteLocale,
 } from "@/lib/site-locale";
+import {getOpenGraphImages, getTwitterImages} from "@/lib/social-metadata";
 
 export const dynamicParams = false;
 
@@ -38,11 +39,13 @@ export function generateMetadata({
             title: copy.metadata.title,
             description: copy.metadata.description,
             locale,
+            images: getOpenGraphImages(),
         },
         twitter: {
             card: "summary_large_image",
             title: copy.metadata.title,
             description: copy.metadata.description,
+            images: getTwitterImages(),
         },
         alternates: {
             canonical: localizedPath,
