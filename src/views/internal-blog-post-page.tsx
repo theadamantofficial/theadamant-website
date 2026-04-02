@@ -111,10 +111,14 @@ function renderArticleBlocks(content: string) {
         .filter(Boolean);
 
     return blocks.map((block, index) => {
+        if (/^---+$/.test(block)) {
+            return <hr key={index} className="border-black/10 dark:border-white/10"/>;
+        }
+
         if (block.startsWith("### ")) {
             return (
                 <h3 key={index} className="text-xl font-semibold text-foreground sm:text-2xl">
-                    {block.replace(/^###\s+/, "")}
+                    {renderInlineMarkdown(block.replace(/^###\s+/, ""))}
                 </h3>
             );
         }
@@ -122,7 +126,15 @@ function renderArticleBlocks(content: string) {
         if (block.startsWith("## ")) {
             return (
                 <h2 key={index} className="text-2xl font-semibold text-foreground sm:text-3xl">
-                    {block.replace(/^##\s+/, "")}
+                    {renderInlineMarkdown(block.replace(/^##\s+/, ""))}
+                </h2>
+            );
+        }
+
+        if (block.startsWith("# ")) {
+            return (
+                <h2 key={index} className="text-2xl font-semibold text-foreground sm:text-3xl">
+                    {renderInlineMarkdown(block.replace(/^#\s+/, ""))}
                 </h2>
             );
         }
@@ -133,17 +145,38 @@ function renderArticleBlocks(content: string) {
             return (
                 <ul key={index} className="list-disc space-y-2 pl-5 text-foreground/78">
                     {lines.map((line) => (
-                        <li key={line}>{line.replace(/^[-*]\s+/, "")}</li>
+                        <li key={line}>{renderInlineMarkdown(line.replace(/^[-*]\s+/, ""))}</li>
                     ))}
                 </ul>
             );
         }
 
         return (
-            <p key={index}>
-                {lines.join(" ")}
+            <p key={index} className="whitespace-pre-wrap">
+                {lines.map((line, lineIndex) => (
+                    <span key={lineIndex}>
+                        {lineIndex > 0 ? <br/> : null}
+                        {renderInlineMarkdown(line)}
+                    </span>
+                ))}
             </p>
         );
+    });
+}
+
+function renderInlineMarkdown(text: string) {
+    const tokens = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).filter(Boolean);
+
+    return tokens.map((token, index) => {
+        if (/^\*\*[^*]+\*\*$/.test(token)) {
+            return <strong key={index} className="font-semibold text-foreground">{token.slice(2, -2)}</strong>;
+        }
+
+        if (/^\*[^*]+\*$/.test(token)) {
+            return <em key={index}>{token.slice(1, -1)}</em>;
+        }
+
+        return <span key={index}>{token}</span>;
     });
 }
 

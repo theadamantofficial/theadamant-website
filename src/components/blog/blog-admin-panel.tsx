@@ -3,7 +3,7 @@
 import {ChangeEvent, FormEvent, useEffect, useState} from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import {ArrowRight, ImagePlus, LockKeyhole, LogOut, PenSquare, PencilLine, ShieldCheck, X} from "lucide-react";
+import {ArrowRight, ImagePlus, LockKeyhole, LogOut, PenSquare, PencilLine, ShieldCheck, Trash2, X} from "lucide-react";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/text-area";
@@ -67,6 +67,7 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
     const [selectedCoverFile, setSelectedCoverFile] = useState<File | null>(null);
     const [coverPreviewUrl, setCoverPreviewUrl] = useState("");
     const [isUploadingCover, setIsUploadingCover] = useState(false);
+    const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -227,6 +228,47 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
             toast.error(message);
         } finally {
             setIsSavingPost(false);
+        }
+    }
+
+    async function handleDeletePost(post: InternalBlogPost) {
+        const confirmed = window.confirm(`Delete "${post.title}"? This cannot be undone.`);
+
+        if (!confirmed) {
+            return;
+        }
+
+        setDeletingPostId(post.id);
+        setEditorError("");
+
+        try {
+            const response = await fetch("/api/blog-admin/posts", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({id: post.id}),
+            });
+
+            const payload = await safeJson<{ error?: string; success?: boolean }>(response);
+
+            if (!response.ok) {
+                throw new Error(payload.error || "Could not delete the article.");
+            }
+
+            setPosts((current) => current.filter((item) => item.id !== post.id));
+
+            if (editingPostId === post.id) {
+                resetEditor();
+            }
+
+            toast.success("Article deleted.");
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Could not delete the article.";
+            setEditorError(message);
+            toast.error(message);
+        } finally {
+            setDeletingPostId(null);
         }
     }
 
@@ -510,7 +552,7 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                             id="blog-content"
                             value={formState.content}
                             onChange={(event) => setFormState((current) => ({...current, content: event.target.value}))}
-                            placeholder={"Write the post here.\n\nUse blank lines between paragraphs.\nUse ## for section headings.\nUse - for bullet lists."}
+                            placeholder={"Write the post here.\n\nUse blank lines between paragraphs.\nUse **bold** for emphasis.\nUse ## for section headings.\nUse - for bullet lists."}
                             rows={14}
                             required
                         />
@@ -543,8 +585,8 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                         <p className="text-sm font-semibold text-foreground">Published internally</p>
                         <p className="text-sm text-foreground/62">
                             {storageMode === "blob"
-                                ? "All approved company logins can publish and edit with Blob-backed persistence"
-                                : "All approved company logins can publish and edit with local fallback storage"}
+                                ? "All approved company logins can publish, edit, and delete with Blob-backed persistence"
+                                : "All approved company logins can publish, edit, and delete with local fallback storage"}
                         </p>
                     </div>
                 </div>
@@ -585,6 +627,15 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                                     >
                                         <PencilLine className="h-4 w-4"/>
                                         Edit
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDeletePost(post)}
+                                        disabled={deletingPostId === post.id}
+                                        className="inline-flex items-center gap-2 font-semibold text-red-600 transition hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
+                                    >
+                                        <Trash2 className="h-4 w-4"/>
+                                        {deletingPostId === post.id ? "Deleting..." : "Delete"}
                                     </button>
                                     <Link
                                         href={getLocalizedPagePath(locale, `blog/${post.slug}`)}

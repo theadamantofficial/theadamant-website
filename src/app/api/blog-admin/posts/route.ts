@@ -2,6 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 import {
     BLOG_ADMIN_COOKIE_NAME,
     createInternalBlogPost,
+    deleteInternalBlogPost,
     listInternalBlogPosts,
     updateInternalBlogPost,
     verifyBlogAdminSessionToken,
@@ -95,6 +96,33 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({post});
     } catch (error) {
         const message = error instanceof Error ? error.message : "Could not update the blog post.";
+        return NextResponse.json({error: message}, {status: message === "Blog post not found." ? 404 : 500});
+    }
+}
+
+export async function DELETE(request: NextRequest) {
+    if (!isAuthenticated(request)) {
+        return NextResponse.json({error: "Unauthorized."}, {status: 401});
+    }
+
+    let payload: {
+        id?: string;
+    };
+
+    try {
+        payload = await request.json();
+    } catch {
+        return NextResponse.json({error: "Invalid blog post payload."}, {status: 400});
+    }
+
+    try {
+        await deleteInternalBlogPost({
+            id: payload.id || "",
+        });
+
+        return NextResponse.json({success: true});
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "Could not delete the blog post.";
         return NextResponse.json({error: message}, {status: message === "Blog post not found." ? 404 : 500});
     }
 }
