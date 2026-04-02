@@ -8,6 +8,7 @@ import {motion} from "motion/react";
 import {useEffect, useState} from "react";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
+import {OpenAuditButton} from "@/components/ui/open-audit-button";
 
 const smoothEase = [0.22, 1, 0.36, 1] as const;
 const DotLottieReact = dynamic(
@@ -126,6 +127,12 @@ export default function HeroSection({
                         {copy.primaryCta}
                         <ArrowRight className="h-4 w-4"/>
                     </Link>
+
+                    {locale === "en" && (
+                        <OpenAuditButton>
+                            Get free audit
+                        </OpenAuditButton>
+                    )}
 
                     <Link href={getLocalizedPath(locale, "services")} className="button-secondary">
                         {copy.secondaryCta}

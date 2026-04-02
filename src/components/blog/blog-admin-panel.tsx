@@ -3,12 +3,13 @@
 import {ChangeEvent, FormEvent, useEffect, useState} from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import {ArrowRight, ImagePlus, LockKeyhole, LogOut, PenSquare, PencilLine, ShieldCheck, Trash2, X} from "lucide-react";
+import {ArrowRight, ImagePlus, LockKeyhole, LogOut, PenSquare, PencilLine, ShieldCheck, Sparkles, Trash2, X} from "lucide-react";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/text-area";
 import {BlogStorageMode, InternalBlogPost} from "@/lib/internal-blog";
 import {getLocalizedPagePath, SiteLocale} from "@/lib/site-locale";
+import {buildFallbackBlogCoverDataUrl} from "@/lib/ai-blog-cover";
 
 interface SessionPayload {
     authenticated: boolean;
@@ -68,6 +69,7 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
     const [coverPreviewUrl, setCoverPreviewUrl] = useState("");
     const [isUploadingCover, setIsUploadingCover] = useState(false);
     const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
+    const [isGeneratingAiCovers, setIsGeneratingAiCovers] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -272,6 +274,40 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
         }
     }
 
+    async function handleGenerateAiCovers() {
+        setIsGeneratingAiCovers(true);
+        setEditorError("");
+
+        try {
+            const response = await fetch("/api/blog-admin/generate-covers", {
+                method: "POST",
+            });
+
+            const payload = await safeJson<{
+                error?: string;
+                posts?: InternalBlogPost[];
+                updatedCount?: number;
+            }>(response);
+
+            if (!response.ok || !payload.posts) {
+                throw new Error(payload.error || "Could not generate AI covers.");
+            }
+
+            setPosts(payload.posts);
+            toast.success(
+                payload.updatedCount
+                    ? `Generated ${payload.updatedCount} AI cover${payload.updatedCount === 1 ? "" : "s"}.`
+                    : "No missing covers needed generation.",
+            );
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Could not generate AI covers.";
+            setEditorError(message);
+            toast.error(message);
+        } finally {
+            setIsGeneratingAiCovers(false);
+        }
+    }
+
     function handleCoverFileChange(event: ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0] ?? null;
         setSelectedCoverFile(file);
@@ -425,7 +461,14 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
         );
     }
 
-    const coverPreview = coverPreviewUrl || formState.coverImage;
+    const coverPreview = coverPreviewUrl || formState.coverImage || (formState.title
+        ? buildFallbackBlogCoverDataUrl({
+            title: formState.title,
+            excerpt: formState.excerpt,
+            tags: formState.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+            slug: "preview",
+        })
+        : "");
     const isEditing = Boolean(editingPostId);
     const storageMode = session?.storageMode || "filesystem";
 
@@ -450,6 +493,10 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                                 <X className="h-4 w-4"/>
                             </button>
                         )}
+                        <button type="button" className="button-secondary" onClick={handleGenerateAiCovers} disabled={isGeneratingAiCovers}>
+                            {isGeneratingAiCovers ? "Generating covers..." : "Generate AI covers"}
+                            <Sparkles className="h-4 w-4"/>
+                        </button>
                         <button type="button" className="button-secondary" onClick={handleLogout}>
                             Log out
                             <LogOut className="h-4 w-4"/>
@@ -518,6 +565,9 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                                 />
                                 <p className="mt-3 text-xs leading-6 text-foreground/55">
                                     Free local upload. Supports JPG, PNG, WEBP, AVIF up to 5MB.
+                                </p>
+                                <p className="mt-2 text-xs leading-6 text-foreground/55">
+                                    Leave this empty and the post gets a generated SVG cover based on its title.
                                 </p>
                             </div>
 
@@ -594,16 +644,14 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                 <div className="mt-6 space-y-4">
                     {posts.length > 0 ? posts.map((post) => (
                         <article key={post.id} className="rounded-[1.4rem] border border-black/8 bg-white/80 p-5 dark:border-white/10 dark:bg-white/[0.04]">
-                            {post.coverImage && (
-                                <div className="mb-4 overflow-hidden rounded-[1rem]">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
-                                        src={post.coverImage}
-                                        alt={post.title}
-                                        className="h-32 w-full object-cover"
-                                    />
-                                </div>
-                            )}
+                            <div className="mb-4 overflow-hidden rounded-[1rem]">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    src={post.coverImage || buildFallbackBlogCoverDataUrl(post)}
+                                    alt={post.title}
+                                    className="h-32 w-full object-cover"
+                                />
+                            </div>
                             <div className="flex flex-wrap gap-2">
                                 {post.tags.slice(0, 3).map((tag) => (
                                     <span key={tag} className="feature-chip !px-3 !py-1 text-xs">

@@ -13,6 +13,9 @@ const ContactUsSection = dynamic(() => import("@/components/sections/contact-us-
 const WebsiteAuditFab = dynamic(
     () => import("@/components/ui/website-audit-fab").then((module) => module.WebsiteAuditFab),
 );
+const SeoChatFab = dynamic(
+    () => import("@/components/ui/seo-chat-fab").then((module) => module.SeoChatFab),
+);
 
 export default function HomePage({
     copy,
@@ -61,13 +64,14 @@ export default function HomePage({
 
         <Navbar copy={copy.navbar} locale={locale}/>
 
-        <WebsiteAuditFab locale={locale}/>
+        {locale === "en" && <WebsiteAuditFab locale={locale}/>}
+        {locale === "en" && <SeoChatFab/>}
 
         <HeroSection copy={copy.hero} locale={locale}/>
 
         <ValuePropsSection copy={copy.valueProps}/>
 
-        <ServicesSection copy={copy.services}/>
+        <ServicesSection copy={copy.services} locale={locale}/>
 
         <ProcessSection copy={copy.process}/>
 

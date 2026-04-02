@@ -16,12 +16,14 @@ import {
 } from "lucide-react";
 import {loadEmailJs} from "@/lib/load-emailjs";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
+import {OpenSeoChatButton} from "@/components/ui/open-seo-chat-button";
 import {
     type AuditResult,
     extractMetricFromReportText,
     formatAuditReport,
     normalizeAuditScore,
 } from "@/lib/website-audit";
+import {OPEN_WEBSITE_AUDIT_EVENT} from "@/lib/website-audit-events";
 
 type AuditStatus = "idle" | "loading" | "success" | "error";
 
@@ -64,6 +66,13 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
             document.body.style.overflow = previousOverflow;
         };
     }, [isOpen]);
+
+    useEffect(() => {
+        const handleOpen = () => setIsOpen(true);
+
+        window.addEventListener(OPEN_WEBSITE_AUDIT_EVENT, handleOpen);
+        return () => window.removeEventListener(OPEN_WEBSITE_AUDIT_EVENT, handleOpen);
+    }, []);
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -258,6 +267,15 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
                                                     Audit My Website
                                                     <ArrowRight className="h-4 w-4"/>
                                                 </button>
+                                                <OpenSeoChatButton
+                                                    className="h-13 w-full px-6"
+                                                    detail={{
+                                                        websiteUrl,
+                                                        issue: "I need quick help improving SEO and conversions.",
+                                                    }}
+                                                >
+                                                    Quick solve with SEO AI
+                                                </OpenSeoChatButton>
                                             </form>
 
                                             {status === "error" && (
@@ -391,6 +409,14 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
                                                         <button type="button" className="button-secondary" onClick={resetAudit}>
                                                             Run another audit
                                                         </button>
+                                                        <OpenSeoChatButton
+                                                            detail={{
+                                                                websiteUrl: result.url,
+                                                                issue: issues[0] || improvements[0] || "Help me fix the issues from this audit.",
+                                                            }}
+                                                        >
+                                                            Ask SEO AI to fix this
+                                                        </OpenSeoChatButton>
                                                         <Link
                                                             href={getLocalizedPath(locale, "contact")}
                                                             className="button-primary"

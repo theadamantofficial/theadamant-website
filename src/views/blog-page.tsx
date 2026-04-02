@@ -1,4 +1,5 @@
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {ArrowRight, ExternalLink, PenSquare} from "lucide-react";
 import {Navbar} from "@/components/layouts/navbar";
 import Footer from "@/components/layouts/footer";
@@ -8,6 +9,15 @@ import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPagePath, getLocalizedPath, localeToHtmlLang, SiteLocale} from "@/lib/site-locale";
 import {getSiteUrl} from "@/lib/site-url";
 import {MediumPost} from "@/lib/medium";
+import {OpenAuditButton} from "@/components/ui/open-audit-button";
+import {buildFallbackBlogCoverDataUrl} from "@/lib/ai-blog-cover";
+
+const WebsiteAuditFab = dynamic(
+    () => import("@/components/ui/website-audit-fab").then((module) => module.WebsiteAuditFab),
+);
+const SeoChatFab = dynamic(
+    () => import("@/components/ui/seo-chat-fab").then((module) => module.SeoChatFab),
+);
 
 const BLOG_COPY: Record<SiteLocale, {
     kicker: string;
@@ -222,6 +232,8 @@ export default function BlogPage({
             ))}
 
             <Navbar copy={copy.navbar} locale={locale}/>
+            {locale === "en" && <WebsiteAuditFab locale={locale}/>}
+            {locale === "en" && <SeoChatFab/>}
 
             <section className="relative px-6 pb-16 pt-28 sm:px-8 lg:px-12">
                 <div className="section-shell">
@@ -241,6 +253,11 @@ export default function BlogPage({
                             {INTERFACE_COPY.adminAccess}
                             <ArrowRight className="h-4 w-4"/>
                         </Link>
+                        {locale === "en" && (
+                            <OpenAuditButton>
+                                Get free audit
+                            </OpenAuditButton>
+                        )}
                         <Link href={getLocalizedPath(locale, "contact")} className="button-primary">
                             {blogCopy.startProject}
                             <ArrowRight className="h-4 w-4"/>
@@ -266,17 +283,13 @@ export default function BlogPage({
                         <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                             {internalPosts.map((post) => (
                                 <article key={post.id} className="glass-panel lift-card flex h-full flex-col overflow-hidden">
-                                    {post.coverImage ? (
-                                        // eslint-disable-next-line @next/next/no-img-element
-                                        <img
-                                            src={post.coverImage}
-                                            alt={post.title}
-                                            className="h-52 w-full object-cover"
-                                            loading="lazy"
-                                        />
-                                    ) : (
-                                        <div className="h-52 bg-[radial-gradient(circle_at_top_left,rgba(13,92,99,0.18),transparent_45%),linear-gradient(180deg,rgba(255,255,255,0.72),rgba(234,223,206,0.7))] dark:bg-[radial-gradient(circle_at_top_left,rgba(88,183,179,0.18),transparent_45%),linear-gradient(180deg,rgba(24,28,31,0.92),rgba(14,17,19,0.94))]"/>
-                                    )}
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                        src={post.coverImage || buildFallbackBlogCoverDataUrl(post)}
+                                        alt={post.title}
+                                        className="h-52 w-full object-cover"
+                                        loading="lazy"
+                                    />
 
                                     <div className="flex flex-1 flex-col p-6">
                                         <div className="flex flex-wrap gap-2">
