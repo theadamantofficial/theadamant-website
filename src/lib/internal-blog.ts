@@ -37,6 +37,10 @@ export interface UpdateInternalBlogPostInput {
     authorName?: string;
 }
 
+export interface DeleteInternalBlogPostInput {
+    id: string;
+}
+
 interface BlogAdminCredentials {
     emails: string[];
     password: string;
@@ -262,6 +266,23 @@ export async function updateInternalBlogPost(input: UpdateInternalBlogPostInput)
     await writeInternalBlogPosts(posts);
 
     return nextPost;
+}
+
+export async function deleteInternalBlogPost(input: DeleteInternalBlogPostInput) {
+    const id = input.id.trim();
+
+    if (!id) {
+        throw new Error("Blog post id is required.");
+    }
+
+    const posts = await readInternalBlogPosts();
+    const nextPosts = posts.filter((post) => post.id !== id);
+
+    if (nextPosts.length === posts.length) {
+        throw new Error("Blog post not found.");
+    }
+
+    await writeInternalBlogPosts(nextPosts);
 }
 
 function signSessionPayload(payload: string) {
