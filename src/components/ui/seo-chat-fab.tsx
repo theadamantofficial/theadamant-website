@@ -1,13 +1,14 @@
 "use client";
 
 import {AnimatePresence, motion} from "motion/react";
-import {BotMessageSquare, LoaderCircle, MessageSquareText, PhoneCall, SendHorizontal, Sparkles, UserRound, X} from "lucide-react";
+import {BotMessageSquare, LoaderCircle, Maximize2, MessageSquareText, Minimize2, PhoneCall, SendHorizontal, Sparkles, UserRound, X} from "lucide-react";
 import {FormEvent, type ReactNode, useEffect, useMemo, useRef, useState} from "react";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/text-area";
 import {OPEN_SEO_CHAT_EVENT, type OpenSeoChatEventDetail} from "@/lib/seo-chat-events";
 import {OpenAuditButton} from "@/components/ui/open-audit-button";
 import {SeoChatLead, SeoChatMessage, normalizeSeoChatLead} from "@/lib/seo-chat";
+import {cn} from "@/lib/utils";
 
 const initialLeadState: SeoChatLead = {
     name: "",
@@ -20,6 +21,7 @@ const initialLeadState: SeoChatLead = {
 
 export function SeoChatFab() {
     const [isOpen, setIsOpen] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
     const [lead, setLead] = useState<SeoChatLead>(initialLeadState);
     const [messages, setMessages] = useState<SeoChatMessage[]>([]);
     const [draft, setDraft] = useState("");
@@ -155,6 +157,7 @@ export function SeoChatFab() {
             setLead(normalizedLead);
             setSessionId(window.crypto?.randomUUID?.() || String(Date.now()));
             setMessages([createMessage("assistant", payload.message)]);
+            setIsExpanded(true);
             setHasStarted(true);
             setHasEnded(false);
             setSnapshotTitle(payload.snapshot?.title || "");
@@ -209,6 +212,7 @@ export function SeoChatFab() {
             }
 
             setMessages((current) => [...current, createMessage("assistant", payload.message!)]);
+            setIsExpanded(true);
             setSnapshotTitle(payload.snapshot?.title || snapshotTitle);
         } catch (error) {
             setErrorMessage(error instanceof Error ? error.message : "SEO chat is unavailable right now.");
@@ -224,6 +228,7 @@ export function SeoChatFab() {
 
     function resetChat() {
         setIsOpen(false);
+        setIsExpanded(false);
         setLead(initialLeadState);
         setMessages([]);
         setDraft("");
@@ -267,7 +272,7 @@ export function SeoChatFab() {
                         />
 
                         <motion.aside
-                            className="seo-chat-sheet"
+                            className={cn("seo-chat-sheet", isExpanded && "seo-chat-sheet-expanded")}
                             initial={{opacity: 0, y: 28, scale: 0.98}}
                             animate={{opacity: 1, y: 0, scale: 1}}
                             exit={{opacity: 0, y: 24, scale: 0.98}}
@@ -291,13 +296,26 @@ export function SeoChatFab() {
                                         </p>
                                     </div>
 
-                                    <button
-                                        type="button"
-                                        className="theme-toggle h-10 w-10"
-                                        onClick={() => void closeChat("dialog_close")}
-                                    >
-                                        <X className="h-4.5 w-4.5"/>
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        {hasStarted && (
+                                            <button
+                                                type="button"
+                                                className="button-secondary h-10 px-3"
+                                                aria-label={isExpanded ? "Minimize SEO AI chat" : "Maximize SEO AI chat"}
+                                                onClick={() => setIsExpanded((current) => !current)}
+                                            >
+                                                {isExpanded ? <Minimize2 className="h-4 w-4"/> : <Maximize2 className="h-4 w-4"/>}
+                                                <span className="hidden sm:inline">{isExpanded ? "Minimize" : "Maximize"}</span>
+                                            </button>
+                                        )}
+                                        <button
+                                            type="button"
+                                            className="theme-toggle h-10 w-10"
+                                            onClick={() => void closeChat("dialog_close")}
+                                        >
+                                            <X className="h-4.5 w-4.5"/>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {!hasStarted ? (
@@ -388,7 +406,13 @@ export function SeoChatFab() {
                                             </div>
                                         </div>
 
-                                        <div ref={transcriptRef} className="seo-chat-transcript flex-1 overflow-y-auto px-5 py-5 sm:px-6">
+                                        <div
+                                            ref={transcriptRef}
+                                            className={cn(
+                                                "seo-chat-transcript flex-1 overflow-y-auto px-5 py-5 sm:px-6",
+                                                isExpanded && "seo-chat-transcript-expanded",
+                                            )}
+                                        >
                                             <div className="space-y-4">
                                                 {messages.map((message) => (
                                                     <div
