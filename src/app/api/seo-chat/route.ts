@@ -3,7 +3,9 @@ import {requestGroqChatCompletion} from "@/lib/groq";
 import {fetchSeoRuntimeSnapshot} from "@/lib/seo-runtime-snapshot";
 import {
     buildSeoChatSystemPrompt,
+    formatSeoChatAssistantReply,
     normalizeSeoChatLead,
+    reviewSeoChatTurn,
     SeoChatMessage,
     validateSeoChatLead,
 } from "@/lib/seo-chat";
@@ -50,6 +52,15 @@ export async function POST(request: NextRequest) {
             content: message.content.trim(),
         }));
 
+    const guardrailResult = reviewSeoChatTurn(lead, messages);
+
+    if (!guardrailResult.allowed) {
+        return NextResponse.json({
+            message: guardrailResult.response,
+            snapshot,
+        });
+    }
+
     if (userMessages.length === 0) {
         userMessages.push({
             role: "user",
@@ -71,7 +82,7 @@ export async function POST(request: NextRequest) {
         });
 
         return NextResponse.json({
-            message: reply,
+            message: formatSeoChatAssistantReply(reply),
             snapshot,
         });
     } catch (error) {

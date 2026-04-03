@@ -6,7 +6,7 @@ import {Toaster} from "react-hot-toast";
 import {headers} from "next/headers";
 import {DEFAULT_SITE_LOCALE, isSiteLocale, localeToHtmlLang, SiteLocale} from "@/lib/site-locale";
 import {getSiteMetadataBase} from "@/lib/site-url";
-import {getOpenGraphImages, getTwitterImages} from "@/lib/social-metadata";
+import {buildOpenGraphMetadata, buildTwitterMetadata} from "@/lib/social-metadata";
 
 export const metadata: Metadata = {
     title: {
@@ -34,18 +34,16 @@ export const metadata: Metadata = {
         follow: true,
     },
     openGraph: {
+        ...buildOpenGraphMetadata({
+            title: "The Adamant | Digital Product Design and Development",
+            description: "Design-forward websites, UX systems, and mobile experiences with clear messaging, fast performance, and SEO-ready structure.",
+            pagePath: "/",
+        }),
+    },
+    twitter: buildTwitterMetadata({
         title: "The Adamant | Digital Product Design and Development",
         description: "Design-forward websites, UX systems, and mobile experiences with clear messaging, fast performance, and SEO-ready structure.",
-        type: "website",
-        siteName: "The Adamant",
-        images: getOpenGraphImages(),
-    },
-    twitter: {
-        card: "summary_large_image",
-        title: "The Adamant | Digital Product Design and Development",
-        description: "Design-forward websites, UX systems, and mobile experiences with clear messaging, fast performance, and SEO-ready structure.",
-        images: getTwitterImages(),
-    },
+    }),
     metadataBase: getSiteMetadataBase(),
 };
 

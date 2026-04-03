@@ -289,10 +289,10 @@ export function SeoChatFab() {
                                             SEO AI
                                         </p>
                                         <h2 id="seo-chat-title" className="mt-4 text-2xl font-semibold text-foreground">
-                                            Quick SEO help with lead capture built in.
+                                            Focused SEO help for real website questions.
                                         </h2>
                                         <p className="mt-2 text-sm leading-6 text-foreground/70">
-                                            Share your details, website, and issue first. Closing the chat sends the transcript to The Adamant team.
+                                            Share your details, website, and issue first. This chat stays on SEO, UX, landing pages, metadata, local SEO, page speed, and conversion topics. Closing the chat sends the transcript to The Adamant team.
                                         </p>
                                     </div>
 
@@ -376,7 +376,7 @@ export function SeoChatFab() {
                                             </div>
 
                                             <div className="rounded-[1.4rem] border border-black/8 bg-black/[0.03] p-4 text-sm leading-6 text-foreground/68 dark:border-white/10 dark:bg-white/[0.03]">
-                                                The chat will analyze the provided website URL at runtime when possible, so the advice is less generic than a normal assistant chat.
+                                                The chat analyzes the provided website URL at runtime when possible. Off-topic or low-value prompts are redirected back to website, SEO, UX, and conversion questions.
                                             </div>
 
                                             {errorMessage && (
@@ -452,7 +452,7 @@ export function SeoChatFab() {
                                                 <Textarea
                                                     value={draft}
                                                     onChange={(event) => setDraft(event.target.value)}
-                                                    placeholder="Ask about homepage SEO, landing pages, keyword targeting, metadata, schema, local SEO, or conversion fixes."
+                                                    placeholder="Ask about homepage SEO, landing pages, keyword targeting, metadata, schema, local SEO, page speed, or conversion fixes."
                                                     rows={3}
                                                 />
                                                 <div className="flex flex-wrap gap-3">
