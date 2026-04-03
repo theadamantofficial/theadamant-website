@@ -9,7 +9,7 @@ import {
     getLocalizedPagePath,
 } from "@/lib/site-locale";
 import {getSiteUrl} from "@/lib/site-url";
-import {getOpenGraphImages, getTwitterImages} from "@/lib/social-metadata";
+import {buildTwitterMetadata, getOpenGraphImages} from "@/lib/social-metadata";
 const copy = getSiteCopy(DEFAULT_SITE_LOCALE);
 
 export const runtime = "nodejs";
@@ -41,18 +41,18 @@ export async function generateMetadata({
             description: post.excerpt,
             type: "article",
             url,
+            siteName: "The Adamant",
+            images: getOpenGraphImages(post.coverImage, post.title),
             publishedTime: post.publishedAt,
             modifiedTime: post.updatedAt,
             authors: [post.authorName],
             tags: post.tags,
-            images: getOpenGraphImages(post.coverImage, post.title),
         },
-        twitter: {
-            card: "summary_large_image",
+        twitter: buildTwitterMetadata({
             title: post.title,
             description: post.excerpt,
-            images: getTwitterImages(post.coverImage),
-        },
+            imagePath: post.coverImage,
+        }),
         alternates: {
             canonical: getLocalizedPagePath(DEFAULT_SITE_LOCALE, pathname),
             languages: getLanguageAlternates(pathname),

@@ -1,6 +1,6 @@
 import type {Metadata} from "next";
 import {getSiteUrl} from "@/lib/site-url";
-import {getOpenGraphImages, getTwitterImages} from "@/lib/social-metadata";
+import {buildOpenGraphMetadata, buildTwitterMetadata} from "@/lib/social-metadata";
 
 interface LandingHighlight {
     title: string;
@@ -315,18 +315,17 @@ export function buildServiceLandingMetadata(page: ServiceLandingPageConfig): Met
         alternates: {
             canonical: `/${page.slug}`,
         },
-        openGraph: {
+        openGraph: buildOpenGraphMetadata({
             title: page.metaTitle,
             description: page.metaDescription,
-            type: "website",
-            url,
-            images: getOpenGraphImages(page.image, page.title),
-        },
-        twitter: {
-            card: "summary_large_image",
+            pagePath: url,
+            imagePath: page.image,
+            alt: page.title,
+        }),
+        twitter: buildTwitterMetadata({
             title: page.metaTitle,
             description: page.metaDescription,
-            images: getTwitterImages(page.image),
-        },
+            imagePath: page.image,
+        }),
     };
 }

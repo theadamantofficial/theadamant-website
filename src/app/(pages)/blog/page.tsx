@@ -4,7 +4,7 @@ import {listInternalBlogPosts} from "@/lib/internal-blog";
 import {getSiteCopy} from "@/lib/site-copy";
 import {DEFAULT_SITE_LOCALE, getLanguageAlternates} from "@/lib/site-locale";
 import {fetchMediumPosts} from "@/lib/medium";
-import {getOpenGraphImages, getTwitterImages} from "@/lib/social-metadata";
+import {buildOpenGraphMetadata, buildTwitterMetadata} from "@/lib/social-metadata";
 const copy = getSiteCopy(DEFAULT_SITE_LOCALE);
 
 export const runtime = "nodejs";
@@ -15,17 +15,15 @@ export const metadata: Metadata = {
         absolute: "The Adamant Blog",
     },
     description: "Read The Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
-    openGraph: {
+    openGraph: buildOpenGraphMetadata({
         title: "The Adamant Blog",
         description: "Read The Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
-        images: getOpenGraphImages(),
-    },
-    twitter: {
-        card: "summary_large_image",
+        pagePath: "/blog",
+    }),
+    twitter: buildTwitterMetadata({
         title: "The Adamant Blog",
         description: "Read The Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
-        images: getTwitterImages(),
-    },
+    }),
     alternates: {
         canonical: "/blog",
         languages: getLanguageAlternates("blog"),
