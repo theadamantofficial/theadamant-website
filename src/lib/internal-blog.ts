@@ -636,7 +636,7 @@ function buildExcerptFromContent(content: string) {
 }
 
 function normalizeArticleContentForStorage(content: string) {
-    let normalized = content
+    const normalized = content
         .replace(/\r\n?/g, "\n")
         .replace(/<\s*\/?\s*br\s*\/?\s*>/gi, "\n")
         .replace(/<\s*\/?\s*hr\s*\/?\s*>/gi, "\n---\n")
