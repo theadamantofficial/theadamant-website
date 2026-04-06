@@ -152,57 +152,45 @@ export default function InternalBlogPostPage({
 }
 
 function renderArticleBlocks(content: string) {
-    const normalizedContent = normalizeArticleContent(content);
-    const blocks = normalizedContent
-        .split(/\n{2,}/)
-        .map((block) => block.trim())
-        .filter(Boolean);
+    const blocks = tokenizeArticleBlocks(content);
 
     return blocks.map((block, index) => {
-        if (/^---+$/.test(block)) {
+        if (block.type === "hr") {
             return <hr key={index} className="border-black/10 dark:border-white/10"/>;
         }
 
-        if (block.startsWith("### ")) {
-            return (
-                <h3 key={index} className="text-xl font-semibold text-foreground sm:text-2xl">
-                    {renderInlineMarkdown(block.replace(/^###\s+/, ""))}
-                </h3>
-            );
-        }
+        if (block.type === "heading") {
+            if (block.level >= 3) {
+                return (
+                    <h3 key={index} className="text-xl font-semibold text-foreground sm:text-2xl">
+                        {renderInlineMarkdown(block.text)}
+                    </h3>
+                );
+            }
 
-        if (block.startsWith("## ")) {
             return (
                 <h2 key={index} className="text-2xl font-semibold text-foreground sm:text-3xl">
-                    {renderInlineMarkdown(block.replace(/^##\s+/, ""))}
+                    {renderInlineMarkdown(block.text)}
                 </h2>
             );
         }
 
-        if (block.startsWith("# ")) {
-            return (
-                <h2 key={index} className="text-2xl font-semibold text-foreground sm:text-3xl">
-                    {renderInlineMarkdown(block.replace(/^#\s+/, ""))}
-                </h2>
-            );
-        }
+        if (block.type === "list") {
+            const ListTag = block.ordered ? "ol" : "ul";
 
-        const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
-
-        if (lines.every((line) => /^[-*]\s+/.test(line))) {
             return (
-                <ul key={index} className="list-disc space-y-2 pl-5 text-foreground/78">
-                    {lines.map((line) => (
-                        <li key={line}>{renderInlineMarkdown(line.replace(/^[-*]\s+/, ""))}</li>
+                <ListTag key={index} className={`pl-5 ${block.ordered ? "list-decimal" : "list-disc"} space-y-2`}>
+                    {block.items.map((item) => (
+                        <li key={item}>{renderInlineMarkdown(item)}</li>
                     ))}
-                </ul>
+                </ListTag>
             );
         }
 
         return (
             <p key={index} className="whitespace-pre-wrap">
-                {lines.map((line, lineIndex) => (
-                    <span key={lineIndex}>
+                {block.text.split("\n").map((line, lineIndex) => (
+                    <span key={`${index}-${lineIndex}`}>
                         {lineIndex > 0 ? <br/> : null}
                         {renderInlineMarkdown(line)}
                     </span>
@@ -210,6 +198,104 @@ function renderArticleBlocks(content: string) {
             </p>
         );
     });
+}
+
+function tokenizeArticleBlocks(content: string): Array<
+    | {type: "hr"}
+    | {type: "heading"; level: 1 | 2 | 3 | 4; text: string}
+    | {type: "list"; ordered: boolean; items: string[]}
+    | {type: "paragraph"; text: string}
+> {
+    const normalized = normalizeArticleContent(content);
+    const lines = normalized.split("\n");
+    const blocks: Array<
+        | {type: "hr"}
+        | {type: "heading"; level: 1 | 2 | 3 | 4; text: string}
+        | {type: "list"; ordered: boolean; items: string[]}
+        | {type: "paragraph"; text: string}
+    > = [];
+    let paragraphLines: string[] = [];
+    let listLines: string[] = [];
+    let isOrderedList = false;
+
+    const flushParagraph = () => {
+        if (!paragraphLines.length) {
+            return;
+        }
+
+        const paragraphText = paragraphLines.join("\n").trim();
+        if (paragraphText) {
+            blocks.push({type: "paragraph", text: paragraphText});
+        }
+        paragraphLines = [];
+    };
+
+    const flushList = () => {
+        if (!listLines.length) {
+            return;
+        }
+
+        blocks.push({type: "list", ordered: isOrderedList, items: listLines});
+        listLines = [];
+        isOrderedList = false;
+    };
+
+    for (const rawLine of lines) {
+        const line = rawLine.trim();
+        const headingMatch = line.match(/^(#{1,4})\s+(.*)$/);
+        const unorderedMatch = line.match(/^[-*+]\s+(.*)$/);
+        const orderedMatch = line.match(/^(\d+)\.\s+(.*)$/);
+
+        if (headingMatch) {
+            flushParagraph();
+            flushList();
+            blocks.push({
+                type: "heading",
+                level: Math.min(4, Math.max(1, headingMatch[1].length)) as 1 | 2 | 3 | 4,
+                text: headingMatch[2].trim(),
+            });
+            continue;
+        }
+
+        if (/^---+$/.test(line)) {
+            flushParagraph();
+            flushList();
+            blocks.push({type: "hr"});
+            continue;
+        }
+
+        if (!line) {
+            flushParagraph();
+            flushList();
+            continue;
+        }
+
+        if (unorderedMatch || orderedMatch) {
+            flushParagraph();
+
+            if (orderedMatch) {
+                if (listLines.length > 0 && !isOrderedList) {
+                    flushList();
+                }
+                isOrderedList = true;
+                listLines.push(orderedMatch[2].trim());
+                continue;
+            }
+
+            if (listLines.length > 0 && isOrderedList) {
+                flushList();
+            }
+            isOrderedList = false;
+            listLines.push(unorderedMatch[1].trim());
+            continue;
+        }
+
+        paragraphLines.push(line);
+    }
+
+    flushParagraph();
+    flushList();
+    return blocks;
 }
 
 function normalizeArticleContent(content: string) {

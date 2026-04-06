@@ -236,7 +236,7 @@ export async function getInternalBlogPostBySlug(slug: string) {
 
 export async function createInternalBlogPost(input: CreateInternalBlogPostInput) {
     const title = input.title.trim();
-    const content = input.content.trim();
+    const content = normalizeArticleContentForStorage(input.content).trim();
 
     if (!title || !content) {
         throw new Error("Title and content are required.");
@@ -284,7 +284,7 @@ export async function createInternalBlogPost(input: CreateInternalBlogPostInput)
 
 export async function updateInternalBlogPost(input: UpdateInternalBlogPostInput) {
     const title = input.title.trim();
-    const content = input.content.trim();
+    const content = normalizeArticleContentForStorage(input.content).trim();
 
     if (!title || !content) {
         throw new Error("Title and content are required.");
@@ -633,6 +633,37 @@ function buildExcerptFromContent(content: string) {
     }
 
     return `${flattened.slice(0, 177).trim()}...`;
+}
+
+function normalizeArticleContentForStorage(content: string) {
+    let normalized = content
+        .replace(/\r\n?/g, "\n")
+        .replace(/<\s*\/?\s*br\s*\/?\s*>/gi, "\n")
+        .replace(/<\s*\/?\s*hr\s*\/?\s*>/gi, "\n---\n")
+        .replace(/<\s*\/?\s*p[^>]*>/gi, "\n")
+        .replace(/<\s*\/?\s*ul[^>]*>/gi, "\n")
+        .replace(/<\s*\/?\s*ol[^>]*>/gi, "\n")
+        .replace(/<\s*li\b[^>]*>([\s\S]*?)<\s*\/\s*li>/gi, "- $1\n")
+        .replace(/<\s*h1\b[^>]*>([\s\S]*?)<\s*\/\s*h1>/gi, "\n# $1\n")
+        .replace(/<\s*h2\b[^>]*>([\s\S]*?)<\s*\/\s*h2>/gi, "\n## $1\n")
+        .replace(/<\s*h3\b[^>]*>([\s\S]*?)<\s*\/\s*h3>/gi, "\n### $1\n")
+        .replace(/<\s*h4\b[^>]*>([\s\S]*?)<\s*\/\s*h4>/gi, "\n### $1\n")
+        .replace(/<\s*strong\b[^>]*>([\s\S]*?)<\s*\/\s*strong>/gi, "**$1**")
+        .replace(/<\s*b\b[^>]*>([\s\S]*?)<\s*\/\s*b>/gi, "**$1**")
+        .replace(/<\s*em\b[^>]*>([\s\S]*?)<\s*\/\s*em>/gi, "*$1*")
+        .replace(/<\s*i\b[^>]*>([\s\S]*?)<\s*\/\s*i>/gi, "*$1*")
+        .replace(/&nbsp;/gi, " ")
+        .replace(/&amp;/gi, "&")
+        .replace(/&lt;/gi, "<")
+        .replace(/&gt;/gi, ">")
+        .replace(/&quot;/gi, "\"")
+        .replace(/&#39;/gi, "'")
+        .replace(/&apos;/gi, "'");
+
+    return normalized
+        .replace(/<\s*\/?\s*[^>]+>/gi, "")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
 }
 
 function normalizeTitleForUniqueness(value: string) {
