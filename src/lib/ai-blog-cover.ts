@@ -53,23 +53,25 @@ export async function generateAiBlogCoverSvg(post: Pick<InternalBlogPost, "title
 }
 
 export function buildFallbackBlogCoverDataUrl(post: Pick<InternalBlogPost, "title" | "excerpt" | "tags" | "slug">) {
-    const svg = renderBlogCoverSvg(post, buildFallbackDesign(post.title, post.tags));
+    const svg = renderBlogCoverSvg(post, buildFallbackDesign(post.title, post.tags, post.slug));
     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
-async function generateBlogCoverDesign(post: Pick<InternalBlogPost, "title" | "excerpt" | "tags">) {
-    const fallback = buildFallbackDesign(post.title, post.tags);
+async function generateBlogCoverDesign(post: Pick<InternalBlogPost, "title" | "excerpt" | "tags" | "slug">) {
+    const fallback = buildFallbackDesign(post.title, post.tags, post.slug);
+    const styleSeed = buildCoverStyleSeed(post);
 
     try {
         const response = await requestGroqChatCompletion({
             model: getGroqBlogCoverModel(),
-            maxTokens: 260,
-            temperature: 0.7,
+            maxTokens: 320,
+            temperature: 0.78,
             messages: [
                 {
                     role: "system",
                     content: [
                         "You are designing a premium blog cover layout for a digital product and SEO studio.",
+                        "Use title, tags, and style seed to create a distinct visual direction.",
                         "Return JSON only.",
                         "Use this exact schema:",
                         '{"eyebrow":"short uppercase phrase","titleLines":["line 1","line 2","optional line 3"],"accentLabel":"2 to 4 words","gradientFrom":"#RRGGBB","gradientTo":"#RRGGBB","accent":"#RRGGBB","panel":"rgba(255,255,255,0.12)","ink":"#RRGGBB"}',
@@ -78,6 +80,7 @@ async function generateBlogCoverDesign(post: Pick<InternalBlogPost, "title" | "e
                         "- Keep eyebrow under 5 words.",
                         "- accentLabel should feel like a sharp article tag.",
                         "- Colors must be readable and premium.",
+                        "- Do not reuse the same design concept across different title seeds.",
                     ].join(" "),
                 },
                 {
@@ -86,6 +89,8 @@ async function generateBlogCoverDesign(post: Pick<InternalBlogPost, "title" | "e
                         title: post.title,
                         excerpt: post.excerpt,
                         tags: post.tags,
+                        slug: post.slug,
+                        styleSeed,
                     }),
                 },
             ],
@@ -121,8 +126,8 @@ function normalizeDesign(parsed: BlogCoverDesignPayload, fallback: BlogCoverDesi
     };
 }
 
-function buildFallbackDesign(title: string, tags: string[]): BlogCoverDesign {
-    const palette = DEFAULT_DESIGNS[Math.abs(hashCode(title)) % DEFAULT_DESIGNS.length];
+function buildFallbackDesign(title: string, tags: string[], slug: string): BlogCoverDesign {
+    const palette = DEFAULT_DESIGNS[Math.abs(hashCode(`${title}|${slug}`)) % DEFAULT_DESIGNS.length];
     const lines = splitTitleIntoLines(title);
 
     return {
@@ -276,4 +281,15 @@ function hashCode(value: string) {
     }
 
     return hash;
+}
+
+function buildCoverStyleSeed(post: Pick<InternalBlogPost, "title" | "tags" | "slug">) {
+    const primaryTag = post.tags?.[0]?.trim() || "seo";
+    const titlePrefix = post.title
+        .toLowerCase()
+        .split(/\s+/)
+        .slice(0, 2)
+        .join("-");
+
+    return `${post.slug || "default"}-${primaryTag}-${titlePrefix}`;
 }
