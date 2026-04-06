@@ -4,12 +4,14 @@ import path from "node:path";
 import {get, put} from "@vercel/blob";
 import type {BlobAccessType, GetBlobResult, PutBlobResult} from "@vercel/blob";
 import {generateAiBlogCoverSvg} from "@/lib/ai-blog-cover";
+import {extractJsonObject, getGroqChatModel, requestGroqChatCompletion} from "@/lib/groq";
 import {getSiteUrl} from "@/lib/site-url";
 
 export interface InternalBlogPost {
     id: string;
     slug: string;
     title: string;
+    seoTitle?: string;
     excerpt: string;
     content: string;
     coverImage: string | null;
@@ -71,8 +73,18 @@ const BLOG_ADMIN_EMAIL_FALLBACK = "team@theadamant.local";
 const BLOG_ADMIN_PASSWORD_FALLBACK = "theadamant-admin";
 const BLOG_ADMIN_SECRET_FALLBACK = "theadamant-blog-local-secret";
 const BLOG_ADMIN_SESSION_MAX_AGE = 60 * 60 * 24 * 14;
+const DEFAULT_BLOG_SEO_FOCUS = "Website Design, UX & SEO";
 
 export const BLOG_ADMIN_COOKIE_NAME = "theadamant-blog-admin";
+
+export function getEnhancedBlogSeoTitle(title: string, tags: string[] = []) {
+    const safeTitle = title.trim().replace(/\s+/g, " ");
+    const focus = (tags[0]?.trim() || DEFAULT_BLOG_SEO_FOCUS).replace(/\s+/g, " ");
+
+    const preferredTitle = safeTitle.length > 54 ? `${safeTitle.slice(0, 51).trim()}...` : safeTitle;
+
+    return `${preferredTitle} | ${focus} | The Adamant`;
+}
 
 export function getBlogAdminCredentials(): BlogAdminCredentials {
     const envEmails = parseBlogAdminEmails(process.env.BLOG_ADMIN_EMAILS || process.env.BLOG_ADMIN_EMAIL);
@@ -231,12 +243,19 @@ export async function createInternalBlogPost(input: CreateInternalBlogPostInput)
     }
 
     const posts = await readInternalBlogPosts();
-    const now = new Date().toISOString();
-    const slug = createUniqueSlug(title, posts);
-    const excerpt = input.excerpt?.trim() || buildExcerptFromContent(content);
     const tags = normalizeTags(input.tags);
-    const coverImage = await resolveBlogCoverImage(input.coverImage, {
+    const resolvedDraft = await resolveUniqueBlogDraft({
         title,
+        excerpt: input.excerpt?.trim(),
+        content,
+        tags,
+        posts,
+    });
+    const now = new Date().toISOString();
+    const slug = createUniqueSlug(resolvedDraft.title, posts);
+    const excerpt = resolvedDraft.excerpt || buildExcerptFromContent(content);
+    const coverImage = await resolveBlogCoverImage(input.coverImage, {
+        title: resolvedDraft.title,
         excerpt,
         tags,
         slug,
@@ -245,9 +264,10 @@ export async function createInternalBlogPost(input: CreateInternalBlogPostInput)
     const post: InternalBlogPost = {
         id: randomUUID(),
         slug,
-        title,
+        title: resolvedDraft.title,
+        seoTitle: resolvedDraft.seoTitle || getEnhancedBlogSeoTitle(resolvedDraft.title, tags),
         excerpt,
-        content,
+        content: resolvedDraft.content,
         coverImage,
         tags,
         authorName: input.authorName?.trim() || "The Adamant Team",
@@ -278,19 +298,29 @@ export async function updateInternalBlogPost(input: UpdateInternalBlogPostInput)
     }
 
     const existingPost = posts[existingPostIndex];
-    const excerpt = input.excerpt?.trim() || buildExcerptFromContent(content);
     const tags = normalizeTags(input.tags);
-    const coverImage = await resolveBlogCoverImage(input.coverImage, {
+    const resolvedDraft = await resolveUniqueBlogDraft({
         title,
+        excerpt: input.excerpt?.trim(),
+        content,
+        tags,
+        posts,
+        ignorePostId: existingPost.id,
+    });
+    const excerpt = resolvedDraft.excerpt || buildExcerptFromContent(content);
+
+    const coverImage = await resolveBlogCoverImage(input.coverImage, {
+        title: resolvedDraft.title,
         excerpt,
         tags,
         slug: existingPost.slug,
     });
     const nextPost: InternalBlogPost = {
         ...existingPost,
-        title,
+        title: resolvedDraft.title,
+        seoTitle: resolvedDraft.seoTitle || getEnhancedBlogSeoTitle(resolvedDraft.title, tags),
         excerpt,
-        content,
+        content: resolvedDraft.content,
         coverImage,
         tags,
         authorName: input.authorName?.trim() || existingPost.authorName,
@@ -552,6 +582,7 @@ function normalizeStoredPost(value: unknown): InternalBlogPost | null {
         id: candidate.id,
         slug: candidate.slug,
         title: candidate.title,
+        seoTitle: typeof candidate.seoTitle === "string" ? candidate.seoTitle.trim() : undefined,
         excerpt: candidate.excerpt,
         content: candidate.content,
         coverImage: typeof candidate.coverImage === "string" ? candidate.coverImage : null,
@@ -602,6 +633,167 @@ function buildExcerptFromContent(content: string) {
     }
 
     return `${flattened.slice(0, 177).trim()}...`;
+}
+
+function normalizeTitleForUniqueness(value: string) {
+    return value
+        .toLowerCase()
+        .replace(/&/g, " and ")
+        .replace(/[^a-z0-9\s]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function titleCollides(value: string, posts: InternalBlogPost[], ignorePostId?: string) {
+    const normalized = normalizeTitleForUniqueness(value);
+
+    return posts.some((post) => (
+        post.id !== (ignorePostId || "")
+        && normalizeTitleForUniqueness(post.title) === normalized
+    ));
+}
+
+function buildDuplicateCount(value: string, posts: InternalBlogPost[], ignorePostId?: string) {
+    const normalized = normalizeTitleForUniqueness(value);
+
+    return posts.filter((post) => (
+        post.id !== (ignorePostId || "")
+        && normalizeTitleForUniqueness(post.title) === normalized
+    )).length;
+}
+
+async function resolveUniqueBlogDraft({
+    title,
+    excerpt,
+    content,
+    tags,
+    posts,
+    ignorePostId,
+}: {
+    title: string;
+    excerpt?: string;
+    content: string;
+    tags: string[];
+    posts: InternalBlogPost[];
+    ignorePostId?: string;
+}) {
+    const candidateTitle = title.trim();
+    const candidateExcerpt = excerpt?.trim() || "";
+
+    if (!titleCollides(candidateTitle, posts, ignorePostId)) {
+        return {
+            title: candidateTitle,
+            excerpt: candidateExcerpt,
+            content,
+            seoTitle: getEnhancedBlogSeoTitle(candidateTitle, tags),
+        };
+    }
+
+    const rewritten = await rewriteDuplicateBlogDraft({
+        title: candidateTitle,
+        excerpt: candidateExcerpt,
+        tags,
+        posts,
+        ignorePostId,
+        content,
+    });
+
+    if (rewritten && !titleCollides(rewritten.title, posts, ignorePostId)) {
+        return rewritten;
+    }
+
+    const duplicateCount = buildDuplicateCount(candidateTitle, posts, ignorePostId) + 1;
+    const fallbackTitle = `${candidateTitle} (Edition ${duplicateCount})`;
+
+    return {
+        title: fallbackTitle,
+        excerpt: candidateExcerpt,
+        content,
+        seoTitle: getEnhancedBlogSeoTitle(fallbackTitle, tags),
+    };
+}
+
+async function rewriteDuplicateBlogDraft({
+    title,
+    excerpt,
+    tags,
+    posts,
+    ignorePostId,
+    content,
+}: {
+    title: string;
+    excerpt: string;
+    tags: string[];
+    posts: InternalBlogPost[];
+    ignorePostId?: string;
+    content: string;
+}) {
+    const existingTitles = posts
+        .filter((post) => post.id !== (ignorePostId || ""))
+        .map((post) => post.title);
+
+    try {
+        const response = await requestGroqChatCompletion({
+            model: getGroqChatModel(),
+            temperature: 0.65,
+            maxTokens: 260,
+            messages: [
+                {
+                    role: "system",
+                    content: [
+                        "You are a senior SEO copy editor for a digital product website.",
+                        "The provided title already exists in the blog library.",
+                        "Return JSON only.",
+                        `Use this exact schema: ${JSON.stringify({
+                            title: "unique and SEO-ready title",
+                            excerpt: "new excerpt with same meaning (under 180 chars)",
+                            seoTitle: "maximally keyword-rich SEO title",
+                        })}`,
+                        "Rules:",
+                        "- Do not duplicate existing titles.",
+                        "- Keep the article intent and subject the same.",
+                        "- Make title unique with a new angle or phrasing.",
+                        "- Keep output concise and practical.",
+                    ].join(" "),
+                },
+                {
+                    role: "user",
+                    content: JSON.stringify({
+                        requestedTitle: title,
+                        currentExcerpt: excerpt || "No excerpt provided.",
+                        tags,
+                        existingTitles,
+                    }),
+                },
+            ],
+        });
+
+        const parsed = extractJsonObject<{
+            title?: string;
+            excerpt?: string;
+            seoTitle?: string;
+        }>(response);
+
+        if (!parsed?.title) {
+            return null;
+        }
+
+        const resolvedTitle = parsed.title.trim();
+        if (!resolvedTitle || titleCollides(resolvedTitle, posts, ignorePostId)) {
+            return null;
+        }
+
+        const resolvedExcerpt = parsed.excerpt?.trim() || excerpt;
+
+        return {
+            title: resolvedTitle,
+            excerpt: resolvedExcerpt,
+            content,
+            seoTitle: parsed.seoTitle?.trim(),
+        };
+    } catch {
+        return null;
+    }
 }
 
 function normalizeTags(tags: CreateInternalBlogPostInput["tags"]) {

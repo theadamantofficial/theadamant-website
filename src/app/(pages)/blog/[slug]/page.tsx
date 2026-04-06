@@ -1,7 +1,7 @@
 import type {Metadata} from "next";
 import {notFound} from "next/navigation";
 import InternalBlogPostPage from "@/views/internal-blog-post-page";
-import {getInternalBlogPostBySlug} from "@/lib/internal-blog";
+import {getEnhancedBlogSeoTitle, getInternalBlogPostBySlug} from "@/lib/internal-blog";
 import {getSiteCopy} from "@/lib/site-copy";
 import {
     DEFAULT_SITE_LOCALE,
@@ -29,27 +29,28 @@ export async function generateMetadata({
     const pathname = `blog/${post.slug}`;
     const siteUrl = getSiteUrl();
     const url = `${siteUrl}${getLocalizedPagePath(DEFAULT_SITE_LOCALE, pathname)}`;
+    const seoTitle = getEnhancedBlogSeoTitle(post.title, post.tags);
 
     return {
         title: {
-            absolute: `${post.title} | The Adamant`,
+            absolute: seoTitle,
         },
         description: post.excerpt,
         keywords: post.tags,
         openGraph: {
-            title: post.title,
+            title: seoTitle,
             description: post.excerpt,
             type: "article",
             url,
             siteName: "The Adamant",
-            images: getOpenGraphImages(post.coverImage, post.title),
+            images: getOpenGraphImages(post.coverImage, seoTitle),
             publishedTime: post.publishedAt,
             modifiedTime: post.updatedAt,
             authors: [post.authorName],
             tags: post.tags,
         },
         twitter: buildTwitterMetadata({
-            title: post.title,
+            title: seoTitle,
             description: post.excerpt,
             imagePath: post.coverImage,
         }),
