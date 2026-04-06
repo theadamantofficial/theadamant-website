@@ -152,7 +152,8 @@ export default function InternalBlogPostPage({
 }
 
 function renderArticleBlocks(content: string) {
-    const blocks = content
+    const normalizedContent = normalizeArticleContent(content);
+    const blocks = normalizedContent
         .split(/\n{2,}/)
         .map((block) => block.trim())
         .filter(Boolean);
@@ -209,6 +210,39 @@ function renderArticleBlocks(content: string) {
             </p>
         );
     });
+}
+
+function normalizeArticleContent(content: string) {
+    let normalized = content
+        .replace(/\r\n?/g, "\n")
+        .replace(/<\s*\/?\s*br\s*\/?\s*>/gi, "\n")
+        .replace(/<\s*\/?\s*hr\s*\/?\s*>/gi, "\n---\n")
+        .replace(/<\s*\/?\s*p[^>]*>/gi, "\n")
+        .replace(/<\s*\/?\s*ul[^>]*>/gi, "\n")
+        .replace(/<\s*\/?\s*ol[^>]*>/gi, "\n")
+        .replace(/<\s*li\b[^>]*>([\s\S]*?)<\s*\/\s*li>/gi, "- $1\n")
+        .replace(/<\s*h1\b[^>]*>([\s\S]*?)<\s*\/\s*h1>/gi, "\n# $1\n")
+        .replace(/<\s*h2\b[^>]*>([\s\S]*?)<\s*\/\s*h2>/gi, "\n## $1\n")
+        .replace(/<\s*h3\b[^>]*>([\s\S]*?)<\s*\/\s*h3>/gi, "\n### $1\n")
+        .replace(/<\s*h4\b[^>]*>([\s\S]*?)<\s*\/\s*h4>/gi, "\n### $1\n")
+        .replace(/<\s*strong\b[^>]*>([\s\S]*?)<\s*\/\s*strong>/gi, "**$1**")
+        .replace(/<\s*b\b[^>]*>([\s\S]*?)<\s*\/\s*b>/gi, "**$1**")
+        .replace(/<\s*em\b[^>]*>([\s\S]*?)<\s*\/\s*em>/gi, "*$1*")
+        .replace(/<\s*i\b[^>]*>([\s\S]*?)<\s*\/\s*i>/gi, "*$1*")
+        .replace(/&nbsp;/gi, " ")
+        .replace(/&amp;/gi, "&")
+        .replace(/&lt;/gi, "<")
+        .replace(/&gt;/gi, ">")
+        .replace(/&quot;/gi, "\"")
+        .replace(/&#39;/gi, "'")
+        .replace(/&apos;/gi, "'");
+
+    normalized = normalized
+        .replace(/<\s*\/?\s*[^>]+>/gi, "")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+
+    return normalized;
 }
 
 function renderInlineMarkdown(text: string) {
