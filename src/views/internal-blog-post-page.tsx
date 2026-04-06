@@ -270,17 +270,19 @@ function tokenizeArticleBlocks(content: string): Array<
             continue;
         }
 
-        if (unorderedMatch || orderedMatch) {
+        if (orderedMatch) {
             flushParagraph();
 
-            if (orderedMatch) {
-                if (listLines.length > 0 && !isOrderedList) {
-                    flushList();
-                }
-                isOrderedList = true;
-                listLines.push(orderedMatch[2].trim());
-                continue;
+            if (listLines.length > 0 && !isOrderedList) {
+                flushList();
             }
+            isOrderedList = true;
+            listLines.push(orderedMatch[2].trim());
+            continue;
+        }
+
+        if (unorderedMatch) {
+            flushParagraph();
 
             if (listLines.length > 0 && isOrderedList) {
                 flushList();
