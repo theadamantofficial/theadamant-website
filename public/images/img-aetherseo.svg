@@ -1,0 +1,43 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="900" rx="64" fill="url(#bg)"/>
+  <rect x="66" y="66" width="1068" height="768" rx="44" fill="url(#panel)" fill-opacity="0.92" stroke="rgba(255,255,255,0.16)"/>
+  <circle cx="953" cy="223" r="184" fill="url(#glow1)" fill-opacity="0.75"/>
+  <circle cx="302" cy="713" r="226" fill="url(#glow2)" fill-opacity="0.6"/>
+  <circle cx="889" cy="264" r="120" stroke="#9DB4FF" stroke-width="2"/>
+  <circle cx="889" cy="264" r="79" stroke="#C9D5FF" stroke-width="2" stroke-dasharray="8 10"/>
+  <circle cx="889" cy="264" r="18" fill="#F6F7FF"/>
+  <path d="M237 314C308.994 229.625 388.505 187.438 475.531 187.438C570.624 187.438 645.804 223.646 701.07 296.062" stroke="#BFD0FF" stroke-width="3" stroke-linecap="round"/>
+  <path d="M237 368C308.994 452.375 388.505 494.562 475.531 494.562C570.624 494.562 645.804 458.354 701.07 385.938" stroke="#85A2FF" stroke-width="3" stroke-linecap="round"/>
+  <rect x="149" y="156" width="138" height="138" rx="36" fill="url(#mark)"/>
+  <path d="M190 247L220.5 185L251 247H229.6L220.5 228.3L211.4 247H190Z" fill="#F3F6FF"/>
+  <path d="M212 218.5H229.5L240.5 240.5H223L212 218.5Z" fill="#C4D3FF"/>
+  <text x="149" y="399" fill="#F7F8FF" font-family="Helvetica, Arial, sans-serif" font-size="96" font-weight="700" letter-spacing="-2">AetherSEO</text>
+  <text x="151" y="461" fill="#A9B6DA" font-family="Helvetica, Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="7">AI MEETS SEO</text>
+  <text x="149" y="562" fill="#DCE4FF" font-family="Helvetica, Arial, sans-serif" font-size="42" font-weight="600">Structured SEO operations in one workspace</text>
+  <text x="149" y="631" fill="#B2BDD9" font-family="Helvetica, Arial, sans-serif" font-size="30">Plan content, run audits, and publish with cleaner multilingual workflows.</text>
+  <rect x="149" y="690" width="234" height="64" rx="32" fill="#F5F7FF"/>
+  <text x="190" y="731" fill="#101522" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700">In-house product</text>
+  <defs>
+    <linearGradient id="bg" x1="88" y1="62" x2="1119" y2="848" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1230"/>
+      <stop offset="0.52" stop-color="#111B46"/>
+      <stop offset="1" stop-color="#1A2251"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="135" y1="121" x2="1049" y2="794" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#101B44"/>
+      <stop offset="1" stop-color="#15214F"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="149" y1="156" x2="287" y2="294" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6F8CFF"/>
+      <stop offset="1" stop-color="#93E2FF"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(953 223) rotate(90) scale(184)">
+      <stop stop-color="#6484FF"/>
+      <stop offset="1" stop-color="#6484FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(302 713) rotate(90) scale(226)">
+      <stop stop-color="#4BD8FF"/>
+      <stop offset="1" stop-color="#4BD8FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

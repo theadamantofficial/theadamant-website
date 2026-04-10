@@ -49,7 +49,7 @@ export default function ServicesSection({
                 )}
             </Reveal>
 
-            <StaggerGroup className="mt-10 grid items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <StaggerGroup className="mt-10 grid items-stretch gap-6 md:grid-cols-2 xl:grid-cols-4">
                 {copy.items.map((service) => (
                     <StaggerItem key={service.title} className="h-full">
                         <ServiceCard
@@ -57,6 +57,9 @@ export default function ServicesSection({
                             description={service.description}
                             detail={service.detail}
                             image={service.image}
+                            badge={service.badge}
+                            href={service.href}
+                            ctaLabel={service.ctaLabel}
                         />
                     </StaggerItem>
                 ))}
