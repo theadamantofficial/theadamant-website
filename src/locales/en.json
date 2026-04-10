@@ -71,8 +71,8 @@
   "services": {
     "kicker": "Services",
     "title": "Design and development services built to convert interest into action.",
-    "description": "From SEO-friendly websites to mobile product delivery, we support brands that need a website development company or app development company with sharper execution and cleaner strategy.",
-    "chips": ["Landing pages", "Marketing websites", "Product interfaces", "Cross-platform mobile apps"],
+    "description": "From SEO-friendly websites to mobile product delivery and in-house software, we support brands that need sharper execution, cleaner strategy, and practical digital systems.",
+    "chips": ["Landing pages", "Marketing websites", "Product interfaces", "Cross-platform mobile apps", "SEO systems"],
     "items": [
       {
         "title": "UI/UX Design",
@@ -91,6 +91,15 @@
         "description": "High-performance apps with sleek design and seamless functionality.",
         "detail": "Cross-platform mobile app development, mobile app UI design, smooth onboarding flows, scalable product experiences, and user-friendly app interfaces for Android and iOS growth.",
         "image": "/images/img-app-dev.png"
+      },
+      {
+        "title": "AetherSEO",
+        "description": "The Adamant's in-house SEO workspace for multilingual publishing, audits, and structured content operations.",
+        "detail": "AetherSEO helps startups and lean teams plan content, run audits, track SEO work, and keep publishing workflows organized inside one product instead of scattered tools.",
+        "image": "/images/img-aetherseo.svg",
+        "badge": "In-house product",
+        "href": "https://aetherseo.com/en",
+        "ctaLabel": "Visit AetherSEO"
       }
     ]
   },

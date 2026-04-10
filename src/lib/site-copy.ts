@@ -29,6 +29,9 @@ interface ServiceItem {
     description: string;
     detail: string;
     image: string;
+    badge?: string;
+    href?: string;
+    ctaLabel?: string;
 }
 
 interface ProcessItem {
