@@ -185,6 +185,15 @@
             transform: rotate(360deg);
         }
     }
+
+    @keyframes marquee {
+        from {
+            transform: translate3d(0, 0, 0);
+        }
+        to {
+            transform: translate3d(-50%, 0, 0);
+        }
+    }
 }
 
 @layer components {
@@ -457,6 +466,16 @@
     .seo-chat-bubble-user {
         @apply ml-auto max-w-[88%] border-primary/18 bg-primary/8 dark:border-primary/25 dark:bg-primary/10;
     }
+
+    .proof-marquee {
+        animation: marquee 26s linear infinite;
+        will-change: transform;
+    }
+
+    .proof-marquee-reverse {
+        animation-direction: reverse;
+        animation-duration: 32s;
+    }
 }
 
 @layer base {
@@ -505,5 +524,13 @@
 
     input, textarea, select {
         cursor: var(--cursor-text);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .proof-marquee,
+    .proof-marquee-reverse {
+        animation: none;
+        transform: translate3d(0, 0, 0);
     }
 }
