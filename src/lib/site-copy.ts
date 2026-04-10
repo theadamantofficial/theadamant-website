@@ -32,6 +32,7 @@ interface ServiceItem {
     badge?: string;
     href?: string;
     ctaLabel?: string;
+    proofHighlights?: string[];
 }
 
 interface ProcessItem {
@@ -85,6 +86,11 @@ export interface SiteCopy {
         title: string;
         description: string;
         chips: string[];
+        proofStrip?: {
+            kicker: string;
+            title: string;
+            description: string;
+        };
         items: ServiceItem[];
     };
     process: {

@@ -21,7 +21,7 @@ export default function ServicesSection({
     locale: SiteLocale;
 }) {
     return (
-        <section id="services" className="section-shell py-24" aria-labelledby="services-heading">
+        <section id="services" className="section-shell py-16 sm:py-20" aria-labelledby="services-heading">
             <Reveal className="max-w-3xl">
                 <p className="section-kicker">{copy.kicker}</p>
                 <h2 id="services-heading" className="section-title">
@@ -49,7 +49,7 @@ export default function ServicesSection({
                 )}
             </Reveal>
 
-            <StaggerGroup className="mt-10 grid items-stretch gap-6 md:grid-cols-2 xl:grid-cols-4">
+            <StaggerGroup className="mt-8 grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {copy.items.map((service) => (
                     <StaggerItem key={service.title} className="h-full">
                         <ServiceCard

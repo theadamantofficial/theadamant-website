@@ -71,8 +71,13 @@
   "services": {
     "kicker": "Services",
     "title": "Design and development services built to convert interest into action.",
-    "description": "From SEO-friendly websites to mobile product delivery and in-house software, we support brands that need sharper execution, cleaner strategy, and practical digital systems.",
+    "description": "From SEO-friendly websites to mobile product delivery, we support brands that need sharper execution, cleaner strategy, and practical digital systems.",
     "chips": ["Landing pages", "Marketing websites", "Product interfaces", "Cross-platform mobile apps", "SEO systems"],
+    "proofStrip": {
+      "kicker": "Selected work",
+      "title": "Products and partner systems already shipped with us.",
+      "description": "AetherSEO sits here as visible proof of the SEO, publishing, and workflow systems The Adamant can design and build without crowding the services section."
+    },
     "items": [
       {
         "title": "UI/UX Design",
@@ -98,6 +103,7 @@
         "detail": "AetherSEO helps startups and lean teams plan content, run audits, track SEO work, and keep publishing workflows organized inside one product instead of scattered tools.",
         "image": "/images/img-aetherseo.svg",
         "badge": "In-house product",
+        "proofHighlights": ["Multilingual publishing", "SEO audits", "Content operations", "Workflow tracking"],
         "href": "https://aetherseo.com/en",
         "ctaLabel": "Visit AetherSEO"
       }

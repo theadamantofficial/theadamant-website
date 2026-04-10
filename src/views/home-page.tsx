@@ -5,6 +5,7 @@ import {SiteCopy} from "@/lib/site-copy";
 import {SiteLocale} from "@/lib/site-locale";
 
 const HeroSection = dynamic(() => import("@/components/sections/hero-section"));
+const PartnerProofStrip = dynamic(() => import("@/components/sections/partner-proof-strip"));
 const ValuePropsSection = dynamic(() => import("@/components/sections/value-props-section"));
 const ServicesSection = dynamic(() => import("@/components/sections/services-section"));
 const ProcessSection = dynamic(() => import("@/components/sections/process-section"));
@@ -24,6 +25,11 @@ export default function HomePage({
     copy: SiteCopy;
     locale: SiteLocale;
 }) {
+    const proofItems = copy.services.items.filter((item) => (item.proofHighlights?.length ?? 0) > 0);
+    const servicesCopy = {
+        ...copy.services,
+        items: copy.services.items.filter((item) => (item.proofHighlights?.length ?? 0) === 0),
+    };
     const schemas = [
         {
             "@context": "https://schema.org",
@@ -69,9 +75,11 @@ export default function HomePage({
 
         <HeroSection copy={copy.hero} locale={locale}/>
 
+        <PartnerProofStrip copy={copy.services.proofStrip} items={proofItems}/>
+
         <ValuePropsSection copy={copy.valueProps}/>
 
-        <ServicesSection copy={copy.services} locale={locale}/>
+        <ServicesSection copy={servicesCopy} locale={locale}/>
 
         <ProcessSection copy={copy.process}/>
 
