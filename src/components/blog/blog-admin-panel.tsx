@@ -4,6 +4,7 @@ import {ChangeEvent, FormEvent, useEffect, useState} from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import {ArrowRight, ImagePlus, LockKeyhole, LogOut, PenSquare, PencilLine, ShieldCheck, Sparkles, Trash2, X} from "lucide-react";
+import {LoadingState} from "@/components/ui/branded-loading";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/text-area";
@@ -369,8 +370,13 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
 
     if (sessionStatus === "loading") {
         return (
-            <div className="glass-panel p-8 text-sm text-foreground/68">
-                Checking blog admin session...
+            <div className="glass-panel p-8">
+                <LoadingState
+                    align="start"
+                    size="sm"
+                    title="Checking blog admin session"
+                    description="Verifying your secure editor access before the publishing workspace loads."
+                />
             </div>
         );
     }
