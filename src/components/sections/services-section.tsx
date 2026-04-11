@@ -57,6 +57,7 @@ export default function ServicesSection({
                             description={service.description}
                             detail={service.detail}
                             image={service.image}
+                            imageAlt={service.imageAlt}
                             badge={service.badge}
                             href={service.href}
                             ctaLabel={service.ctaLabel}

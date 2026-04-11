@@ -93,7 +93,7 @@ function BeltTileCard({tile}: {tile: BeltTile}) {
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-black/8 bg-[#0d1114] p-2 shadow-inner dark:border-white/10">
                     <Image
                         src={tile.item.image}
-                        alt={tile.item.title}
+                        alt={getProofImageAlt(tile.item)}
                         width={40}
                         height={40}
                         className="h-auto w-auto max-w-full object-contain"
@@ -152,7 +152,7 @@ function StaticProofShowcase({item}: {item: ProofItem}) {
                     <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.35rem] border border-black/8 bg-[#0d1114] p-3 shadow-inner dark:border-white/10">
                         <Image
                             src={item.image}
-                            alt={item.title}
+                            alt={getProofImageAlt(item)}
                             width={44}
                             height={44}
                             className="h-auto w-auto max-w-full object-contain"
@@ -255,4 +255,8 @@ function getWebsiteLabel(href?: string) {
     } catch {
         return href;
     }
+}
+
+function getProofImageAlt(item: ProofItem) {
+    return item.imageAlt ?? (item.href ? `${item.title} logo` : `${item.title} illustration`);
 }
