@@ -116,14 +116,14 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
                     <div className="overflow-hidden rounded-[1.75rem] border border-black/8 bg-[#edf4f1] pt-6 dark:border-white/10 dark:bg-[#122326]">
                         <Image
                             src="/images/img-contact-us-light.png"
-                            alt="Illustration representing contact and project planning"
+                            alt=""
                             className="max-h-[250px] w-full object-cover object-center dark:hidden"
                             width={700}
                             height={520}
                         />
                         <Image
                             src="/images/img-contact-us-dark.png"
-                            alt="Illustration representing contact and project planning"
+                            alt=""
                             className="hidden max-h-[250px] w-full object-cover object-center dark:block"
                             width={700}
                             height={520}

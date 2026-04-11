@@ -9,12 +9,13 @@ interface ServiceCardProps {
     description: string;
     detail: string;
     image: string;
+    imageAlt?: string;
     badge?: string;
     href?: string;
     ctaLabel?: string;
 }
 
-export function ServiceCard({title, description, detail, image, badge, href, ctaLabel}: ServiceCardProps) {
+export function ServiceCard({title, description, detail, image, imageAlt, badge, href, ctaLabel}: ServiceCardProps) {
     return (
         <CardContainer className="inter-var h-full w-full" containerClassName="h-full w-full items-stretch py-0">
             <CardBody
@@ -23,7 +24,7 @@ export function ServiceCard({title, description, detail, image, badge, href, cta
                     <div className="relative h-52 w-full overflow-hidden rounded-[1.5rem] border border-black/6 dark:border-white/8">
                         <Image
                             src={image}
-                            alt={title}
+                            alt={imageAlt ?? `${title} service illustration`}
                             fill
                             className="object-cover rounded-xl group-hover/card:shadow-xl"
                             sizes="(max-width: 768px) 100vw,

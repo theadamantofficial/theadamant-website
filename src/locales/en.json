@@ -2,8 +2,8 @@
   "locale": "en",
   "dir": "ltr",
   "metadata": {
-    "title": "Website Development Company in India | UI/UX Design, SEO & App Development | The Adamant",
-    "description": "The Adamant is a website development company in India delivering SEO-friendly websites, landing pages, UI/UX design, and mobile app development for startups and growth-focused brands."
+    "title": "The Adamant | Website Development & SEO in India",
+    "description": "The Adamant builds SEO-friendly websites, landing pages, UI/UX systems, and mobile apps for startups and growth-focused brands in India."
   },
   "schema": {
     "organizationDescription": "The Adamant is a website development and UI/UX design company in India building SEO-friendly websites, landing pages, product interfaces, and mobile apps for startups and growth-focused brands."
@@ -84,24 +84,28 @@
         "title": "UI/UX Design",
         "description": "UI/UX design for landing pages, websites, and product flows that feel modern and easy to use.",
         "detail": "Landing page design, website redesign, responsive interface design, wireframes, user journeys, and conversion-focused layouts built to improve clarity, trust, engagement, and lead generation.",
+        "imageAlt": "UI/UX design interface mockup",
         "image": "/images/img-ui-ux-design.png"
       },
       {
         "title": "Website Development",
         "description": "Custom website development with fast performance, technical SEO, and scalable front-end architecture.",
         "detail": "Business websites, startup websites, service websites, and marketing pages built with responsive layouts, clean code, technical SEO foundations, and content structure designed to rank better and convert more visitors.",
+        "imageAlt": "Website development service website mockup",
         "image": "/images/img-web-dev.png"
       },
       {
         "title": "Mobile App Development",
         "description": "Cross-platform app development with polished UI, smooth onboarding, and reliable performance.",
         "detail": "Mobile app design and development for Android and iOS, including product flows, scalable front-end systems, onboarding journeys, and user-friendly experiences that support product growth.",
+        "imageAlt": "Mobile app development screens preview",
         "image": "/images/img-app-dev.png"
       },
       {
         "title": "AetherSEO",
         "description": "The Adamant's in-house SEO workspace for multilingual publishing, audits, and structured content operations.",
         "detail": "AetherSEO helps startups and lean teams plan content, run audits, track SEO work, and keep publishing workflows organized inside one product instead of spreading operations across disconnected tools.",
+        "imageAlt": "AetherSEO logo",
         "image": "/images/img-aetherseo.svg",
         "badge": "In-house product",
         "proofHighlights": ["Multilingual publishing", "SEO audits", "Content operations", "Workflow tracking"],

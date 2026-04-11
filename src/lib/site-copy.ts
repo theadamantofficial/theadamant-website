@@ -29,6 +29,7 @@ interface ServiceItem {
     description: string;
     detail: string;
     image: string;
+    imageAlt?: string;
     badge?: string;
     href?: string;
     ctaLabel?: string;
