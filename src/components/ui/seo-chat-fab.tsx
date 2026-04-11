@@ -1,8 +1,9 @@
 "use client";
 
 import {AnimatePresence, motion} from "motion/react";
-import {BotMessageSquare, LoaderCircle, Maximize2, MessageSquareText, Minimize2, PhoneCall, SendHorizontal, Sparkles, UserRound, X} from "lucide-react";
+import {BotMessageSquare, Maximize2, MessageSquareText, Minimize2, PhoneCall, SendHorizontal, Sparkles, UserRound, X} from "lucide-react";
 import {FormEvent, type ReactNode, useEffect, useMemo, useRef, useState} from "react";
+import {LoadingAnimation} from "@/components/ui/branded-loading";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/text-area";
 import {OPEN_SEO_CHAT_EVENT, type OpenSeoChatEventDetail} from "@/lib/seo-chat-events";
@@ -388,7 +389,7 @@ export function SeoChatFab() {
                                             <div className="flex flex-wrap gap-3">
                                                 <button type="submit" className="button-primary" disabled={isResponding}>
                                                     {isResponding ? "Starting..." : "Start SEO AI chat"}
-                                                    {isResponding ? <LoaderCircle className="h-4 w-4 animate-spin"/> : <SendHorizontal className="h-4 w-4"/>}
+                                                    {isResponding ? <Sparkles className="h-4 w-4"/> : <SendHorizontal className="h-4 w-4"/>}
                                                 </button>
                                                 <OpenAuditButton>
                                                     Run full audit instead
@@ -432,9 +433,13 @@ export function SeoChatFab() {
                                                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/50">
                                                             SEO AI
                                                         </p>
-                                                        <div className="mt-3 inline-flex items-center gap-2 text-sm text-foreground/70">
-                                                            <LoaderCircle className="h-4 w-4 animate-spin"/>
-                                                            Thinking through your site...
+                                                        <div className="mt-3 inline-flex items-center gap-3 text-sm text-foreground/70">
+                                                            <LoadingAnimation
+                                                                className="w-16 shrink-0 rounded-[1.2rem] p-1.5 shadow-none"
+                                                                animationClassName="rounded-[0.95rem]"
+                                                                speed={1.12}
+                                                            />
+                                                            <span>Thinking through your site...</span>
                                                         </div>
                                                     </div>
                                                 )}
