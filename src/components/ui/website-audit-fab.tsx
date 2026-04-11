@@ -8,12 +8,12 @@ import {
     CheckCircle2,
     Gauge,
     Globe,
+    LoaderCircle,
     Mail,
     Sparkles,
     TriangleAlert,
     X,
 } from "lucide-react";
-import {LoadingState} from "@/components/ui/branded-loading";
 import {loadEmailJs} from "@/lib/load-emailjs";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 import {OpenSeoChatButton} from "@/components/ui/open-seo-chat-button";
@@ -217,12 +217,16 @@ export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
 
                                 <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6">
                                     {status === "loading" ? (
-                                        <div className="flex h-full min-h-[24rem] items-center justify-center">
-                                            <LoadingState
-                                                size="md"
-                                                title={LOADING_MESSAGE}
-                                                description="This can take a moment while the workflow runs, scores the site, and prepares your audit summary."
-                                            />
+                                        <div className="flex h-full min-h-[24rem] flex-col items-center justify-center text-center">
+                                            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-primary/15 bg-primary/10 text-primary">
+                                                <LoaderCircle className="h-7 w-7 animate-spin"/>
+                                            </div>
+                                            <h3 className="mt-6 text-2xl font-semibold text-foreground">
+                                                {LOADING_MESSAGE}
+                                            </h3>
+                                            <p className="mt-3 max-w-sm text-sm leading-6 text-foreground/70">
+                                                This can take a moment while the workflow runs and prepares your audit.
+                                            </p>
                                         </div>
                                     ) : (
                                         <div className="space-y-5">
