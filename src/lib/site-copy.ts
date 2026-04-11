@@ -65,6 +65,7 @@ export interface SiteCopy {
     };
     hero: {
         kicker: string;
+        tagline?: string;
         title: string;
         description: string;
         primaryCta: string;
