@@ -2,11 +2,11 @@
   "locale": "en",
   "dir": "ltr",
   "metadata": {
-    "title": "Website Development Company in India | The Adamant",
-    "description": "The Adamant builds SEO-friendly websites, UX systems, and mobile experiences for brands that need sharper messaging, faster performance, and stronger search foundations."
+    "title": "Website Development Company in India | UI/UX Design, SEO & App Development | The Adamant",
+    "description": "The Adamant is a website development company in India delivering SEO-friendly websites, landing pages, UI/UX design, and mobile app development for startups and growth-focused brands."
   },
   "schema": {
-    "organizationDescription": "The Adamant builds SEO-friendly websites, product interfaces, and mobile experiences with clear messaging, fast performance, and stronger search foundations."
+    "organizationDescription": "The Adamant is a website development and UI/UX design company in India building SEO-friendly websites, landing pages, product interfaces, and mobile apps for startups and growth-focused brands."
   },
   "navbar": {
     "navItems": [
@@ -21,86 +21,87 @@
     "languageAriaLabel": "Change website language"
   },
   "hero": {
-    "kicker": "Website development company in India for growth-focused brands",
-    "title": "Website Development Company in India for SEO-Friendly Websites and Apps",
-    "description": "The Adamant works as a website development company and app development company for brands that want clearer messaging, stronger UX, and launch-ready digital products.",
+    "kicker": "Website development company in India for startups and growth-focused brands",
+    "tagline": "Firm in Vision. Bold in Action",
+    "title": "Website Development Company in India for SEO-Friendly Websites, UI/UX Design, and Apps",
+    "description": "The Adamant helps startups and growth-focused brands build SEO-friendly websites, high-converting landing pages, intuitive UI/UX systems, and mobile apps that turn attention into qualified business inquiries.",
     "primaryCta": "Book a consultation",
     "secondaryCta": "Explore services",
     "positioningPoints": [
-      "Clear messaging that explains value in seconds",
-      "Semantic structure that helps search engines understand the page",
-      "Responsive layouts built to feel polished on every device"
+      "SEO-friendly page structure built for discoverability and clarity",
+      "UI/UX design that explains your offer fast and improves conversion intent",
+      "Responsive website and app experiences that stay polished across devices"
     ],
-    "previewEyebrowLeft": "Launch-ready digital presence",
-    "previewEyebrowRight": "Strategy to shipping",
-    "floatingBadges": ["Modern motion", "Search-ready", "Conversion-led"],
+    "previewEyebrowLeft": "SEO-ready brand presence",
+    "previewEyebrowRight": "Design, build, launch",
+    "floatingBadges": ["Landing pages", "Search-ready", "UI/UX systems"],
     "featureCards": [
       {
-        "title": "Attention-first design",
-        "description": "Hierarchy, contrast, and motion that guide the eye fast."
+        "title": "Conversion-focused design",
+        "description": "Content hierarchy, layout, and motion tailored to hold attention and guide action."
       },
       {
-        "title": "SEO foundations",
-        "description": "Metadata, semantic sections, and search-readable copy."
+        "title": "Search-ready development",
+        "description": "Semantic markup, metadata, and keyword-aware copy built into launch."
       },
       {
-        "title": "Fast-moving execution",
-        "description": "Launch momentum without bloated layouts or vague messaging."
+        "title": "Fast execution for growing brands",
+        "description": "Design and development systems that move from strategy to shipping without noise."
       }
     ]
   },
   "valueProps": {
     "kicker": "Why this works",
-    "title": "A better homepage should do more than look good.",
-    "description": "It should guide attention, explain value quickly, and create enough confidence that a new visitor wants to stay on the page. These improvements focus on exactly that.",
+    "title": "A growth homepage should rank, explain, and convert.",
+    "description": "Your landing page has to earn trust, match search intent, and move visitors toward action. These updates focus on all three at the same time.",
     "items": [
       {
-        "title": "Hook attention quickly",
-        "description": "Use stronger hierarchy, clearer copy, and more intentional visuals so visitors immediately understand the offer and feel the brand has substance."
+        "title": "Match search intent early",
+        "description": "Use clearer service language, high-intent keywords, and stronger page structure so search engines and visitors understand the offer quickly."
       },
       {
-        "title": "Build SEO into the foundation",
-        "description": "Support search visibility with semantic sections, better metadata, FAQ content, internal anchors, and keyword-rich supporting copy."
+        "title": "Explain the offer without friction",
+        "description": "Guide visitors with sharper messaging, cleaner hierarchy, and more useful supporting copy so they know what you do and why it matters."
       },
       {
-        "title": "Earn trust before the first call",
-        "description": "Shape the page to feel more credible and premium, so users are more willing to keep scrolling, click through, and submit an inquiry."
+        "title": "Support trust and conversion",
+        "description": "Build confidence with credible positioning, polished interfaces, and visible next steps that make it easier to inquire, book, or buy."
       }
     ]
   },
   "services": {
     "kicker": "Services",
-    "title": "Design and development services built to convert interest into action.",
-    "description": "From SEO-friendly websites to mobile product delivery, we support brands that need sharper execution, cleaner strategy, and practical digital systems.",
-    "chips": ["Landing pages", "Marketing websites", "Product interfaces", "Cross-platform mobile apps", "SEO systems"],
+    "title": "Website, UI/UX, and app development services built for organic growth.",
+    "description": "From SEO-friendly websites and landing pages to product design and mobile app development, The Adamant helps brands launch digital experiences that are easier to discover and easier to trust.",
+    "chips": ["SEO websites", "Landing pages", "UI/UX design", "Mobile apps", "Technical SEO"],
     "proofStrip": {
       "kicker": "Selected work",
-      "title": "Products and partner systems already shipped with us.",
-      "description": "AetherSEO sits here as visible proof of the SEO, publishing, and workflow systems The Adamant can design and build without crowding the services section."
+      "title": "Products and partner systems already delivered with us.",
+      "description": "AetherSEO shows how The Adamant builds practical SEO, publishing, and workflow systems that support real content operations, not just polished mockups."
     },
     "items": [
       {
         "title": "UI/UX Design",
-        "description": "Clean, modern, and user-friendly designs that engage and convert.",
-        "detail": "Landing page design, website redesign, responsive interface design, wireframes, user journeys, and conversion-focused layouts built to improve trust, engagement, and lead generation.",
+        "description": "UI/UX design for landing pages, websites, and product flows that feel modern and easy to use.",
+        "detail": "Landing page design, website redesign, responsive interface design, wireframes, user journeys, and conversion-focused layouts built to improve clarity, trust, engagement, and lead generation.",
         "image": "/images/img-ui-ux-design.png"
       },
       {
         "title": "Website Development",
-        "description": "Fast, scalable, and SEO-friendly websites tailored to your business.",
-        "detail": "Responsive website development, performance optimization, technical SEO foundations, clean front-end architecture, and business websites designed to rank better and convert more visitors.",
+        "description": "Custom website development with fast performance, technical SEO, and scalable front-end architecture.",
+        "detail": "Business websites, startup websites, service websites, and marketing pages built with responsive layouts, clean code, technical SEO foundations, and content structure designed to rank better and convert more visitors.",
         "image": "/images/img-web-dev.png"
       },
       {
         "title": "Mobile App Development",
-        "description": "High-performance apps with sleek design and seamless functionality.",
-        "detail": "Cross-platform mobile app development, mobile app UI design, smooth onboarding flows, scalable product experiences, and user-friendly app interfaces for Android and iOS growth.",
+        "description": "Cross-platform app development with polished UI, smooth onboarding, and reliable performance.",
+        "detail": "Mobile app design and development for Android and iOS, including product flows, scalable front-end systems, onboarding journeys, and user-friendly experiences that support product growth.",
         "image": "/images/img-app-dev.png"
       },
       {
         "title": "AetherSEO",
         "description": "The Adamant's in-house SEO workspace for multilingual publishing, audits, and structured content operations.",
-        "detail": "AetherSEO helps startups and lean teams plan content, run audits, track SEO work, and keep publishing workflows organized inside one product instead of scattered tools.",
+        "detail": "AetherSEO helps startups and lean teams plan content, run audits, track SEO work, and keep publishing workflows organized inside one product instead of spreading operations across disconnected tools.",
         "image": "/images/img-aetherseo.svg",
         "badge": "In-house product",
         "proofHighlights": ["Multilingual publishing", "SEO audits", "Content operations", "Workflow tracking"],
@@ -111,86 +112,86 @@
   },
   "process": {
     "kicker": "Process",
-    "title": "A simple path from rough presence to a sharper digital brand.",
-    "description": "Early-stage websites improve fastest when strategy, design, development, and SEO are treated as one system instead of separate tasks.",
+    "title": "From idea to launch, every step supports visibility and conversion.",
+    "description": "The strongest landing pages are built as one system where positioning, UI/UX, development, and SEO work together from the start.",
     "steps": [
       {
         "number": "01",
-        "title": "Clarify the positioning",
-        "description": "Define the audience, offer, and message so the page speaks clearly instead of sounding generic."
+        "title": "Define the audience and search intent",
+        "description": "Map the offer, the ideal customer, and the keywords that should shape the page before design begins."
       },
       {
         "number": "02",
-        "title": "Shape the experience",
-        "description": "Turn that positioning into a design system, content hierarchy, and interaction pattern that feels deliberate."
+        "title": "Shape the message and UX",
+        "description": "Turn that strategy into a page structure, content hierarchy, and interface system that feels clear and deliberate."
       },
       {
         "number": "03",
-        "title": "Build for performance",
-        "description": "Develop the site with responsive layouts, cleaner structure, and practical SEO improvements already in place."
+        "title": "Build with performance and SEO in place",
+        "description": "Develop the site with responsive layouts, semantic markup, technical SEO foundations, and cleaner front-end execution."
       },
       {
         "number": "04",
-        "title": "Launch with momentum",
-        "description": "Refine the final touchpoints so the page is ready to attract, persuade, and convert the right visitors."
+        "title": "Launch, measure, and improve",
+        "description": "Refine the final conversion touchpoints so the page is ready to attract, persuade, and support the next round of growth."
       }
     ]
   },
   "faq": {
     "kicker": "FAQ",
-    "title": "Questions people often have before they reach out.",
-    "description": "These answers also strengthen the page semantically by giving search engines clearer context around your services and how the site is meant to help.",
+    "title": "Questions brands ask before hiring a website development partner.",
+    "description": "These answers give potential clients and search engines clearer context around The Adamant's services, process, and SEO-focused approach.",
     "items": [
       {
-        "question": "What kind of projects does The Adamant handle?",
-        "answer": "The Adamant focuses on UI/UX design, website development, and mobile app experiences for brands that want a sharper digital presence and a stronger first impression."
+        "question": "What services does The Adamant offer?",
+        "answer": "The Adamant offers UI/UX design, website development, landing page design, technical SEO foundations, and mobile app development for startups and growth-focused brands."
       },
       {
-        "question": "Can the website be made more SEO-friendly from the beginning?",
-        "answer": "Yes. Strong metadata, crawlable section structure, useful supporting copy, internal anchor links, and FAQ content can all be built into the site early instead of being added later as cleanup."
+        "question": "Can you build an SEO-friendly website from day one?",
+        "answer": "Yes. Metadata, semantic structure, internal linking, keyword-aware copy, responsive performance, and technical SEO foundations can all be built into the website before launch instead of being added later as cleanup."
       },
       {
-        "question": "Why does homepage structure matter so much?",
-        "answer": "The homepage usually decides whether a new visitor keeps scrolling or leaves. Clear hierarchy, focused messaging, and visible next steps help users understand value quickly and move toward contact."
+        "question": "Do you help with landing page copy and UI/UX as well?",
+        "answer": "Yes. The Adamant works on copy direction, content hierarchy, layout, and interface design together so the landing page reads clearly, looks credible, and supports conversion."
       },
       {
-        "question": "Does design affect conversions as much as development?",
-        "answer": "It does when the design improves clarity. Better layout, pacing, contrast, and call-to-action placement reduce hesitation and make the site feel more credible, which supports conversion."
+        "question": "When should a business choose custom website development over a template?",
+        "answer": "Custom website development is a stronger fit when the business needs sharper branding, better SEO structure, faster performance, or a website that has to support specific user journeys, integrations, or conversion goals."
       }
     ]
   },
   "contact": {
     "kicker": "Contact",
-    "title": "Tell us what you want to build.",
-    "description": "If you need a stronger first impression, clearer messaging, or an app development company that can move from concept to launch without bloated execution, share your scope, timeline, and business goal here.",
+    "title": "Tell us what you want your website, landing page, or app to achieve.",
+    "description": "If you need a website development company in India to improve search visibility, sharpen your messaging, or build a digital product that feels credible from day one, share your scope, timeline, and business goal here.",
     "highlights": [
       {
-        "title": "Share the real goal",
-        "description": "Tell us what you want users to understand, feel, or do when they land on the page."
+        "title": "Share the business goal",
+        "description": "Tell us what you want users to understand, feel, search for, or do when they land on the page."
       },
       {
         "title": "Expect a focused reply",
-        "description": "We can shape the right mix of design, development, and SEO foundations around your scope."
+        "description": "We can shape the right mix of UI/UX, website development, app work, and SEO foundations around your scope."
       },
       {
         "title": "Move at launch speed",
-        "description": "The process is meant to keep momentum high, especially for early-stage websites and product ideas."
+        "description": "The process is built to keep momentum high, especially for early-stage launches, redesigns, and product ideas."
       }
     ],
-    "briefTitle": "A better brief gets a sharper first reply.",
-    "briefDescription": "If you already have these details, include them so the first response can be more specific.",
+    "briefTitle": "A stronger brief leads to a faster, sharper proposal.",
+    "briefDescription": "If you already know these details, include them so the first response can be more specific and more useful.",
     "briefItems": [
       {
         "title": "Business goal",
-        "description": "What should this page, product, or launch help you achieve?"
+        "description": "What should this website, landing page, product, or launch help you achieve?"
       },
       {
         "title": "Launch timing",
-        "description": "Share the target window so the scope can match the pace."
+        "description": "Share the target window so the scope, SEO work, and design decisions can match the pace."
       },
       {
         "title": "References",
-        "description": "Links, examples, or competitors help us understand the direction quickly."
+        "description": "Links, examples, keywords, or competitor references help us understand the direction quickly."
       }
     ],
     "form": {
@@ -201,7 +202,7 @@
       "purposeLabel": "Select purpose",
       "purposePlaceholder": "Select purpose...",
       "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Tell us about the page, product, or experience you want users to remember.",
+      "descriptionPlaceholder": "Tell us about the website, landing page, app, or product experience you want to build.",
       "purposeOptions": [
         {"value": "general", "label": "General Inquiry"},
         {"value": "demo", "label": "Request a Demo"},
@@ -221,7 +222,7 @@
     }
   },
   "footer": {
-    "description": "Design-forward websites, product interfaces, and mobile experiences built to earn trust quickly and support search visibility from the start.",
+    "description": "The Adamant builds SEO-friendly websites, landing pages, product interfaces, and mobile apps for brands that need clearer messaging, stronger search visibility, and faster execution.",
     "sections": [
       {
         "title": "Navigate",
@@ -243,6 +244,6 @@
       }
     ],
     "copyright": "The Adamant. All rights reserved.",
-    "tagline": "Designed for clarity, speed, and stronger first impressions."
+    "tagline": "Firm in Vision. Bold in Action"
   }
 }

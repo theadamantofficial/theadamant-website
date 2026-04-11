@@ -110,6 +110,15 @@ export default function HeroSection({
                     {copy.kicker}
                 </motion.p>
 
+                {copy.tagline && (
+                    <motion.p
+                        className="mt-4 text-sm font-semibold uppercase tracking-[0.28em] text-foreground/60"
+                        variants={heroItemVariants}
+                    >
+                        {copy.tagline}
+                    </motion.p>
+                )}
+
                 <motion.h1
                     id="hero-heading"
                     className="hero-heading mt-8"
