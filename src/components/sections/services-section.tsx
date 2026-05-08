@@ -7,7 +7,8 @@ import Link from "next/link";
 import {SiteLocale} from "@/lib/site-locale";
 
 const LANDING_LINKS = [
-    {href: "/website-development", label: "Website development"},
+    {href: "/website-development", label: "Global SEO-friendly website development"},
+    {href: "/digital-marketing-services", label: "Digital marketing services"},
     {href: "/website-development-noida", label: "Website development in Noida"},
     {href: "/website-development-india", label: "Website development in India"},
     {href: "/app-development-noida", label: "App development in Noida"},

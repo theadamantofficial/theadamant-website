@@ -2,11 +2,11 @@
   "locale": "en",
   "dir": "ltr",
   "metadata": {
-    "title": "Innovative Web, Mobile & SaaS Solutions",
-    "description": "The Adamant creates search-optimized websites, scalable SaaS products, mobile apps, and custom digital experiences for brands ready to grow."
+    "title": "Innovative Web, Mobile, SaaS & Digital Marketing Solutions",
+    "description": "The Adamant creates SEO-friendly websites, scalable SaaS products, mobile apps, and digital marketing campaigns for brands in India, the USA, UK, Japan, and global markets."
   },
   "schema": {
-    "organizationDescription": "The Adamant is an India-based UI/UX and development studio crafting search-aware websites, landing pages, product interfaces, and mobile apps for startups and expanding teams."
+    "organizationDescription": "The Adamant is a global UI/UX, development, and digital marketing studio crafting SEO-friendly websites, landing pages, product interfaces, mobile apps, social media systems, and paid ad campaigns for startups and expanding teams across India, the USA, UK, Japan, and other global markets."
   },
   "navbar": {
     "navItems": [
@@ -21,20 +21,20 @@
     "languageAriaLabel": "Change website language"
   },
   "hero": {
-    "kicker": "India-based web partner for startups and scaling teams",
+    "kicker": "Global SEO-friendly web and digital marketing partner for India, USA, UK, and Japan",
     "tagline": "Firm in Vision. Bold in Action",
-    "title": "Innovative Web, Mobile & SaaS Solutions",
-    "description": "We create search-optimized websites, scalable SaaS products, mobile apps, and custom digital experiences for brands with ambitious growth plans.",
+    "title": "Innovative Web, Mobile, SaaS & Digital Marketing Solutions",
+    "description": "We create SEO-friendly websites, scalable SaaS products, mobile apps, and digital marketing systems including social media management, brand growth, and paid ad campaigns for ambitious brands worldwide.",
     "primaryCta": "Book a consultation",
     "secondaryCta": "Explore services",
     "positioningPoints": [
       "Structured for search visibility with clearer hierarchy and user-first navigation",
       "UI/UX design that explains your offer fast and improves conversion intent",
-      "Responsive website and app experiences that stay polished across devices"
+      "Digital marketing support for social media, brand visibility, and paid ad campaigns"
     ],
     "previewEyebrowLeft": "SEO-ready brand presence",
-    "previewEyebrowRight": "Design, build, launch",
-    "floatingBadges": ["Landing pages", "Search-ready", "UI/UX systems"],
+    "previewEyebrowRight": "Design, build, market",
+    "floatingBadges": ["Landing pages", "Search-ready", "Paid ads"],
     "featureCards": [
       {
         "title": "Conversion-focused design",
@@ -45,8 +45,8 @@
         "description": "Semantic markup, metadata, and keyword-aware copy built into launch."
       },
       {
-        "title": "Fast execution for growing brands",
-        "description": "Design and development systems that move from strategy to shipping without noise."
+        "title": "Growth campaigns for global brands",
+        "description": "Social media, brand visibility, and paid ads aligned with the website and conversion path."
       }
     ]
   },
@@ -71,9 +71,9 @@
   },
   "services": {
     "kicker": "Services",
-    "title": "Website, UI/UX, and app development services built for organic growth.",
-    "description": "From search-optimized websites and landing pages to product design and mobile app development, The Adamant helps brands launch digital experiences that are easier to find and easier to trust.",
-    "chips": ["SEO websites", "Landing pages", "UI/UX design", "Mobile apps", "Technical SEO"],
+    "title": "Website, UI/UX, app development, and digital marketing services built for growth.",
+    "description": "From SEO-friendly websites and landing pages to product design, mobile app development, social media management, brand boosting, and paid ads, The Adamant helps brands launch digital experiences that are easier to find, trust, and scale.",
+    "chips": ["SEO websites", "Landing pages", "UI/UX design", "Mobile apps", "Digital marketing", "Social media", "Paid ads", "USA, UK & Japan"],
     "proofStrip": {
       "kicker": "Selected work",
       "title": "Products and partner systems already delivered with us.",
@@ -100,6 +100,13 @@
         "detail": "Mobile app design and development for Android and iOS, including product flows, scalable front-end systems, onboarding journeys, and user-friendly experiences that support product growth.",
         "imageAlt": "Showcase of a mobile app user interface design",
         "image": "/images/img-app-dev.png"
+      },
+      {
+        "title": "Digital Marketing",
+        "description": "Digital marketing services for social media management, brand visibility, and paid ad campaigns.",
+        "detail": "Social media handling, content planning, brand boosting, paid ads setup, campaign management, audience targeting, and performance-focused marketing support that connects search visibility, traffic, and conversions.",
+        "imageAlt": "Digital marketing dashboard showing social media, paid ads, and brand growth signals",
+        "image": "/images/img-digital-marketing.svg"
       },
       {
         "title": "AetherSEO",
@@ -148,7 +155,7 @@
     "items": [
       {
         "question": "What services does The Adamant offer?",
-        "answer": "The Adamant offers UI/UX design, website development, landing page design, technical SEO foundations, and mobile app development for startups and expanding teams."
+        "answer": "The Adamant offers UI/UX design, website development, landing page design, technical SEO foundations, mobile app development, and digital marketing services including social media management, brand boosting, and paid ad campaign support for startups and expanding teams."
       },
       {
         "question": "Can you build an SEO-friendly website from day one?",
@@ -161,13 +168,17 @@
       {
         "question": "When should a business choose custom website development over a template?",
         "answer": "Custom website development is a stronger fit when the business needs sharper branding, better SEO structure, faster performance, or a website that has to support specific user journeys, integrations, or conversion goals."
+      },
+      {
+        "question": "Can you also handle digital marketing after the website is live?",
+        "answer": "Yes. The Adamant can support social media handling, content planning, brand visibility, paid ads, and campaign direction so the website, SEO structure, and marketing channels work together."
       }
     ]
   },
   "contact": {
     "kicker": "Contact",
-    "title": "Tell us what you want your website, landing page, or app to achieve.",
-    "description": "If you need an India-based website partner to improve search visibility, sharpen your messaging, or build a digital product that feels credible from day one, share your scope, timeline, and business goal here.",
+    "title": "Tell us what you want your website, landing page, app, or marketing campaign to achieve.",
+    "description": "If you need a global website and digital marketing partner for India, the USA, UK, Japan, or another market, share your scope, timeline, search goals, and business goal here.",
     "highlights": [
       {
         "title": "Share the business goal",
@@ -175,7 +186,7 @@
       },
       {
         "title": "Expect a focused reply",
-        "description": "We can shape the right mix of UI/UX, website development, app work, and SEO foundations around your scope."
+        "description": "We can shape the right mix of UI/UX, website development, app work, SEO foundations, social media, and paid ads around your scope."
       },
       {
         "title": "Move at launch speed",
@@ -187,7 +198,7 @@
     "briefItems": [
       {
         "title": "Business goal",
-        "description": "What should this website, landing page, product, or launch help you achieve?"
+        "description": "What should this website, landing page, product, campaign, or launch help you achieve?"
       },
       {
         "title": "Launch timing",
@@ -206,11 +217,12 @@
       "purposeLabel": "Select purpose",
       "purposePlaceholder": "Select purpose...",
       "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Tell us about the website, landing page, app, or product experience you want to build.",
+      "descriptionPlaceholder": "Tell us about the website, landing page, app, product experience, or digital marketing campaign you want to build.",
       "purposeOptions": [
         {"value": "general", "label": "General Inquiry"},
         {"value": "demo", "label": "Request a Demo"},
         {"value": "quote", "label": "Get a Quote / Pricing"},
+        {"value": "digital-marketing", "label": "Digital Marketing Services"},
         {"value": "support", "label": "Technical Support"},
         {"value": "partnership", "label": "Partnership / Collaboration"},
         {"value": "careers", "label": "Career Opportunities"},
@@ -226,7 +238,7 @@
     }
   },
   "footer": {
-    "description": "The Adamant creates search-aware websites, landing pages, product interfaces, and mobile apps for brands that need clearer messaging, stronger visibility, and faster execution.",
+    "description": "The Adamant creates SEO-friendly websites, landing pages, product interfaces, mobile apps, social media systems, and paid ad campaigns for brands that need clearer messaging, stronger visibility, and faster execution.",
     "sections": [
       {
         "title": "Navigate",
@@ -243,7 +255,8 @@
         "links": [
           {"name": "UI/UX Design", "anchor": "services"},
           {"name": "Website Development", "anchor": "services"},
-          {"name": "Mobile Apps", "anchor": "services"}
+          {"name": "Mobile Apps", "anchor": "services"},
+          {"name": "Digital Marketing", "anchor": "services"}
         ]
       }
     ],

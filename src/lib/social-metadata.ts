@@ -1,8 +1,8 @@
 import type {Metadata} from "next";
 import {getSiteUrl} from "@/lib/site-url";
 
-export const DEFAULT_SOCIAL_IMAGE_PATH = "/images/social-preview.png";
-export const DEFAULT_SOCIAL_IMAGE_ALT = "The Adamant | Digital Product Design and Development";
+export const DEFAULT_SOCIAL_IMAGE_PATH = "/opengraph-image";
+export const DEFAULT_SOCIAL_IMAGE_ALT = "The Adamant | Web, App, SaaS and Digital Marketing";
 const SITE_NAME = "The Adamant";
 const TWITTER_HANDLE = "@theadamantofc";
 
