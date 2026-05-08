@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import {ArrowRight, CheckCircle2, Globe, MapPin, Smartphone} from "lucide-react";
+import type {LucideIcon} from "lucide-react";
 import {Navbar} from "@/components/layouts/navbar";
 import Footer from "@/components/layouts/footer";
 import ContactUsSection from "@/components/sections/contact-us-section";
@@ -27,6 +28,8 @@ export default function ServiceLandingPage({
 }) {
     const siteUrl = getSiteUrl();
     const pageUrl = `${siteUrl}/${page.slug}`;
+    const marketChipLabel = getMarketChipLabel(page.slug);
+    const MarketChipIcon = getMarketChipIcon(page.slug);
     const pageSchema = {
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
@@ -89,8 +92,8 @@ export default function ServiceLandingPage({
                                 Conversion-focused UX
                             </span>
                             <span className="feature-chip">
-                                {page.slug.includes("app") ? <Smartphone className="h-4 w-4"/> : <MapPin className="h-4 w-4"/>}
-                                {page.slug.includes("noida") ? "Noida-focused positioning" : "Launch-ready delivery"}
+                                <MarketChipIcon className="h-4 w-4"/>
+                                {marketChipLabel}
                             </span>
                         </div>
                     </div>
@@ -118,7 +121,7 @@ export default function ServiceLandingPage({
                                 <p className="mt-3 text-sm leading-7 text-foreground/68">
                                     Separate service pages help search engines understand the difference between general
                                     brand messaging and specific offers such as website development, location-based
-                                    landing pages, and mobile app services.
+                                    landing pages, digital marketing services, and mobile app services.
                                 </p>
                             </div>
                         </div>
@@ -222,6 +225,30 @@ export default function ServiceLandingPage({
     );
 }
 
+function getMarketChipLabel(slug: string) {
+    if (slug.includes("noida")) {
+        return "Noida-focused positioning";
+    }
+
+    if (slug.includes("digital-marketing")) {
+        return "Global campaign support";
+    }
+
+    return "Global launch-ready delivery";
+}
+
+function getMarketChipIcon(slug: string): LucideIcon {
+    if (slug.includes("app")) {
+        return Smartphone;
+    }
+
+    if (slug.includes("noida")) {
+        return MapPin;
+    }
+
+    return Globe;
+}
+
 function buildAreaServed(slug: string) {
     if (slug.includes("noida")) {
         return {
@@ -237,8 +264,22 @@ function buildAreaServed(slug: string) {
         };
     }
 
-    return {
-        "@type": "Country",
-        name: "India",
-    };
+    return [
+        {
+            "@type": "Country",
+            name: "India",
+        },
+        {
+            "@type": "Country",
+            name: "United States",
+        },
+        {
+            "@type": "Country",
+            name: "United Kingdom",
+        },
+        {
+            "@type": "Country",
+            name: "Japan",
+        },
+    ];
 }

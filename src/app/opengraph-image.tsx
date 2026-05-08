@@ -1,6 +1,6 @@
 import {ImageResponse} from "next/og";
 
-export const alt = "The Adamant | Digital Product Design and Development";
+export const alt = "The Adamant | Web, App, SaaS and Digital Marketing";
 export const size = {
     width: 1200,
     height: 630,
@@ -102,10 +102,10 @@ export default function OpenGraphImage() {
                                     fontSize: 74,
                                     fontWeight: 800,
                                     lineHeight: 1.02,
-                                    letterSpacing: "-0.05em",
+                                    letterSpacing: 0,
                                 }}
                             >
-                                Design-forward websites, products, and mobile experiences.
+                                SEO-friendly websites, apps, SaaS, and digital marketing.
                             </div>
                             <div
                                 style={{
@@ -115,7 +115,7 @@ export default function OpenGraphImage() {
                                     color: "rgba(29, 29, 26, 0.78)",
                                 }}
                             >
-                                Fast-loading builds, sharp interfaces, and SEO-ready structure from day one.
+                                Global support for India, the USA, UK, Japan, social media, brand growth, and paid ads.
                             </div>
                         </div>
                         <div
@@ -125,7 +125,7 @@ export default function OpenGraphImage() {
                                 marginTop: "34px",
                             }}
                         >
-                            {["Web design", "SEO-ready builds", "Mobile apps"].map((label) => (
+                            {["SEO-friendly sites", "Social media", "Paid ads"].map((label) => (
                                 <div
                                     key={label}
                                     style={{
@@ -191,7 +191,7 @@ export default function OpenGraphImage() {
                                     Strategy
                                 </div>
                                 <div style={{fontSize: 34, fontWeight: 700, lineHeight: 1.15}}>
-                                    Clear messaging and conversion-focused flows
+                                    Search-ready pages and conversion-focused campaigns
                                 </div>
                             </div>
                             <div
@@ -253,7 +253,7 @@ export default function OpenGraphImage() {
                             }}
                         >
                             <div>theadamant.com</div>
-                            <div style={{fontWeight: 700, color: "#1d1d1a"}}>Built to look sharp and load fast</div>
+                            <div style={{fontWeight: 700, color: "#1d1d1a"}}>Built to rank, convert, and grow</div>
                         </div>
                     </div>
                 </div>

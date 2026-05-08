@@ -10,10 +10,10 @@ import {buildOpenGraphMetadata, buildTwitterMetadata} from "@/lib/social-metadat
 
 export const metadata: Metadata = {
     title: {
-        default: "The Adamant | Digital Product Design and Development",
+        default: "The Adamant | Web, App, SaaS and Digital Marketing",
         template: "%s | The Adamant",
     },
-    description: "The Adamant designs websites, product interfaces, and mobile experiences built to look sharp, load fast, and support SEO from day one.",
+    description: "The Adamant designs SEO-friendly websites, product interfaces, mobile experiences, and digital marketing campaigns for brands in India, the USA, UK, Japan, and global markets.",
     applicationName: "The Adamant",
     authors: [{name: "The Adamant"}],
     creator: "The Adamant",
@@ -21,12 +21,17 @@ export const metadata: Metadata = {
     keywords: [
         "web design",
         "website development",
+        "global website development company",
         "website development company in India",
         "website development company in Noida",
         "SEO-friendly websites",
         "UI UX design",
         "mobile app development",
         "app development company in Noida",
+        "digital marketing services",
+        "social media management",
+        "brand boosting",
+        "paid ads management",
         "digital product studio",
     ],
     robots: {
@@ -35,14 +40,14 @@ export const metadata: Metadata = {
     },
     openGraph: {
         ...buildOpenGraphMetadata({
-            title: "The Adamant | Digital Product Design and Development",
-            description: "Design-forward websites, UX systems, and mobile experiences with clear messaging, fast performance, and SEO-ready structure.",
+            title: "The Adamant | Web, App, SaaS and Digital Marketing",
+            description: "Design-forward websites, UX systems, mobile experiences, and digital marketing campaigns with clear messaging, fast performance, and SEO-ready structure.",
             pagePath: "/",
         }),
     },
     twitter: buildTwitterMetadata({
-        title: "The Adamant | Digital Product Design and Development",
-        description: "Design-forward websites, UX systems, and mobile experiences with clear messaging, fast performance, and SEO-ready structure.",
+        title: "The Adamant | Web, App, SaaS and Digital Marketing",
+        description: "Design-forward websites, UX systems, mobile experiences, and digital marketing campaigns with clear messaging, fast performance, and SEO-ready structure.",
     }),
     metadataBase: getSiteMetadataBase(),
 };

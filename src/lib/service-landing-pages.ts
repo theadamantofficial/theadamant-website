@@ -46,15 +46,17 @@ const SERVICE_LANDING_PAGE_LIST: ServiceLandingPageConfig[] = [
     {
         slug: "website-development",
         image: "/images/img-web-dev.png",
-        eyebrow: "Custom website builds",
-        title: "Website development company for brands that need a sharper, faster website",
-        intro: "The Adamant builds custom business sites with clear messaging, semantic structure, and conversion-focused UX. If you need a website development company that can ship SEO-friendly websites without bloated templates, this page is the starting point.",
-        metaTitle: "Website Development Company | The Adamant",
-        metaDescription: "Need a website development company that ships SEO-friendly websites with sharp UX and clean technical foundations? The Adamant builds custom business websites that move faster from strategy to launch.",
+        eyebrow: "Global website builds",
+        title: "Website development company for global brands that need a sharper, faster website",
+        intro: "The Adamant builds custom business sites with clear messaging, semantic structure, and conversion-focused UX for teams in India, the USA, UK, Japan, and global markets. If you need a website development company that can ship SEO-friendly websites without bloated templates, this page is the starting point.",
+        metaTitle: "Global Website Development Company | The Adamant",
+        metaDescription: "Need a global website development company for SEO-friendly websites with sharp UX and clean technical foundations? The Adamant builds custom business websites for India, the USA, UK, Japan, and global markets.",
         keywords: [
+            "global website development company",
             "website development company",
             "SEO-friendly websites",
             "custom website development",
+            "website development USA UK Japan",
         ],
         scopeTitle: "What this website development service covers",
         scopeDescription: "The work is shaped around launch clarity, stronger conversion paths, and technical decisions that support long-term SEO instead of cleanup later.",
@@ -95,6 +97,7 @@ const SERVICE_LANDING_PAGE_LIST: ServiceLandingPageConfig[] = [
             },
         ],
         relatedLinks: [
+            {href: "/digital-marketing-services", label: "Digital marketing services"},
             {href: "/website-development-noida", label: "Website development in Noida"},
             {href: "/website-development-india", label: "Website development in India"},
             {href: "/app-development-noida", label: "App development in Noida"},
@@ -103,6 +106,72 @@ const SERVICE_LANDING_PAGE_LIST: ServiceLandingPageConfig[] = [
         secondaryAction: {
             kind: "audit",
             label: "Get free audit",
+        },
+    },
+    {
+        slug: "digital-marketing-services",
+        image: "/images/img-digital-marketing.svg",
+        eyebrow: "Digital marketing services",
+        title: "Digital marketing services for social media, brand growth, and paid ads",
+        intro: "The Adamant supports brands that need sharper visibility after launch with social media handling, brand boosting, paid ads, and campaign direction. The work connects SEO-friendly website structure with digital marketing channels so traffic has a clearer place to land and convert.",
+        metaTitle: "Digital Marketing Services | Social Media & Paid Ads | The Adamant",
+        metaDescription: "The Adamant provides digital marketing services for social media management, brand boosting, paid ads, and SEO-friendly growth campaigns across India, the USA, UK, Japan, and global markets.",
+        keywords: [
+            "digital marketing services",
+            "social media management",
+            "brand boosting services",
+            "paid ads management",
+            "digital marketing USA UK Japan",
+            "SEO-friendly digital marketing",
+        ],
+        scopeTitle: "What this digital marketing service covers",
+        scopeDescription: "The work focuses on improving visibility, attracting better-fit traffic, and keeping campaigns connected to the website, landing pages, and conversion goals.",
+        scopeItems: [
+            "Social media handling for consistent brand presence and content planning",
+            "Brand boosting campaigns shaped around positioning, trust, and reach",
+            "Paid ads setup and campaign management for lead generation and awareness",
+            "Audience targeting, offer messaging, and landing page alignment",
+            "SEO-friendly campaign structure that supports search visibility and conversion tracking",
+            "Performance review areas for improving traffic quality, engagement, and inquiries",
+        ],
+        highlights: [
+            {
+                title: "Social media handled with clearer direction",
+                description: "Posts, campaign themes, and content priorities are planned around the brand message instead of publishing disconnected updates.",
+            },
+            {
+                title: "Paid ads connected to conversion paths",
+                description: "Ad campaigns work better when targeting, landing pages, CTA placement, and offer messaging are shaped together from the start.",
+            },
+            {
+                title: "Global market support",
+                description: "Campaign direction can support audiences across India, the USA, UK, Japan, and other markets without losing the brand's core positioning.",
+            },
+        ],
+        faqs: [
+            {
+                question: "What digital marketing services do you provide?",
+                answer: "The work can cover social media management, content planning, brand visibility campaigns, paid ads setup, campaign management, audience targeting, and landing page alignment.",
+            },
+            {
+                question: "Can digital marketing be combined with website development?",
+                answer: "Yes. That is usually the strongest setup because campaign messaging, SEO structure, landing pages, and conversion paths can be planned as one system.",
+            },
+            {
+                question: "Do you support international campaigns?",
+                answer: "Yes. Campaign planning can support India, the USA, UK, Japan, and global markets depending on the audience, budget, offer, and business goals.",
+            },
+        ],
+        relatedLinks: [
+            {href: "/website-development", label: "Global SEO-friendly website development"},
+            {href: "/website-development-india", label: "Website development in India"},
+            {href: "/website-development-noida", label: "Website development in Noida"},
+        ],
+        primaryCtaLabel: "Plan a campaign",
+        secondaryAction: {
+            kind: "link",
+            label: "Explore services",
+            href: "/#services",
         },
     },
     {
@@ -158,6 +227,7 @@ const SERVICE_LANDING_PAGE_LIST: ServiceLandingPageConfig[] = [
         ],
         relatedLinks: [
             {href: "/website-development", label: "Website development company"},
+            {href: "/digital-marketing-services", label: "Digital marketing services"},
             {href: "/website-development-india", label: "Website development in India"},
             {href: "/app-development-noida", label: "App development in Noida"},
         ],
@@ -220,6 +290,7 @@ const SERVICE_LANDING_PAGE_LIST: ServiceLandingPageConfig[] = [
         ],
         relatedLinks: [
             {href: "/website-development", label: "Website development company"},
+            {href: "/digital-marketing-services", label: "Digital marketing services"},
             {href: "/website-development-noida", label: "Website development in Noida"},
             {href: "/app-development-noida", label: "App development in Noida"},
         ],
@@ -282,6 +353,7 @@ const SERVICE_LANDING_PAGE_LIST: ServiceLandingPageConfig[] = [
         ],
         relatedLinks: [
             {href: "/website-development", label: "Website development company"},
+            {href: "/digital-marketing-services", label: "Digital marketing services"},
             {href: "/website-development-noida", label: "Website development in Noida"},
             {href: "/website-development-india", label: "Website development in India"},
         ],
