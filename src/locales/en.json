@@ -2,11 +2,11 @@
   "locale": "en",
   "dir": "ltr",
   "metadata": {
-    "title": "Software Studio for Websites, Apps & SaaS Products",
-    "description": "We design and build SEO-ready websites, scalable SaaS platforms, mobile apps, and custom digital products for ambitious brands worldwide."
+    "title": "Innovative Web, Mobile & SaaS Solutions",
+    "description": "The Adamant creates search-optimized websites, scalable SaaS products, mobile apps, and custom digital experiences for brands ready to grow."
   },
   "schema": {
-    "organizationDescription": "The Adamant is a website development and UI/UX design company in India building SEO-friendly websites, landing pages, product interfaces, and mobile apps for startups and growth-focused brands."
+    "organizationDescription": "The Adamant is an India-based UI/UX and development studio crafting search-aware websites, landing pages, product interfaces, and mobile apps for startups and expanding teams."
   },
   "navbar": {
     "navItems": [
@@ -21,14 +21,14 @@
     "languageAriaLabel": "Change website language"
   },
   "hero": {
-    "kicker": "Website development company in India for startups and growth-focused brands",
+    "kicker": "India-based web partner for startups and scaling teams",
     "tagline": "Firm in Vision. Bold in Action",
-    "title": "Software Studio for Websites, Apps & SaaS Products",
-    "description": "We design and build SEO-ready websites, scalable SaaS platforms, mobile apps, and custom digital products for ambitious brands worldwide.",
+    "title": "Innovative Web, Mobile & SaaS Solutions",
+    "description": "We create search-optimized websites, scalable SaaS products, mobile apps, and custom digital experiences for brands with ambitious growth plans.",
     "primaryCta": "Book a consultation",
     "secondaryCta": "Explore services",
     "positioningPoints": [
-      "SEO-friendly page structure built for discoverability and clarity",
+      "Structured for search visibility with clearer hierarchy and user-first navigation",
       "UI/UX design that explains your offer fast and improves conversion intent",
       "Responsive website and app experiences that stay polished across devices"
     ],
@@ -72,7 +72,7 @@
   "services": {
     "kicker": "Services",
     "title": "Website, UI/UX, and app development services built for organic growth.",
-    "description": "From SEO-friendly websites and landing pages to product design and mobile app development, The Adamant helps brands launch digital experiences that are easier to discover and easier to trust.",
+    "description": "From search-optimized websites and landing pages to product design and mobile app development, The Adamant helps brands launch digital experiences that are easier to find and easier to trust.",
     "chips": ["SEO websites", "Landing pages", "UI/UX design", "Mobile apps", "Technical SEO"],
     "proofStrip": {
       "kicker": "Selected work",
@@ -84,21 +84,21 @@
         "title": "UI/UX Design",
         "description": "UI/UX design for landing pages, websites, and product flows that feel modern and easy to use.",
         "detail": "Landing page design, website redesign, responsive interface design, wireframes, user journeys, and conversion-focused layouts built to improve clarity, trust, engagement, and lead generation.",
-        "imageAlt": "UI/UX design interface mockup",
+        "imageAlt": "Visual representation of a software design workflow",
         "image": "/images/img-ui-ux-design.png"
       },
       {
         "title": "Website Development",
         "description": "Custom website development with fast performance, technical SEO, and scalable front-end architecture.",
         "detail": "Business websites, startup websites, service websites, and marketing pages built with responsive layouts, clean code, technical SEO foundations, and content structure designed to rank better and convert more visitors.",
-        "imageAlt": "Website development service website mockup",
+        "imageAlt": "Infographic-style preview of an SEO-focused website structure",
         "image": "/images/img-web-dev.png"
       },
       {
         "title": "Mobile App Development",
         "description": "Cross-platform app development with polished UI, smooth onboarding, and reliable performance.",
         "detail": "Mobile app design and development for Android and iOS, including product flows, scalable front-end systems, onboarding journeys, and user-friendly experiences that support product growth.",
-        "imageAlt": "Mobile app development screens preview",
+        "imageAlt": "Showcase of a mobile app user interface design",
         "image": "/images/img-app-dev.png"
       },
       {
@@ -148,7 +148,7 @@
     "items": [
       {
         "question": "What services does The Adamant offer?",
-        "answer": "The Adamant offers UI/UX design, website development, landing page design, technical SEO foundations, and mobile app development for startups and growth-focused brands."
+        "answer": "The Adamant offers UI/UX design, website development, landing page design, technical SEO foundations, and mobile app development for startups and expanding teams."
       },
       {
         "question": "Can you build an SEO-friendly website from day one?",
@@ -167,7 +167,7 @@
   "contact": {
     "kicker": "Contact",
     "title": "Tell us what you want your website, landing page, or app to achieve.",
-    "description": "If you need a website development company in India to improve search visibility, sharpen your messaging, or build a digital product that feels credible from day one, share your scope, timeline, and business goal here.",
+    "description": "If you need an India-based website partner to improve search visibility, sharpen your messaging, or build a digital product that feels credible from day one, share your scope, timeline, and business goal here.",
     "highlights": [
       {
         "title": "Share the business goal",
@@ -226,7 +226,7 @@
     }
   },
   "footer": {
-    "description": "The Adamant builds SEO-friendly websites, landing pages, product interfaces, and mobile apps for brands that need clearer messaging, stronger search visibility, and faster execution.",
+    "description": "The Adamant creates search-aware websites, landing pages, product interfaces, and mobile apps for brands that need clearer messaging, stronger visibility, and faster execution.",
     "sections": [
       {
         "title": "Navigate",
