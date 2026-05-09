@@ -191,6 +191,8 @@
         {"value": "general", "label": "સામાન્ય પૂછપરછ"},
         {"value": "demo", "label": "ડેમો માટે વિનંતી"},
         {"value": "quote", "label": "ક્વોટ / પ્રાઇસિંગ"},
+        {"value": "website-development", "label": "વેબસાઇટ ડેવલપમેન્ટ"},
+        {"value": "app-development", "label": "એપ ડેવલપમેન્ટ"},
         {"value": "support", "label": "ટેક્નિકલ સપોર્ટ"},
         {"value": "partnership", "label": "પાર્ટનરશિપ / સહકાર"},
         {"value": "careers", "label": "કેરિયર અવસર"},

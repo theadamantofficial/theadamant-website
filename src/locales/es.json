@@ -191,6 +191,8 @@
         {"value": "general", "label": "Consulta general"},
         {"value": "demo", "label": "Solicitar demo"},
         {"value": "quote", "label": "Cotización / precios"},
+        {"value": "website-development", "label": "Desarrollo web"},
+        {"value": "app-development", "label": "Desarrollo de apps"},
         {"value": "support", "label": "Soporte técnico"},
         {"value": "partnership", "label": "Alianza / colaboración"},
         {"value": "careers", "label": "Oportunidades laborales"},

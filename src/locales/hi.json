@@ -191,6 +191,8 @@
         {"value": "general", "label": "सामान्य पूछताछ"},
         {"value": "demo", "label": "डेमो का अनुरोध"},
         {"value": "quote", "label": "कोट / प्राइसिंग"},
+        {"value": "website-development", "label": "वेबसाइट डेवलपमेंट"},
+        {"value": "app-development", "label": "ऐप डेवलपमेंट"},
         {"value": "support", "label": "तकनीकी सहायता"},
         {"value": "partnership", "label": "पार्टनरशिप / सहयोग"},
         {"value": "careers", "label": "कैरियर अवसर"},

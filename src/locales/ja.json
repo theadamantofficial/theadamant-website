@@ -191,6 +191,8 @@
         {"value": "general", "label": "一般的なお問い合わせ"},
         {"value": "demo", "label": "デモを依頼"},
         {"value": "quote", "label": "見積もり / 料金"},
+        {"value": "website-development", "label": "Webサイト開発"},
+        {"value": "app-development", "label": "アプリ開発"},
         {"value": "support", "label": "技術サポート"},
         {"value": "partnership", "label": "提携 / コラボレーション"},
         {"value": "careers", "label": "採用情報"},
