@@ -3,6 +3,7 @@ import {NextRequest, NextResponse} from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const DEFAULT_FIREBASE_DATABASE_URL = "https://adamant-3eada-default-rtdb.firebaseio.com";
 const DEFAULT_FIREBASE_PROJECT_DETAILS_PATH = "projectDetails";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const REFERENCE_ID_PATTERN = /^[A-Z0-9][A-Z0-9-]{7,63}$/;
@@ -44,16 +45,10 @@ function getFirebaseDatabaseUrl() {
     const rawUrl = (
         process.env.FIREBASE_DATABASE_URL ||
         process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL ||
-        ""
+        DEFAULT_FIREBASE_DATABASE_URL
     ).trim();
 
     return rawUrl.replace(/^['"]|['"]$/g, "").replace(/\/+$/g, "");
-}
-
-function getFirebaseDatabaseAuthToken() {
-    const rawToken = process.env.FIREBASE_DATABASE_AUTH_TOKEN?.trim() || "";
-
-    return rawToken.replace(/^['"]|['"]$/g, "");
 }
 
 function getFirebaseProjectDetailsPath() {
@@ -149,11 +144,6 @@ export async function POST(request: NextRequest) {
 async function saveProjectDetailsToFirebase(databaseUrl: string, projectDetails: ProjectDetailsRecord) {
     const path = encodeFirebasePath(getFirebaseProjectDetailsPath());
     const firebaseUrl = new URL(`${databaseUrl}/${path}/${encodeURIComponent(projectDetails.referenceId)}.json`);
-    const authToken = getFirebaseDatabaseAuthToken();
-
-    if (authToken) {
-        firebaseUrl.searchParams.set("auth", authToken);
-    }
 
     const response = await fetch(firebaseUrl, {
         method: "PUT",

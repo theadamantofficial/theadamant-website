@@ -40,14 +40,6 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
         const form = e.currentTarget;
 
         setSubmissionError(null);
-
-        if (!EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
-            const errorMessage = copy.form.configError;
-            setSubmissionError(errorMessage);
-            toast.error(errorMessage);
-            return;
-        }
-
         setIsSubmitting(true);
 
         try {
@@ -59,6 +51,13 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
             setFormValue(form, "order_id", referenceId);
 
             await saveProjectDetails(form, referenceId, submittedAt);
+
+            if (!EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+                const errorMessage = copy.form.configError;
+                setSubmissionError(errorMessage);
+                toast.error(errorMessage);
+                return;
+            }
 
             const emailjs = await loadEmailJs();
             await emailjs.sendForm(
