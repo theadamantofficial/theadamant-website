@@ -191,6 +191,8 @@
         {"value": "general", "label": "Demande générale"},
         {"value": "demo", "label": "Demander une démo"},
         {"value": "quote", "label": "Devis / tarifs"},
+        {"value": "website-development", "label": "Développement web"},
+        {"value": "app-development", "label": "Développement d'app"},
         {"value": "support", "label": "Support technique"},
         {"value": "partnership", "label": "Partenariat / collaboration"},
         {"value": "careers", "label": "Opportunités de carrière"},

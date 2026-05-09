@@ -191,6 +191,8 @@
         {"value": "general", "label": "பொது கேள்வி"},
         {"value": "demo", "label": "டெமோ கோரிக்கை"},
         {"value": "quote", "label": "கோட் / விலை"},
+        {"value": "website-development", "label": "வலைத்தள டெவலப்மெண்ட்"},
+        {"value": "app-development", "label": "ஆப் டெவலப்மெண்ட்"},
         {"value": "support", "label": "தொழில்நுட்ப உதவி"},
         {"value": "partnership", "label": "பார்ட்னர்ஷிப் / கூட்டணி"},
         {"value": "careers", "label": "வேலை வாய்ப்புகள்"},

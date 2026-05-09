@@ -51,6 +51,15 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
         setIsSubmitting(true);
 
         try {
+            const submittedAt = new Date().toISOString();
+            const referenceId = createReferenceId(submittedAt);
+
+            setFormValue(form, "submitted_at", submittedAt);
+            setFormValue(form, "reference_id", referenceId);
+            setFormValue(form, "order_id", referenceId);
+
+            await saveProjectDetails(form, referenceId, submittedAt);
+
             const emailjs = await loadEmailJs();
             await emailjs.sendForm(
                 EMAILJS_SERVICE_ID,
@@ -61,13 +70,11 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
                 }
             );
 
-            void notifyQueryWebhook(form);
-
             form.reset();
             setIsSubmitted(true);
             toast.success(copy.form.successToast);
         } catch (error) {
-            console.error("EmailJS submission failed", error);
+            console.error("Project details submission failed", error);
             const errorMessage = copy.form.sendError;
             setSubmissionError(errorMessage);
             toast.error(errorMessage);
@@ -135,7 +142,9 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
                     <form className="flex h-full flex-col rounded-[1.7rem] bg-white/88 px-6 py-8 dark:bg-zinc-950/90 lg:px-8 lg:py-10"
                           onSubmit={handleSubmit}>
                         <input type="hidden" name="site_name" value="The Adamant"/>
-                        <input type="hidden" name="submitted_at" value={new Date().toISOString()}/>
+                        <input type="hidden" name="submitted_at" defaultValue=""/>
+                        <input type="hidden" name="reference_id" defaultValue=""/>
+                        <input type="hidden" name="order_id" defaultValue=""/>
 
                         <div className="flex flex-1 flex-col gap-8">
                             <LabelInputContainer>
@@ -235,26 +244,60 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
     );
 }
 
-async function notifyQueryWebhook(form: HTMLFormElement) {
+async function saveProjectDetails(form: HTMLFormElement, referenceId: string, submittedAt: string) {
     const formData = new FormData(form);
 
-    try {
-        await fetch("/api/contact-query", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                name: String(formData.get("user_name") || ""),
-                email: String(formData.get("user_email") || ""),
-                inquiryType: String(formData.get("inquiry_type") || ""),
-                message: String(formData.get("message") || ""),
-                submittedAt: String(formData.get("submitted_at") || new Date().toISOString()),
-            }),
-        });
-    } catch (error) {
-        console.error("Contact query webhook failed", error);
+    const response = await fetch("/api/contact-query", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            referenceId,
+            orderId: referenceId,
+            name: String(formData.get("user_name") || ""),
+            email: String(formData.get("user_email") || ""),
+            inquiryType: String(formData.get("inquiry_type") || ""),
+            message: String(formData.get("message") || ""),
+            submittedAt,
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Project details backend failed with status ${response.status}`);
     }
+}
+
+function setFormValue(form: HTMLFormElement, name: string, value: string) {
+    const field = form.elements.namedItem(name);
+
+    if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
+        field.value = value;
+    }
+}
+
+function createReferenceId(submittedAt: string) {
+    const datePart = submittedAt.slice(0, 10).replaceAll("-", "");
+    const randomPart = getRandomToken(8);
+
+    return `ADM-${datePart}-${randomPart}`;
+}
+
+function getRandomToken(length: number) {
+    if (globalThis.crypto?.getRandomValues) {
+        const bytes = new Uint8Array(length);
+        globalThis.crypto.getRandomValues(bytes);
+
+        return Array.from(bytes, (byte) => (byte % 36).toString(36))
+            .join("")
+            .toUpperCase();
+    }
+
+    return Math.random()
+        .toString(36)
+        .slice(2, 2 + length)
+        .padEnd(length, "0")
+        .toUpperCase();
 }
 
 const LabelInputContainer = ({

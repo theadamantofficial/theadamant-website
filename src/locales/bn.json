@@ -191,6 +191,8 @@
         {"value": "general", "label": "সাধারণ জিজ্ঞাসা"},
         {"value": "demo", "label": "ডেমো অনুরোধ"},
         {"value": "quote", "label": "কোট / প্রাইসিং"},
+        {"value": "website-development", "label": "ওয়েবসাইট ডেভেলপমেন্ট"},
+        {"value": "app-development", "label": "অ্যাপ ডেভেলপমেন্ট"},
         {"value": "support", "label": "টেকনিক্যাল সাপোর্ট"},
         {"value": "partnership", "label": "পার্টনারশিপ / সহযোগিতা"},
         {"value": "careers", "label": "ক্যারিয়ার সুযোগ"},

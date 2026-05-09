@@ -222,6 +222,8 @@
         {"value": "general", "label": "General Inquiry"},
         {"value": "demo", "label": "Request a Demo"},
         {"value": "quote", "label": "Get a Quote / Pricing"},
+        {"value": "website-development", "label": "Website Development"},
+        {"value": "app-development", "label": "App Development"},
         {"value": "digital-marketing", "label": "Digital Marketing Services"},
         {"value": "support", "label": "Technical Support"},
         {"value": "partnership", "label": "Partnership / Collaboration"},
