@@ -9,6 +9,7 @@ import {
     updateInternalBlogPost,
     verifyBlogAdminSessionToken,
 } from "@/lib/internal-blog";
+import {isBlogStorageUnavailableError} from "@/lib/blog-storage-error";
 import {SEO_SITE_LOCALES, getLocalizedPagePath} from "@/lib/site-locale";
 
 export const runtime = "nodejs";
@@ -19,8 +20,12 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({error: "Unauthorized."}, {status: 401});
     }
 
-    const posts = await listInternalBlogPosts();
-    return NextResponse.json({posts});
+    try {
+        const posts = await listInternalBlogPosts();
+        return NextResponse.json({posts});
+    } catch (error) {
+        return blogErrorResponse(error, "Could not load blog posts.");
+    }
 }
 
 export async function POST(request: NextRequest) {
@@ -58,12 +63,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({post}, {status: 201});
     } catch (error) {
-        return NextResponse.json(
-            {
-                error: error instanceof Error ? error.message : "Could not save the blog post.",
-            },
-            {status: 500},
-        );
+        return blogErrorResponse(error, "Could not save the blog post.");
     }
 }
 
@@ -104,8 +104,7 @@ export async function PUT(request: NextRequest) {
 
         return NextResponse.json({post});
     } catch (error) {
-        const message = error instanceof Error ? error.message : "Could not update the blog post.";
-        return NextResponse.json({error: message}, {status: message === "Blog post not found." ? 404 : 500});
+        return blogErrorResponse(error, "Could not update the blog post.");
     }
 }
 
@@ -134,8 +133,7 @@ export async function DELETE(request: NextRequest) {
 
         return NextResponse.json({success: true});
     } catch (error) {
-        const message = error instanceof Error ? error.message : "Could not delete the blog post.";
-        return NextResponse.json({error: message}, {status: message === "Blog post not found." ? 404 : 500});
+        return blogErrorResponse(error, "Could not delete the blog post.");
     }
 }
 
@@ -148,4 +146,15 @@ function revalidateBlogPaths(slug: string) {
         revalidatePath(getLocalizedPagePath(locale, "blog"));
         revalidatePath(getLocalizedPagePath(locale, `blog/${slug}`));
     }
+}
+
+function blogErrorResponse(error: unknown, fallbackMessage: string) {
+    const message = error instanceof Error ? error.message : fallbackMessage;
+    const status = isBlogStorageUnavailableError(error)
+        ? 503
+        : message === "Blog post not found."
+            ? 404
+            : 500;
+
+    return NextResponse.json({error: message}, {status});
 }

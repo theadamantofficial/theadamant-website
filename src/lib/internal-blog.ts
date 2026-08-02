@@ -1,11 +1,18 @@
 import {createHmac, randomUUID, timingSafeEqual} from "node:crypto";
 import {mkdir, readFile, writeFile} from "node:fs/promises";
 import path from "node:path";
-import {get, put} from "@vercel/blob";
-import type {BlobAccessType, GetBlobResult, PutBlobResult} from "@vercel/blob";
-import {generateAiBlogCoverSvg} from "@/lib/ai-blog-cover";
+import {parseStoredBlogPosts} from "@/lib/blog-post-record";
+import {BlogSlugConflictError, isBlogSlugConflictError} from "@/lib/blog-storage-error";
 import {extractJsonObject, getGroqChatModel, requestGroqChatCompletion} from "@/lib/groq";
 import {getSiteUrl} from "@/lib/site-url";
+import {
+    deleteSupabaseBlogPost,
+    getSupabaseBlogPostBySlug,
+    insertSupabaseBlogPost,
+    isSupabaseBlogConfigured,
+    listSupabaseBlogPosts,
+    updateSupabaseBlogPost,
+} from "@/lib/supabase-blog";
 
 export interface InternalBlogPost {
     id: string;
@@ -59,16 +66,9 @@ interface BlogAdminSession {
     email: string | null;
 }
 
-export type BlogStorageMode = "blob" | "filesystem";
-export interface GenerateMissingBlogCoversResult {
-    updatedCount: number;
-    failedCount: number;
-    updatedSlugs: string[];
-}
+export type BlogStorageMode = "supabase" | "filesystem";
 
 const BLOG_POSTS_FILE = path.join(process.cwd(), "src/content/internal-blog-posts.json");
-const BLOG_POSTS_BLOB_PATH = "blog/internal-blog-posts.json";
-const BLOG_COVER_UPLOAD_DIRECTORY = path.join(process.cwd(), "public/uploads/blog-covers");
 const BLOG_ADMIN_EMAIL_FALLBACK = "team@theadamant.local";
 const BLOG_ADMIN_PASSWORD_FALLBACK = "theadamant-admin";
 const BLOG_ADMIN_SECRET_FALLBACK = "theadamant-blog-local-secret";
@@ -127,21 +127,22 @@ export function getBlogAdminSessionCookieOptions() {
 }
 
 export function getBlogStorageMode(): BlogStorageMode {
-    return getBlobReadWriteToken() ? "blob" : "filesystem";
-}
+    const requestedMode = process.env.BLOG_STORAGE_MODE?.trim().toLowerCase();
 
-export function isBlobStorageConfigured() {
-    return Boolean(getBlobReadWriteToken());
-}
-
-export function getBlobReadWriteToken() {
-    const rawToken = process.env.BLOB_READ_WRITE_TOKEN?.trim();
-
-    if (!rawToken) {
-        return "";
+    if (requestedMode === "supabase") {
+        return "supabase";
     }
 
-    return rawToken.replace(/^['"]|['"]$/g, "");
+    if (requestedMode === "filesystem") {
+        return "filesystem";
+    }
+
+    const hasSupabaseEnvironment = Boolean(
+        process.env.SUPABASE_URL?.trim()
+        || process.env.SUPABASE_SECRET_KEY?.trim(),
+    );
+
+    return isSupabaseBlogConfigured() || hasSupabaseEnvironment ? "supabase" : "filesystem";
 }
 
 export function getBlogDeployWebhookUrl() {
@@ -152,13 +153,6 @@ export function getBlogDeployWebhookUrl() {
     }
 
     return rawUrl.replace(/^['"]|['"]$/g, "");
-}
-
-export function buildBlogMediaProxyPath(blobPathname: string) {
-    return `/api/blog-media/${blobPathname
-        .split("/")
-        .map((segment) => encodeURIComponent(segment))
-        .join("/")}`;
 }
 
 export function createBlogAdminSessionToken(email: string) {
@@ -230,7 +224,11 @@ export async function listInternalBlogPosts() {
 }
 
 export async function getInternalBlogPostBySlug(slug: string) {
-    const posts = await readInternalBlogPosts();
+    if (getBlogStorageMode() === "supabase") {
+        return getSupabaseBlogPostBySlug(slug);
+    }
+
+    const posts = await readLocalInternalBlogPosts();
     return posts.find((post) => post.slug === slug) ?? null;
 }
 
@@ -252,34 +250,39 @@ export async function createInternalBlogPost(input: CreateInternalBlogPostInput)
         posts,
     });
     const now = new Date().toISOString();
-    const slug = createUniqueSlug(resolvedDraft.title, posts);
+    let slug = createUniqueSlug(resolvedDraft.title, posts);
     const excerpt = resolvedDraft.excerpt || buildExcerptFromContent(content);
-    const coverImage = await resolveBlogCoverImage(input.coverImage, {
-        title: resolvedDraft.title,
-        excerpt,
-        tags,
-        slug,
-    });
+    const id = randomUUID();
 
-    const post: InternalBlogPost = {
-        id: randomUUID(),
-        slug,
-        title: resolvedDraft.title,
-        seoTitle: resolvedDraft.seoTitle || getEnhancedBlogSeoTitle(resolvedDraft.title, tags),
-        excerpt,
-        content: resolvedDraft.content,
-        coverImage,
-        tags,
-        authorName: input.authorName?.trim() || "The Adamant Team",
-        createdAt: now,
-        updatedAt: now,
-        publishedAt: now,
-    };
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+        const post: InternalBlogPost = {
+            id,
+            slug,
+            title: resolvedDraft.title,
+            seoTitle: resolvedDraft.seoTitle || getEnhancedBlogSeoTitle(resolvedDraft.title, tags),
+            excerpt,
+            content: resolvedDraft.content,
+            coverImage: null,
+            tags,
+            authorName: input.authorName?.trim() || "The Adamant Team",
+            createdAt: now,
+            updatedAt: now,
+            publishedAt: now,
+        };
 
-    posts.unshift(post);
-    await writeInternalBlogPosts(posts);
+        try {
+            return await insertInternalBlogPost(post);
+        } catch (error) {
+            if (!isBlogSlugConflictError(error)) {
+                throw error;
+            }
 
-    return post;
+            posts.push(post);
+            slug = createUniqueSlug(resolvedDraft.title, posts);
+        }
+    }
+
+    throw new Error("Could not allocate a unique blog slug.");
 }
 
 export async function updateInternalBlogPost(input: UpdateInternalBlogPostInput) {
@@ -309,28 +312,25 @@ export async function updateInternalBlogPost(input: UpdateInternalBlogPostInput)
     });
     const excerpt = resolvedDraft.excerpt || buildExcerptFromContent(content);
 
-    const coverImage = await resolveBlogCoverImage(input.coverImage, {
-        title: resolvedDraft.title,
-        excerpt,
-        tags,
-        slug: existingPost.slug,
-    });
     const nextPost: InternalBlogPost = {
         ...existingPost,
         title: resolvedDraft.title,
         seoTitle: resolvedDraft.seoTitle || getEnhancedBlogSeoTitle(resolvedDraft.title, tags),
         excerpt,
         content: resolvedDraft.content,
-        coverImage,
+        coverImage: null,
         tags,
         authorName: input.authorName?.trim() || existingPost.authorName,
         updatedAt: new Date().toISOString(),
     };
 
-    posts.splice(existingPostIndex, 1, nextPost);
-    await writeInternalBlogPosts(posts);
+    const updatedPost = await replaceInternalBlogPost(nextPost);
 
-    return nextPost;
+    if (!updatedPost) {
+        throw new Error("Blog post not found.");
+    }
+
+    return updatedPost;
 }
 
 export async function deleteInternalBlogPost(input: DeleteInternalBlogPostInput) {
@@ -347,8 +347,7 @@ export async function deleteInternalBlogPost(input: DeleteInternalBlogPostInput)
         throw new Error("Blog post not found.");
     }
 
-    const nextPosts = posts.filter((post) => post.id !== id);
-    await writeInternalBlogPosts(nextPosts);
+    await removeInternalBlogPost(id, posts);
 
     return deletedPost;
 }
@@ -393,50 +392,6 @@ export async function notifyManualBlogChange(
     }
 }
 
-export async function generateAiCoversForPostsMissingImages(): Promise<GenerateMissingBlogCoversResult> {
-    const posts = await readInternalBlogPosts();
-    let updatedCount = 0;
-    let failedCount = 0;
-    const updatedSlugs: string[] = [];
-
-    const nextPosts = await Promise.all(posts.map(async (post) => {
-        if (post.coverImage) {
-            return post;
-        }
-
-        const coverImage = await generateAndStoreBlogCover({
-            title: post.title,
-            excerpt: post.excerpt,
-            tags: post.tags,
-            slug: post.slug,
-        });
-
-        if (!coverImage) {
-            failedCount += 1;
-            return post;
-        }
-
-        updatedCount += 1;
-        updatedSlugs.push(post.slug);
-
-        return {
-            ...post,
-            coverImage,
-            updatedAt: new Date().toISOString(),
-        };
-    }));
-
-    if (updatedCount > 0) {
-        await writeInternalBlogPosts(nextPosts);
-    }
-
-    return {
-        updatedCount,
-        failedCount,
-        updatedSlugs,
-    };
-}
-
 function signSessionPayload(payload: string) {
     const secret = process.env.BLOG_ADMIN_SESSION_SECRET || BLOG_ADMIN_SECRET_FALLBACK;
     return createHmac("sha256", secret).update(payload).digest("hex");
@@ -465,80 +420,61 @@ function safeEqual(left: string, right: string) {
 }
 
 async function readInternalBlogPosts() {
-    if (isBlobStorageConfigured()) {
-        const blobPosts = await readBlobInternalBlogPosts();
-
-        if (blobPosts !== null) {
-            return blobPosts;
-        }
+    if (getBlogStorageMode() === "supabase") {
+        return listSupabaseBlogPosts();
     }
 
     return readLocalInternalBlogPosts();
-}
-
-async function readBlobInternalBlogPosts() {
-    try {
-        const {result} = await executeBlobOperation((access) => (
-            get(BLOG_POSTS_BLOB_PATH, {
-                access,
-                token: getBlobReadWriteToken(),
-            })
-        ));
-
-        if (!result || result.statusCode !== 200 || !result.stream) {
-            return null as InternalBlogPost[] | null;
-        }
-
-        const raw = await new Response(result.stream).text();
-        return parseInternalBlogPosts(raw);
-    } catch {
-        return null as InternalBlogPost[] | null;
-    }
 }
 
 async function readLocalInternalBlogPosts() {
     await ensureInternalBlogStorage();
 
     const raw = await readFile(BLOG_POSTS_FILE, "utf8");
-    return parseInternalBlogPosts(raw);
+    return parseStoredBlogPosts(raw);
 }
 
-function parseInternalBlogPosts(raw: string) {
-    try {
-        const parsed = JSON.parse(raw) as unknown;
-
-        if (!Array.isArray(parsed)) {
-            return [] as InternalBlogPost[];
-        }
-
-        return parsed
-            .map(normalizeStoredPost)
-            .filter((post): post is InternalBlogPost => Boolean(post));
-    } catch {
-        return [] as InternalBlogPost[];
+async function insertInternalBlogPost(post: InternalBlogPost) {
+    if (getBlogStorageMode() === "supabase") {
+        return insertSupabaseBlogPost(post);
     }
+
+    const posts = await readLocalInternalBlogPosts();
+
+    if (posts.some((candidate) => candidate.slug === post.slug)) {
+        throw new BlogSlugConflictError(post.slug);
+    }
+
+    posts.unshift(post);
+    await writeLocalInternalBlogPosts(posts);
+    return post;
 }
 
-async function writeInternalBlogPosts(posts: InternalBlogPost[]) {
-    if (isBlobStorageConfigured()) {
-        await writeBlobInternalBlogPosts(posts);
+async function replaceInternalBlogPost(post: InternalBlogPost) {
+    if (getBlogStorageMode() === "supabase") {
+        return updateSupabaseBlogPost(post);
+    }
+
+    const posts = await readLocalInternalBlogPosts();
+    const index = posts.findIndex((candidate) => candidate.id === post.id);
+
+    if (index === -1) {
+        return null;
+    }
+
+    posts.splice(index, 1, post);
+    await writeLocalInternalBlogPosts(posts);
+    return post;
+}
+
+async function removeInternalBlogPost(id: string, currentPosts?: InternalBlogPost[]) {
+    if (getBlogStorageMode() === "supabase") {
+        await deleteSupabaseBlogPost(id);
         return;
     }
 
-    await writeLocalInternalBlogPosts(posts);
-}
-
-async function writeBlobInternalBlogPosts(posts: InternalBlogPost[]) {
-    await executeBlobOperation((access) => (
-        put(BLOG_POSTS_BLOB_PATH, `${JSON.stringify(posts, null, 2)}\n`, {
-            access,
-            addRandomSuffix: false,
-            allowOverwrite: true,
-            cacheControlMaxAge: 60,
-            contentType: "application/json; charset=utf-8",
-            token: getBlobReadWriteToken(),
-        })
-    ));
+    const posts = currentPosts || await readLocalInternalBlogPosts();
+    await writeLocalInternalBlogPosts(posts.filter((post) => post.id !== id));
 }
 
 async function writeLocalInternalBlogPosts(posts: InternalBlogPost[]) {
@@ -554,44 +490,6 @@ async function ensureInternalBlogStorage() {
     } catch {
         await writeFile(BLOG_POSTS_FILE, "[]\n", "utf8");
     }
-}
-
-function normalizeStoredPost(value: unknown): InternalBlogPost | null {
-    if (!value || typeof value !== "object") {
-        return null;
-    }
-
-    const candidate = value as Partial<InternalBlogPost>;
-
-    if (
-        typeof candidate.id !== "string"
-        || typeof candidate.slug !== "string"
-        || typeof candidate.title !== "string"
-        || typeof candidate.excerpt !== "string"
-        || typeof candidate.content !== "string"
-        || typeof candidate.authorName !== "string"
-        || typeof candidate.createdAt !== "string"
-        || typeof candidate.updatedAt !== "string"
-        || typeof candidate.publishedAt !== "string"
-        || !Array.isArray(candidate.tags)
-    ) {
-        return null;
-    }
-
-    return {
-        id: candidate.id,
-        slug: candidate.slug,
-        title: candidate.title,
-        seoTitle: typeof candidate.seoTitle === "string" ? candidate.seoTitle.trim() : undefined,
-        excerpt: candidate.excerpt,
-        content: candidate.content,
-        coverImage: typeof candidate.coverImage === "string" ? candidate.coverImage : null,
-        tags: candidate.tags.filter((tag): tag is string => typeof tag === "string" && Boolean(tag.trim())),
-        authorName: candidate.authorName,
-        createdAt: candidate.createdAt,
-        updatedAt: candidate.updatedAt,
-        publishedAt: candidate.publishedAt,
-    };
 }
 
 function createUniqueSlug(title: string, posts: InternalBlogPost[]) {
@@ -834,121 +732,4 @@ function normalizeTags(tags: CreateInternalBlogPostInput["tags"]) {
         .map((tag) => tag.trim())
         .filter(Boolean)
         .slice(0, 6);
-}
-
-function normalizeCoverImage(value?: string) {
-    if (!value) {
-        return null;
-    }
-
-    const trimmed = value.trim();
-    if (!trimmed) {
-        return null;
-    }
-
-    if (trimmed.startsWith("/")) {
-        return trimmed;
-    }
-
-    try {
-        const parsed = new URL(trimmed);
-        return ["http:", "https:"].includes(parsed.protocol) ? parsed.toString() : null;
-    } catch {
-        return null;
-    }
-}
-
-async function resolveBlogCoverImage(
-    value: string | undefined,
-    post: Pick<InternalBlogPost, "title" | "excerpt" | "tags" | "slug">,
-) {
-    const normalized = normalizeCoverImage(value);
-
-    if (normalized) {
-        return normalized;
-    }
-
-    return await generateAndStoreBlogCover(post);
-}
-
-async function generateAndStoreBlogCover(post: Pick<InternalBlogPost, "title" | "excerpt" | "tags" | "slug">) {
-    try {
-        const svg = await generateAiBlogCoverSvg(post);
-        const fileName = `ai-${post.slug}.svg`;
-
-        if (isBlobStorageConfigured()) {
-            const {result: blob, access} = await executeBlobOperation((blobAccess) => (
-                put(`blog/covers/${fileName}`, svg, {
-                    access: blobAccess,
-                    addRandomSuffix: false,
-                    allowOverwrite: true,
-                    cacheControlMaxAge: 60 * 60 * 24 * 365,
-                    contentType: "image/svg+xml; charset=utf-8",
-                    token: getBlobReadWriteToken(),
-                })
-            ));
-
-            return access === "private" ? buildBlogMediaProxyPath(blob.pathname) : blob.url;
-        }
-
-        await mkdir(BLOG_COVER_UPLOAD_DIRECTORY, {recursive: true});
-        await writeFile(path.join(BLOG_COVER_UPLOAD_DIRECTORY, fileName), svg, "utf8");
-        return `/uploads/blog-covers/${fileName}`;
-    } catch (error) {
-        console.error(`Failed to generate AI blog cover for "${post.title}".`, error);
-        return null;
-    }
-}
-
-export async function uploadBlogCoverToBlob(file: File, pathname: string) {
-    return executeBlobOperation((access) => (
-        put(pathname, file, {
-            access,
-            addRandomSuffix: false,
-            allowOverwrite: true,
-            cacheControlMaxAge: 60 * 60 * 24 * 365,
-            contentType: file.type,
-            token: getBlobReadWriteToken(),
-        })
-    ));
-}
-
-export async function getBlogBlob(pathname: string) {
-    return executeBlobOperation((access) => (
-        get(pathname, {
-            access,
-            token: getBlobReadWriteToken(),
-        })
-    ));
-}
-
-async function executeBlobOperation<T extends GetBlobResult | PutBlobResult | null>(
-    operation: (access: BlobAccessType) => Promise<T>,
-) {
-    const preferredAccess = getPreferredBlobAccess();
-
-    try {
-        return {
-            access: preferredAccess,
-            result: await operation(preferredAccess),
-        };
-    } catch (error) {
-        if (preferredAccess === "public" && isPrivateStoreAccessError(error)) {
-            return {
-                access: "private" as const,
-                result: await operation("private"),
-            };
-        }
-
-        throw error;
-    }
-}
-
-function getPreferredBlobAccess(): BlobAccessType {
-    const configuredAccess = process.env.BLOB_STORE_ACCESS?.trim().toLowerCase();
-    return configuredAccess === "private" ? "private" : "public";
-}
-
-function isPrivateStoreAccessError(error: unknown) {
-    return error instanceof Error && /private store/i.test(error.message);
 }

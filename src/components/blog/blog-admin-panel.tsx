@@ -1,13 +1,13 @@
 "use client";
 
-import {ChangeEvent, FormEvent, useEffect, useState} from "react";
+import {FormEvent, useEffect, useState} from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import {ArrowRight, ImagePlus, LockKeyhole, LogOut, PenSquare, PencilLine, ShieldCheck, Sparkles, Trash2, X} from "lucide-react";
+import {ArrowRight, Image as ImageIcon, LockKeyhole, LogOut, PenSquare, PencilLine, ShieldCheck, Trash2, X} from "lucide-react";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/text-area";
-import {BlogStorageMode, InternalBlogPost} from "@/lib/internal-blog";
+import type {BlogStorageMode, InternalBlogPost} from "@/lib/internal-blog";
 import {getLocalizedPagePath, SiteLocale} from "@/lib/site-locale";
 import {buildFallbackBlogCoverDataUrl} from "@/lib/ai-blog-cover";
 
@@ -23,7 +23,6 @@ interface BlogFormState {
     title: string;
     excerpt: string;
     authorName: string;
-    coverImage: string;
     tags: string;
     content: string;
 }
@@ -32,7 +31,6 @@ const initialFormState: BlogFormState = {
     title: "",
     excerpt: "",
     authorName: "The Adamant Team",
-    coverImage: "",
     tags: "",
     content: "",
 };
@@ -44,12 +42,12 @@ async function requestBlogAdminSession() {
 
 async function requestInternalBlogPosts() {
     const response = await fetch("/api/blog-admin/posts", {cache: "no-store"});
+    const payload = await safeJson<{ error?: string; posts?: InternalBlogPost[] }>(response);
 
     if (!response.ok) {
-        return [] as InternalBlogPost[];
+        throw new Error(payload.error || "Could not load blog posts.");
     }
 
-    const payload = await response.json() as { posts?: InternalBlogPost[] };
     return payload.posts ?? [];
 }
 
@@ -65,11 +63,7 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
     const [editorError, setEditorError] = useState("");
     const [formState, setFormState] = useState(initialFormState);
     const [editingPostId, setEditingPostId] = useState<string | null>(null);
-    const [selectedCoverFile, setSelectedCoverFile] = useState<File | null>(null);
-    const [coverPreviewUrl, setCoverPreviewUrl] = useState("");
-    const [isUploadingCover, setIsUploadingCover] = useState(false);
     const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
-    const [isGeneratingAiCovers, setIsGeneratingAiCovers] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -86,10 +80,16 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
 
                 if (payload.authenticated) {
                     setSessionStatus("authenticated");
-                    const nextPosts = await requestInternalBlogPosts();
+                    try {
+                        const nextPosts = await requestInternalBlogPosts();
 
-                    if (!cancelled) {
-                        setPosts(nextPosts);
+                        if (!cancelled) {
+                            setPosts(nextPosts);
+                        }
+                    } catch (error) {
+                        if (!cancelled) {
+                            setEditorError(error instanceof Error ? error.message : "Could not load blog posts.");
+                        }
                     }
 
                     return;
@@ -108,20 +108,6 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
         };
     }, []);
 
-    useEffect(() => {
-        if (!selectedCoverFile) {
-            setCoverPreviewUrl("");
-            return;
-        }
-
-        const previewUrl = URL.createObjectURL(selectedCoverFile);
-        setCoverPreviewUrl(previewUrl);
-
-        return () => {
-            URL.revokeObjectURL(previewUrl);
-        };
-    }, [selectedCoverFile]);
-
     async function refreshSession() {
         try {
             const payload = await requestBlogAdminSession();
@@ -130,7 +116,11 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
 
             if (payload.authenticated) {
                 setSessionStatus("authenticated");
-                setPosts(await requestInternalBlogPosts());
+                try {
+                    setPosts(await requestInternalBlogPosts());
+                } catch (error) {
+                    setEditorError(error instanceof Error ? error.message : "Could not load blog posts.");
+                }
                 return;
             }
 
@@ -193,11 +183,9 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
         setEditorError("");
 
         try {
-            const coverImage = await resolveCoverImage();
             const requestBody = {
                 ...formState,
                 id: editingPostId,
-                coverImage,
             };
             const isEditing = Boolean(editingPostId);
             const response = await fetch("/api/blog-admin/posts", {
@@ -274,57 +262,15 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
         }
     }
 
-    async function handleGenerateAiCovers() {
-        setIsGeneratingAiCovers(true);
-        setEditorError("");
-
-        try {
-            const response = await fetch("/api/blog-admin/generate-covers", {
-                method: "POST",
-            });
-
-            const payload = await safeJson<{
-                error?: string;
-                posts?: InternalBlogPost[];
-                updatedCount?: number;
-            }>(response);
-
-            if (!response.ok || !payload.posts) {
-                throw new Error(payload.error || "Could not generate AI covers.");
-            }
-
-            setPosts(payload.posts);
-            toast.success(
-                payload.updatedCount
-                    ? `Generated ${payload.updatedCount} AI cover${payload.updatedCount === 1 ? "" : "s"}.`
-                    : "No missing covers needed generation.",
-            );
-        } catch (error) {
-            const message = error instanceof Error ? error.message : "Could not generate AI covers.";
-            setEditorError(message);
-            toast.error(message);
-        } finally {
-            setIsGeneratingAiCovers(false);
-        }
-    }
-
-    function handleCoverFileChange(event: ChangeEvent<HTMLInputElement>) {
-        const file = event.target.files?.[0] ?? null;
-        setSelectedCoverFile(file);
-        setEditorError("");
-    }
-
     function startEditing(post: InternalBlogPost) {
         setEditingPostId(post.id);
         setFormState({
             title: post.title,
             excerpt: post.excerpt,
             authorName: post.authorName,
-            coverImage: post.coverImage || "",
             tags: post.tags.join(", "),
             content: post.content,
         });
-        setSelectedCoverFile(null);
         setEditorError("");
         window.scrollTo({top: 0, behavior: "smooth"});
     }
@@ -332,39 +278,7 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
     function resetEditor() {
         setEditingPostId(null);
         setFormState(initialFormState);
-        setSelectedCoverFile(null);
         setEditorError("");
-        setIsUploadingCover(false);
-    }
-
-    async function resolveCoverImage() {
-        if (!selectedCoverFile) {
-            return formState.coverImage;
-        }
-
-        setIsUploadingCover(true);
-
-        try {
-            const uploadPayload = new FormData();
-            uploadPayload.append("file", selectedCoverFile);
-
-            const response = await fetch("/api/blog-admin/upload", {
-                method: "POST",
-                body: uploadPayload,
-            });
-
-            const payload = await safeJson<{ error?: string; detail?: string; url?: string }>(response);
-
-            if (!response.ok || !payload.url) {
-                throw new Error(payload.detail || payload.error || "Could not upload the cover image.");
-            }
-
-            setFormState((current) => ({...current, coverImage: payload.url!}));
-            setSelectedCoverFile(null);
-            return payload.url;
-        } finally {
-            setIsUploadingCover(false);
-        }
     }
 
     if (sessionStatus === "loading") {
@@ -394,18 +308,17 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
 
                     <div className="mt-6 rounded-[1.5rem] border border-black/8 bg-black/[0.03] p-5 text-sm leading-7 text-foreground/68 dark:border-white/10 dark:bg-white/[0.03]">
                         <p className="font-semibold text-foreground">
-                            {storageMode === "blob" ? "Vercel Blob is active" : "Free local fallback is active"}
+                            {storageMode === "supabase" ? "Supabase is active" : "Local development storage is active"}
                         </p>
-                        {storageMode === "blob" ? (
+                        {storageMode === "supabase" ? (
                             <p className="mt-2">
-                                Internal posts and cover images are now stored through Vercel Blob, so publishing and
-                                uploads can persist on production deployments.
+                                Internal posts are stored as individual database rows. Generated covers require no
+                                uploaded files or external media storage.
                             </p>
                         ) : (
                             <p className="mt-2">
-                                Cover images upload for free into `public/uploads/blog-covers`, and posts stay in the
-                                local JSON file. This is fine in local development. Connect Vercel Blob to make the
-                                same workflow production-safe.
+                                Posts are using the repository JSON file for local development. Configure Supabase
+                                before enabling production publishing.
                             </p>
                         )}
                     </div>
@@ -461,14 +374,14 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
         );
     }
 
-    const coverPreview = coverPreviewUrl || formState.coverImage || (formState.title
+    const coverPreview = formState.title
         ? buildFallbackBlogCoverDataUrl({
             title: formState.title,
             excerpt: formState.excerpt,
             tags: formState.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
             slug: "preview",
         })
-        : "");
+        : "";
     const isEditing = Boolean(editingPostId);
     const storageMode = session?.storageMode || "filesystem";
 
@@ -493,10 +406,6 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                                 <X className="h-4 w-4"/>
                             </button>
                         )}
-                        <button type="button" className="button-secondary" onClick={handleGenerateAiCovers} disabled={isGeneratingAiCovers}>
-                            {isGeneratingAiCovers ? "Generating covers..." : "Generate AI covers"}
-                            <Sparkles className="h-4 w-4"/>
-                        </button>
                         <button type="button" className="button-secondary" onClick={handleLogout}>
                             Log out
                             <LogOut className="h-4 w-4"/>
@@ -549,40 +458,14 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
 
                     <div className="md:col-span-2">
                         <div className="flex items-center justify-between gap-3">
-                            <Label htmlFor="blog-cover-image">Cover image</Label>
-                            <span className="text-xs text-foreground/55">Upload free locally or paste a URL</span>
+                            <Label>Generated cover</Label>
+                            <span className="text-xs text-foreground/55">No upload or storage required</span>
                         </div>
 
-                        <div className="mt-3 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-                            <div className="rounded-[1.4rem] border border-black/8 bg-black/[0.03] p-4 dark:border-white/10 dark:bg-white/[0.03]">
-                                <Label htmlFor="blog-cover-upload">Upload image file</Label>
-                                <Input
-                                    id="blog-cover-upload"
-                                    type="file"
-                                    accept="image/png,image/jpeg,image/webp,image/avif"
-                                    onChange={handleCoverFileChange}
-                                    className="mt-2"
-                                />
-                                <p className="mt-3 text-xs leading-6 text-foreground/55">
-                                    Free local upload. Supports JPG, PNG, WEBP, AVIF up to 5MB.
-                                </p>
-                                <p className="mt-2 text-xs leading-6 text-foreground/55">
-                                    Leave this empty and the post gets a generated SVG cover based on its title.
-                                </p>
-                            </div>
-
-                            <div>
-                                <Label htmlFor="blog-cover-image">Or use image URL</Label>
-                                <Input
-                                    id="blog-cover-image"
-                                    type="url"
-                                    value={formState.coverImage}
-                                    onChange={(event) => setFormState((current) => ({...current, coverImage: event.target.value}))}
-                                    placeholder="https://images.example.com/blog-cover.jpg"
-                                    className="mt-2"
-                                />
-                            </div>
-                        </div>
+                        <p className="mt-2 text-sm leading-6 text-foreground/62">
+                            The cover is generated deterministically from the title and tags. Publishing does not
+                            upload a file or call Vercel Blob.
+                        </p>
 
                         {coverPreview && (
                             <div className="mt-4 overflow-hidden rounded-[1.5rem] border border-black/8 bg-white/70 dark:border-white/10 dark:bg-white/[0.04]">
@@ -619,8 +502,8 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                     <p className="text-sm leading-6 text-foreground/62">
                         Signed in as <span className="font-semibold text-foreground">{session?.email}</span>.
                     </p>
-                    <button type="submit" className="button-primary" disabled={isSavingPost || isUploadingCover}>
-                        {isSavingPost ? (isUploadingCover ? "Uploading cover..." : isEditing ? "Saving changes..." : "Publishing...") : (isEditing ? "Save changes" : "Publish on blog")}
+                    <button type="submit" className="button-primary" disabled={isSavingPost}>
+                        {isSavingPost ? (isEditing ? "Saving changes..." : "Publishing...") : (isEditing ? "Save changes" : "Publish on blog")}
                         <ArrowRight className="h-4 w-4"/>
                     </button>
                 </div>
@@ -634,8 +517,8 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                     <div>
                         <p className="text-sm font-semibold text-foreground">Published internally</p>
                         <p className="text-sm text-foreground/62">
-                            {storageMode === "blob"
-                                ? "All approved company logins can publish, edit, and delete with Blob-backed persistence"
+                            {storageMode === "supabase"
+                                ? "All approved company logins can publish, edit, and delete with Supabase persistence"
                                 : "All approved company logins can publish, edit, and delete with local fallback storage"}
                         </p>
                     </div>
@@ -703,23 +586,15 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
 
                     <div className="rounded-[1.4rem] border border-black/8 bg-black/[0.03] p-5 text-sm leading-7 text-foreground/65 dark:border-white/10 dark:bg-white/[0.03]">
                         <div className="flex items-center gap-3 text-foreground">
-                            <ImagePlus className="h-4 w-4"/>
+                            <ImageIcon className="h-4 w-4"/>
                             <span className="font-semibold">
-                                {storageMode === "blob" ? "Production-safe uploads enabled" : "Free upload path right now"}
+                                Generated covers are active
                             </span>
                         </div>
-                        {storageMode === "blob" ? (
-                            <p className="mt-2">
-                                Cover images and internal blog data are stored in Vercel Blob, so the admin workflow
-                                now survives production deployments instead of relying on the local filesystem.
-                            </p>
-                        ) : (
-                            <p className="mt-2">
-                                Cover images are stored under `public/uploads/blog-covers`, so there is no paid image
-                                service involved for local use. Connect Vercel Blob when you want this to persist in
-                                production.
-                            </p>
-                        )}
+                        <p className="mt-2">
+                            Every article receives a title-and-tag-based SVG data cover at render time. There are no
+                            cover files to upload, migrate, or lose during a storage outage.
+                        </p>
                     </div>
                 </div>
             </div>

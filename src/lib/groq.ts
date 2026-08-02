@@ -33,10 +33,6 @@ export function getGroqChatModel() {
     return process.env.GROQ_CHAT_MODEL?.trim() || DEFAULT_GROQ_CHAT_MODEL;
 }
 
-export function getGroqBlogCoverModel() {
-    return process.env.GROQ_BLOG_COVER_MODEL?.trim() || getGroqChatModel();
-}
-
 export async function requestGroqChatCompletion({
     model = getGroqChatModel(),
     messages,

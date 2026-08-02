@@ -1,4 +1,3 @@
-import {getGroqBlogCoverModel, requestGroqChatCompletion, extractJsonObject} from "@/lib/groq";
 import type {InternalBlogPost} from "@/lib/internal-blog";
 
 interface BlogCoverDesign {
@@ -10,17 +9,6 @@ interface BlogCoverDesign {
     accent: string;
     panel: string;
     ink: string;
-}
-
-interface BlogCoverDesignPayload {
-    eyebrow?: string;
-    titleLines?: string[];
-    accentLabel?: string;
-    gradientFrom?: string;
-    gradientTo?: string;
-    accent?: string;
-    panel?: string;
-    ink?: string;
 }
 
 const DEFAULT_DESIGNS = [
@@ -47,83 +35,9 @@ const DEFAULT_DESIGNS = [
     },
 ];
 
-export async function generateAiBlogCoverSvg(post: Pick<InternalBlogPost, "title" | "excerpt" | "tags" | "slug">) {
-    const design = await generateBlogCoverDesign(post);
-    return renderBlogCoverSvg(post, design);
-}
-
 export function buildFallbackBlogCoverDataUrl(post: Pick<InternalBlogPost, "title" | "excerpt" | "tags" | "slug">) {
     const svg = renderBlogCoverSvg(post, buildFallbackDesign(post.title, post.tags, post.slug));
     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-}
-
-async function generateBlogCoverDesign(post: Pick<InternalBlogPost, "title" | "excerpt" | "tags" | "slug">) {
-    const fallback = buildFallbackDesign(post.title, post.tags, post.slug);
-    const styleSeed = buildCoverStyleSeed(post);
-
-    try {
-        const response = await requestGroqChatCompletion({
-            model: getGroqBlogCoverModel(),
-            maxTokens: 320,
-            temperature: 0.78,
-            messages: [
-                {
-                    role: "system",
-                    content: [
-                        "You are designing a premium blog cover layout for a digital product and SEO studio.",
-                        "Use title, tags, and style seed to create a distinct visual direction.",
-                        "Return JSON only.",
-                        "Use this exact schema:",
-                        '{"eyebrow":"short uppercase phrase","titleLines":["line 1","line 2","optional line 3"],"accentLabel":"2 to 4 words","gradientFrom":"#RRGGBB","gradientTo":"#RRGGBB","accent":"#RRGGBB","panel":"rgba(255,255,255,0.12)","ink":"#RRGGBB"}',
-                        "Rules:",
-                        "- Keep titleLines to 2 or 3 short lines.",
-                        "- Keep eyebrow under 5 words.",
-                        "- accentLabel should feel like a sharp article tag.",
-                        "- Colors must be readable and premium.",
-                        "- Do not reuse the same design concept across different title seeds.",
-                    ].join(" "),
-                },
-                {
-                    role: "user",
-                    content: JSON.stringify({
-                        title: post.title,
-                        excerpt: post.excerpt,
-                        tags: post.tags,
-                        slug: post.slug,
-                        styleSeed,
-                    }),
-                },
-            ],
-        });
-
-        const parsed = extractJsonObject<BlogCoverDesignPayload>(response);
-
-        if (!parsed) {
-            return fallback;
-        }
-
-        return normalizeDesign(parsed, fallback);
-    } catch (error) {
-        console.error("AI blog cover generation fell back to local design.", error);
-        return fallback;
-    }
-}
-
-function normalizeDesign(parsed: BlogCoverDesignPayload, fallback: BlogCoverDesign): BlogCoverDesign {
-    const titleLines = Array.isArray(parsed.titleLines)
-        ? parsed.titleLines.map((line) => line?.trim() || "").filter(Boolean).slice(0, 3)
-        : [];
-
-    return {
-        eyebrow: normalizeText(parsed.eyebrow, fallback.eyebrow),
-        titleLines: titleLines.length > 0 ? titleLines : fallback.titleLines,
-        accentLabel: normalizeText(parsed.accentLabel, fallback.accentLabel),
-        gradientFrom: normalizeColor(parsed.gradientFrom, fallback.gradientFrom),
-        gradientTo: normalizeColor(parsed.gradientTo, fallback.gradientTo),
-        accent: normalizeColor(parsed.accent, fallback.accent),
-        panel: normalizePanel(parsed.panel, fallback.panel),
-        ink: normalizeColor(parsed.ink, fallback.ink),
-    };
 }
 
 function buildFallbackDesign(title: string, tags: string[], slug: string): BlogCoverDesign {
@@ -244,21 +158,6 @@ function trimCopy(value: string, maxLength: number) {
     return `${value.slice(0, maxLength - 3).trim()}...`;
 }
 
-function normalizeText(value: string | undefined, fallback: string) {
-    const trimmed = value?.trim();
-    return trimmed || fallback;
-}
-
-function normalizeColor(value: string | undefined, fallback: string) {
-    const trimmed = value?.trim();
-    return /^#[0-9a-fA-F]{6}$/.test(trimmed || "") ? trimmed! : fallback;
-}
-
-function normalizePanel(value: string | undefined, fallback: string) {
-    const trimmed = value?.trim();
-    return /^rgba\(\d+,\d+,\d+,\s*(0(\.\d+)?|1(\.0+)?)\)$/.test(trimmed || "") ? trimmed! : fallback;
-}
-
 function escapeXml(value: string) {
     return value
         .replace(/&/g, "&amp;")
@@ -281,15 +180,4 @@ function hashCode(value: string) {
     }
 
     return hash;
-}
-
-function buildCoverStyleSeed(post: Pick<InternalBlogPost, "title" | "tags" | "slug">) {
-    const primaryTag = post.tags?.[0]?.trim() || "seo";
-    const titlePrefix = post.title
-        .toLowerCase()
-        .split(/\s+/)
-        .slice(0, 2)
-        .join("-");
-
-    return `${post.slug || "default"}-${primaryTag}-${titlePrefix}`;
 }
