@@ -7,7 +7,7 @@ export interface BlogPostRow {
     seo_title: string | null;
     excerpt: string;
     content: string;
-    cover_image: null;
+    cover_image: string | null;
     tags: string[];
     author_name: string;
     created_at: string;
@@ -23,7 +23,7 @@ export function internalBlogPostToRow(post: InternalBlogPost): BlogPostRow {
         seo_title: post.seoTitle?.trim() || null,
         excerpt: post.excerpt,
         content: post.content,
-        cover_image: null,
+        cover_image: post.coverImage?.trim() || null,
         tags: post.tags,
         author_name: post.authorName,
         created_at: post.createdAt,
@@ -40,7 +40,7 @@ export function blogPostRowToInternalBlogPost(row: BlogPostRow): InternalBlogPos
         seoTitle: row.seo_title?.trim() || undefined,
         excerpt: row.excerpt,
         content: row.content,
-        coverImage: null,
+        coverImage: row.cover_image?.trim() || null,
         tags: Array.isArray(row.tags) ? row.tags.filter((tag) => typeof tag === "string" && Boolean(tag.trim())) : [],
         authorName: row.author_name,
         createdAt: row.created_at,
@@ -78,7 +78,7 @@ export function normalizeStoredBlogPost(value: unknown): InternalBlogPost | null
         seoTitle: typeof candidate.seoTitle === "string" ? candidate.seoTitle.trim() : undefined,
         excerpt: candidate.excerpt,
         content: candidate.content,
-        coverImage: null,
+        coverImage: typeof candidate.coverImage === "string" ? candidate.coverImage.trim() || null : null,
         tags: candidate.tags.filter((tag): tag is string => typeof tag === "string" && Boolean(tag.trim())),
         authorName: candidate.authorName,
         createdAt: candidate.createdAt,

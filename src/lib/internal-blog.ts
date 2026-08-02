@@ -13,6 +13,7 @@ import {
     listSupabaseBlogPosts,
     updateSupabaseBlogPost,
 } from "@/lib/supabase-blog";
+import {removeSupabaseBlogCoverByUrl} from "@/lib/supabase-blog-covers";
 
 export interface InternalBlogPost {
     id: string;
@@ -33,7 +34,7 @@ export interface CreateInternalBlogPostInput {
     title: string;
     excerpt?: string;
     content: string;
-    coverImage?: string;
+    coverImage?: string | null;
     tags?: string[] | string;
     authorName?: string;
 }
@@ -43,7 +44,7 @@ export interface UpdateInternalBlogPostInput {
     title: string;
     excerpt?: string;
     content: string;
-    coverImage?: string;
+    coverImage?: string | null;
     tags?: string[] | string;
     authorName?: string;
 }
@@ -262,7 +263,7 @@ export async function createInternalBlogPost(input: CreateInternalBlogPostInput)
             seoTitle: resolvedDraft.seoTitle || getEnhancedBlogSeoTitle(resolvedDraft.title, tags),
             excerpt,
             content: resolvedDraft.content,
-            coverImage: null,
+            coverImage: normalizeCoverImage(input.coverImage),
             tags,
             authorName: input.authorName?.trim() || "The Adamant Team",
             createdAt: now,
@@ -318,7 +319,9 @@ export async function updateInternalBlogPost(input: UpdateInternalBlogPostInput)
         seoTitle: resolvedDraft.seoTitle || getEnhancedBlogSeoTitle(resolvedDraft.title, tags),
         excerpt,
         content: resolvedDraft.content,
-        coverImage: null,
+        coverImage: input.coverImage === undefined
+            ? existingPost.coverImage
+            : normalizeCoverImage(input.coverImage),
         tags,
         authorName: input.authorName?.trim() || existingPost.authorName,
         updatedAt: new Date().toISOString(),
@@ -328,6 +331,10 @@ export async function updateInternalBlogPost(input: UpdateInternalBlogPostInput)
 
     if (!updatedPost) {
         throw new Error("Blog post not found.");
+    }
+
+    if (existingPost.coverImage && existingPost.coverImage !== updatedPost.coverImage) {
+        await removeManagedCoverWithoutFailingWrite(existingPost.coverImage);
     }
 
     return updatedPost;
@@ -348,6 +355,7 @@ export async function deleteInternalBlogPost(input: DeleteInternalBlogPostInput)
     }
 
     await removeInternalBlogPost(id, posts);
+    await removeManagedCoverWithoutFailingWrite(deletedPost.coverImage);
 
     return deletedPost;
 }
@@ -531,6 +539,22 @@ function buildExcerptFromContent(content: string) {
     }
 
     return `${flattened.slice(0, 177).trim()}...`;
+}
+
+function normalizeCoverImage(value?: string | null) {
+    return value?.trim() || null;
+}
+
+async function removeManagedCoverWithoutFailingWrite(coverImage?: string | null) {
+    if (getBlogStorageMode() !== "supabase" || !coverImage) {
+        return;
+    }
+
+    try {
+        await removeSupabaseBlogCoverByUrl(coverImage);
+    } catch (error) {
+        console.error("Could not clean up the previous Supabase blog cover.", error);
+    }
 }
 
 function normalizeArticleContentForStorage(content: string) {

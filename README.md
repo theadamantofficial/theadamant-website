@@ -10,27 +10,41 @@ The internal blog uses the repository JSON file when `BLOG_STORAGE_MODE=filesyst
 
 ## Supabase blog deployment
 
-Blog records are stored in Supabase in production. Covers are deterministic SVG data URLs and do not use file storage.
+Blog records are stored in Supabase in production. Optional uploaded covers are stored in the public `blog_images`
+Supabase Storage bucket; posts without an uploaded image use a deterministic generated cover.
 
 1. Link the intended Supabase project with the Supabase CLI.
-2. Apply `supabase/migrations/20260802190000_create_blog_posts.sql` with `supabase db push`.
+2. Apply the tracked migrations with `supabase db push`. This creates `blog_posts` and enables persisted HTTPS cover URLs.
 3. Add these server-only Vercel environment variables to Production and Preview:
    - `BLOG_STORAGE_MODE=supabase`
    - `SUPABASE_URL`
    - `SUPABASE_SECRET_KEY`
-4. Preview the repository seed import:
+   - `SUPABASE_BLOG_COVERS_BUCKET=blog_images`
+4. In Supabase Storage, configure `blog_images` as a public bucket with a 5 MB file limit and these allowed MIME types:
+   - `image/jpeg`
+   - `image/png`
+   - `image/webp`
+   - `image/avif`
+
+The bucket is public only for reading published blog images. Uploads and deletes run through the cookie-authenticated
+server API using `SUPABASE_SECRET_KEY`, so no browser upload/delete policies are required and the secret is never sent
+to the client.
+
+5. Preview the repository seed import:
 
    ```bash
    npm run blog:import -- src/content/internal-blog-posts.json
    ```
 
-5. Apply it while creating a non-overwriting backup of the current Supabase rows:
+6. Apply it while creating a non-overwriting backup of the current Supabase rows:
 
    ```bash
    npm run blog:import -- src/content/internal-blog-posts.json --apply --backup=/absolute/secure/path/blog-posts-before-seed.json
    ```
 
-The importer always defaults to dry-run. It merges by post ID, keeps the newest matching record, preserves recovered historical slugs, renames conflicting interim slugs, clears stored cover URLs, and verifies the final database row count.
+The importer always defaults to dry-run. It merges by post ID, keeps the newest matching record, preserves recovered
+historical slugs, renames conflicting interim slugs, discards historical Vercel Blob cover URLs, preserves current
+Supabase cover URLs, and verifies the final database row count.
 
 ## Vercel Blob recovery on 27 August 2026
 

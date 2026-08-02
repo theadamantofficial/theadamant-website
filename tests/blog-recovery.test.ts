@@ -22,12 +22,16 @@ function buildPost(overrides: Partial<InternalBlogPost>): InternalBlogPost {
 describe("blog recovery reconciliation", () => {
     it("keeps the newest row when the same id exists in both sources", () => {
         const recovered = buildPost({title: "Recovered", updatedAt: "2026-08-02T00:00:00.000Z"});
-        const current = buildPost({title: "Current", updatedAt: "2026-08-03T00:00:00.000Z"});
+        const current = buildPost({
+            title: "Current",
+            coverImage: "https://project.supabase.co/storage/v1/object/public/blog_images/covers/current.webp",
+            updatedAt: "2026-08-03T00:00:00.000Z",
+        });
         const result = reconcileRecoveredBlogPosts([current], [recovered]);
 
         expect(result.posts).toHaveLength(1);
         expect(result.posts[0].title).toBe("Current");
-        expect(result.posts[0].coverImage).toBeNull();
+        expect(result.posts[0].coverImage).toBe(current.coverImage);
     });
 
     it("preserves a historical slug and renames an interim conflicting post", () => {

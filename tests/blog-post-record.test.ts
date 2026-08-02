@@ -14,7 +14,7 @@ const post: InternalBlogPost = {
     seoTitle: "Supabase Blog | The Adamant",
     excerpt: "A migration test.",
     content: "## Stored safely",
-    coverImage: "https://old-blob.example/cover.png",
+    coverImage: "https://project.supabase.co/storage/v1/object/public/blog_images/covers/cover.png",
     tags: ["Supabase", "SEO"],
     authorName: "The Adamant Team",
     createdAt: "2026-08-01T00:00:00.000Z",
@@ -23,17 +23,17 @@ const post: InternalBlogPost = {
 };
 
 describe("blog post record mapping", () => {
-    it("maps camel-case posts to database rows without persisted covers", () => {
+    it("maps camel-case posts to database rows with persisted cover URLs", () => {
         const row = internalBlogPostToRow(post);
 
         expect(row.seo_title).toBe(post.seoTitle);
         expect(row.author_name).toBe(post.authorName);
-        expect(row.cover_image).toBeNull();
-        expect(blogPostRowToInternalBlogPost(row)).toEqual({...post, coverImage: null});
+        expect(row.cover_image).toBe(post.coverImage);
+        expect(blogPostRowToInternalBlogPost(row)).toEqual(post);
     });
 
     it("normalizes valid legacy JSON and rejects incomplete rows", () => {
-        expect(normalizeStoredBlogPost(post)).toEqual({...post, coverImage: null});
+        expect(normalizeStoredBlogPost(post)).toEqual(post);
         expect(normalizeStoredBlogPost({title: "Incomplete"})).toBeNull();
         expect(parseStoredBlogPosts(JSON.stringify([post, {title: "Incomplete"}]))).toHaveLength(1);
     });

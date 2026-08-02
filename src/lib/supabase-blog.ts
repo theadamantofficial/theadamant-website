@@ -29,6 +29,31 @@ export function isSupabaseBlogConfigured() {
     return Boolean(getSupabaseUrl() && getSupabaseSecretKey());
 }
 
+export function getSupabaseServerClient() {
+    const url = getSupabaseUrl();
+    const secretKey = getSupabaseSecretKey();
+
+    if (!url || !secretKey) {
+        throw new BlogStorageUnavailableError(new Error(
+            "Set SUPABASE_URL and SUPABASE_SECRET_KEY for Supabase blog storage.",
+        ));
+    }
+
+    const credentials = `${url}:${secretKey}`;
+
+    if (!cachedClient || cachedCredentials !== credentials) {
+        cachedClient = createClient(url, secretKey, {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false,
+            },
+        });
+        cachedCredentials = credentials;
+    }
+
+    return cachedClient;
+}
+
 export async function listSupabaseBlogPosts() {
     const {data, error} = await getSupabaseClient()
         .from("blog_posts")
@@ -122,28 +147,7 @@ export async function upsertSupabaseBlogPosts(posts: InternalBlogPost[]) {
 }
 
 function getSupabaseClient() {
-    const url = getSupabaseUrl();
-    const secretKey = getSupabaseSecretKey();
-
-    if (!url || !secretKey) {
-        throw new BlogStorageUnavailableError(new Error(
-            "Set SUPABASE_URL and SUPABASE_SECRET_KEY for Supabase blog storage.",
-        ));
-    }
-
-    const credentials = `${url}:${secretKey}`;
-
-    if (!cachedClient || cachedCredentials !== credentials) {
-        cachedClient = createClient(url, secretKey, {
-            auth: {
-                autoRefreshToken: false,
-                persistSession: false,
-            },
-        });
-        cachedCredentials = credentials;
-    }
-
-    return cachedClient;
+    return getSupabaseServerClient();
 }
 
 function getSupabaseUrl() {

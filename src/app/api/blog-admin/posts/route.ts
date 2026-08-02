@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         title?: string;
         excerpt?: string;
         content?: string;
-        coverImage?: string;
+        coverImage?: string | null;
         tags?: string[] | string;
         authorName?: string;
     };
@@ -77,7 +77,7 @@ export async function PUT(request: NextRequest) {
         title?: string;
         excerpt?: string;
         content?: string;
-        coverImage?: string;
+        coverImage?: string | null;
         tags?: string[] | string;
         authorName?: string;
     };

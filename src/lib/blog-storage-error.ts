@@ -30,6 +30,22 @@ export class BlogSlugConflictError extends Error {
     }
 }
 
+export class BlogCoverStorageError extends Error {
+    readonly code = "BLOG_COVER_STORAGE_ERROR";
+
+    constructor(message = "Blog cover storage unavailable.", cause?: unknown) {
+        super(message);
+        this.name = "BlogCoverStorageError";
+
+        if (cause !== undefined) {
+            Object.defineProperty(this, "cause", {
+                configurable: true,
+                value: cause,
+            });
+        }
+    }
+}
+
 export function isBlogStorageUnavailableError(error: unknown): error is BlogStorageUnavailableError {
     return error instanceof BlogStorageUnavailableError
         || (error instanceof Error && "code" in error && error.code === "BLOG_STORAGE_UNAVAILABLE");
@@ -38,4 +54,9 @@ export function isBlogStorageUnavailableError(error: unknown): error is BlogStor
 export function isBlogSlugConflictError(error: unknown): error is BlogSlugConflictError {
     return error instanceof BlogSlugConflictError
         || (error instanceof Error && "code" in error && error.code === "BLOG_SLUG_CONFLICT");
+}
+
+export function isBlogCoverStorageError(error: unknown): error is BlogCoverStorageError {
+    return error instanceof BlogCoverStorageError
+        || (error instanceof Error && "code" in error && error.code === "BLOG_COVER_STORAGE_ERROR");
 }

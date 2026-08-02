@@ -36,7 +36,7 @@ export function reconcileRecoveredBlogPosts(
         }
 
         const winner = timestamp(current.updatedAt) >= timestamp(recovered.updatedAt) ? current : recovered;
-        mergedById.set(recovered.id, {...winner, coverImage: null});
+        mergedById.set(recovered.id, {...winner, coverImage: current.coverImage});
 
         if (winner.updatedAt !== current.updatedAt) {
             updatedCount += 1;
@@ -45,7 +45,7 @@ export function reconcileRecoveredBlogPosts(
 
     for (const current of currentById.values()) {
         if (!mergedById.has(current.id)) {
-            mergedById.set(current.id, {...current, coverImage: null});
+            mergedById.set(current.id, current);
         }
     }
 

@@ -1,9 +1,9 @@
 "use client";
 
-import {FormEvent, useEffect, useState} from "react";
+import {ChangeEvent, FormEvent, useEffect, useState} from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import {ArrowRight, Image as ImageIcon, LockKeyhole, LogOut, PenSquare, PencilLine, ShieldCheck, Trash2, X} from "lucide-react";
+import {ArrowRight, Image as ImageIcon, ImageOff, LockKeyhole, LogOut, PenSquare, PencilLine, ShieldCheck, Trash2, X} from "lucide-react";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/text-area";
@@ -23,6 +23,7 @@ interface BlogFormState {
     title: string;
     excerpt: string;
     authorName: string;
+    coverImage: string;
     tags: string;
     content: string;
 }
@@ -31,6 +32,7 @@ const initialFormState: BlogFormState = {
     title: "",
     excerpt: "",
     authorName: "The Adamant Team",
+    coverImage: "",
     tags: "",
     content: "",
 };
@@ -63,6 +65,10 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
     const [editorError, setEditorError] = useState("");
     const [formState, setFormState] = useState(initialFormState);
     const [editingPostId, setEditingPostId] = useState<string | null>(null);
+    const [selectedCoverFile, setSelectedCoverFile] = useState<File | null>(null);
+    const [coverInputKey, setCoverInputKey] = useState(0);
+    const [coverPreviewUrl, setCoverPreviewUrl] = useState("");
+    const [isUploadingCover, setIsUploadingCover] = useState(false);
     const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
 
     useEffect(() => {
@@ -107,6 +113,20 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
             cancelled = true;
         };
     }, []);
+
+    useEffect(() => {
+        if (!selectedCoverFile) {
+            setCoverPreviewUrl("");
+            return;
+        }
+
+        const previewUrl = URL.createObjectURL(selectedCoverFile);
+        setCoverPreviewUrl(previewUrl);
+
+        return () => {
+            URL.revokeObjectURL(previewUrl);
+        };
+    }, [selectedCoverFile]);
 
     async function refreshSession() {
         try {
@@ -183,9 +203,11 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
         setEditorError("");
 
         try {
+            const coverImage = await resolveCoverImage();
             const requestBody = {
                 ...formState,
                 id: editingPostId,
+                coverImage,
             };
             const isEditing = Boolean(editingPostId);
             const response = await fetch("/api/blog-admin/posts", {
@@ -268,9 +290,12 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
             title: post.title,
             excerpt: post.excerpt,
             authorName: post.authorName,
+            coverImage: post.coverImage || "",
             tags: post.tags.join(", "),
             content: post.content,
         });
+        setSelectedCoverFile(null);
+        setCoverInputKey((current) => current + 1);
         setEditorError("");
         window.scrollTo({top: 0, behavior: "smooth"});
     }
@@ -278,7 +303,45 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
     function resetEditor() {
         setEditingPostId(null);
         setFormState(initialFormState);
+        setSelectedCoverFile(null);
+        setCoverInputKey((current) => current + 1);
         setEditorError("");
+        setIsUploadingCover(false);
+    }
+
+    function handleCoverFileChange(event: ChangeEvent<HTMLInputElement>) {
+        const file = event.target.files?.[0] ?? null;
+        setSelectedCoverFile(file);
+        setEditorError("");
+    }
+
+    async function resolveCoverImage() {
+        if (!selectedCoverFile) {
+            return formState.coverImage;
+        }
+
+        setIsUploadingCover(true);
+
+        try {
+            const uploadPayload = new FormData();
+            uploadPayload.append("file", selectedCoverFile);
+
+            const response = await fetch("/api/blog-admin/upload", {
+                method: "POST",
+                body: uploadPayload,
+            });
+            const payload = await safeJson<{ error?: string; url?: string }>(response);
+
+            if (!response.ok || !payload.url) {
+                throw new Error(payload.error || "Could not upload the cover image.");
+            }
+
+            setFormState((current) => ({...current, coverImage: payload.url!}));
+            setSelectedCoverFile(null);
+            return payload.url;
+        } finally {
+            setIsUploadingCover(false);
+        }
     }
 
     if (sessionStatus === "loading") {
@@ -312,8 +375,8 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                         </p>
                         {storageMode === "supabase" ? (
                             <p className="mt-2">
-                                Internal posts are stored as individual database rows. Generated covers require no
-                                uploaded files or external media storage.
+                                Posts are stored as individual database rows, and uploaded covers are stored in the
+                                Supabase `blog_images` bucket. Generated covers remain available when no image is set.
                             </p>
                         ) : (
                             <p className="mt-2">
@@ -374,14 +437,14 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
         );
     }
 
-    const coverPreview = formState.title
+    const coverPreview = coverPreviewUrl || formState.coverImage || (formState.title
         ? buildFallbackBlogCoverDataUrl({
             title: formState.title,
             excerpt: formState.excerpt,
             tags: formState.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
             slug: "preview",
         })
-        : "";
+        : "");
     const isEditing = Boolean(editingPostId);
     const storageMode = session?.storageMode || "filesystem";
 
@@ -458,13 +521,55 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
 
                     <div className="md:col-span-2">
                         <div className="flex items-center justify-between gap-3">
-                            <Label>Generated cover</Label>
-                            <span className="text-xs text-foreground/55">No upload or storage required</span>
+                            <Label htmlFor="blog-cover-upload">Cover image</Label>
+                            <span className="text-xs text-foreground/55">
+                                {storageMode === "supabase" ? "Supabase Storage" : "Generated fallback"}
+                            </span>
                         </div>
 
-                        <p className="mt-2 text-sm leading-6 text-foreground/62">
-                            The cover is generated deterministically from the title and tags. Publishing does not
-                            upload a file or call Vercel Blob.
+                        {storageMode === "supabase" ? (
+                            <div className="mt-3 rounded-[1.4rem] border border-black/8 bg-black/[0.03] p-4 dark:border-white/10 dark:bg-white/[0.03]">
+                                <Input
+                                    key={coverInputKey}
+                                    id="blog-cover-upload"
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp,image/avif"
+                                    onChange={handleCoverFileChange}
+                                />
+                                <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                                    <p className="text-xs leading-6 text-foreground/55">
+                                        JPG, PNG, WEBP, or AVIF up to 5 MB. The file uploads when the article is saved.
+                                    </p>
+                                    {(selectedCoverFile || formState.coverImage) && (
+                                        <button
+                                            type="button"
+                                            className="inline-flex items-center gap-2 text-xs font-semibold text-red-600 transition hover:text-red-500 dark:text-red-400"
+                                            onClick={() => {
+                                                setSelectedCoverFile(null);
+                                                setCoverInputKey((current) => current + 1);
+                                                setFormState((current) => ({...current, coverImage: ""}));
+                                            }}
+                                        >
+                                            <ImageOff className="h-4 w-4"/>
+                                            Remove cover
+                                        </button>
+                                    )}
+                                </div>
+                                {selectedCoverFile && (
+                                    <p className="mt-2 text-xs font-medium text-foreground/70">
+                                        Selected: {selectedCoverFile.name}
+                                    </p>
+                                )}
+                            </div>
+                        ) : (
+                            <p className="mt-2 text-sm leading-6 text-foreground/62">
+                                Local development uses the deterministic title-and-tag cover. Enable Supabase storage
+                                to upload a persistent image.
+                            </p>
+                        )}
+
+                        <p className="mt-3 text-sm leading-6 text-foreground/62">
+                            If no file is selected, the article automatically uses the generated cover shown below.
                         </p>
 
                         {coverPreview && (
@@ -502,8 +607,10 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                     <p className="text-sm leading-6 text-foreground/62">
                         Signed in as <span className="font-semibold text-foreground">{session?.email}</span>.
                     </p>
-                    <button type="submit" className="button-primary" disabled={isSavingPost}>
-                        {isSavingPost ? (isEditing ? "Saving changes..." : "Publishing...") : (isEditing ? "Save changes" : "Publish on blog")}
+                    <button type="submit" className="button-primary" disabled={isSavingPost || isUploadingCover}>
+                        {isSavingPost
+                            ? (isUploadingCover ? "Uploading cover..." : isEditing ? "Saving changes..." : "Publishing...")
+                            : (isEditing ? "Save changes" : "Publish on blog")}
                         <ArrowRight className="h-4 w-4"/>
                     </button>
                 </div>
@@ -588,12 +695,13 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                         <div className="flex items-center gap-3 text-foreground">
                             <ImageIcon className="h-4 w-4"/>
                             <span className="font-semibold">
-                                Generated covers are active
+                                {storageMode === "supabase" ? "Supabase cover storage is active" : "Generated covers are active"}
                             </span>
                         </div>
                         <p className="mt-2">
-                            Every article receives a title-and-tag-based SVG data cover at render time. There are no
-                            cover files to upload, migrate, or lose during a storage outage.
+                            {storageMode === "supabase"
+                                ? "Uploaded cover images are kept in the public blog_images bucket. Articles without an upload still receive a deterministic title-and-tag cover."
+                                : "Every article receives a title-and-tag-based SVG data cover until Supabase storage is enabled."}
                         </p>
                     </div>
                 </div>
