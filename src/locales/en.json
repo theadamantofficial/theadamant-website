@@ -3,14 +3,15 @@
   "dir": "ltr",
   "metadata": {
     "title": "Innovative Web, Mobile, SaaS & Digital Marketing Solutions",
-    "description": "The Adamant creates SEO-friendly websites, scalable SaaS products, mobile apps, and digital marketing campaigns for brands in India, the USA, UK, Japan, and global markets."
+    "description": "The Adamant is a DPIIT-recognized Indian startup creating SEO-friendly websites, scalable SaaS products, mobile apps, and digital marketing campaigns for global brands."
   },
   "schema": {
-    "organizationDescription": "The Adamant is a global UI/UX, development, and digital marketing studio crafting SEO-friendly websites, landing pages, product interfaces, mobile apps, social media systems, and paid ad campaigns for startups and expanding teams across India, the USA, UK, Japan, and other global markets."
+    "organizationDescription": "The Adamant is a DPIIT-recognized Indian startup and global UI/UX, development, and digital marketing studio crafting SEO-friendly websites, product interfaces, mobile apps, social media systems, and paid ad campaigns."
   },
   "navbar": {
     "navItems": [
       {"name": "Services", "anchor": "services"},
+      {"name": "Credentials", "anchor": "credentials"},
       {"name": "Process", "anchor": "process"},
       {"name": "FAQ", "anchor": "faq"},
       {"name": "Contact", "anchor": "contact"}
@@ -49,6 +50,27 @@
         "description": "Social media, brand visibility, and paid ads aligned with the website and conversion path."
       }
     ]
+  },
+  "credentials": {
+    "kicker": "Company credentials",
+    "title": "Registered in India. Recognized by Startup India.",
+    "description": "JSSS Adamant Technologies Private Limited is an incorporated Indian company recognized as a startup by DPIIT under the Government of India's Startup India initiative.",
+    "startupEyebrow": "Government recognition",
+    "startupTitle": "DPIIT-recognized startup",
+    "startupDescription": "Recognized by the Department for Promotion of Industry and Internal Trade, Ministry of Commerce & Industry, Government of India.",
+    "recognitionNumberLabel": "Recognition no.",
+    "issuedLabel": "Issued",
+    "validLabel": "Valid up to",
+    "incorporatedLabel": "Incorporated",
+    "viewCertificate": "View certificate",
+    "verifyCertificate": "Verify on Startup India",
+    "isoEyebrow": "Quality management",
+    "isoTitle": "ISO 9001:2015 certified",
+    "isoDescription": "Our quality management system has been independently assessed for our software, web, mobile, design, marketing, automation, publishing, and technology consulting activities.",
+    "certificationNumberLabel": "Certificate no.",
+    "initialRegistrationLabel": "Initial registration",
+    "recertificationLabel": "Re-certification due",
+    "disclaimer": "DPIIT recognition remains subject to the eligibility and turnover conditions printed on the certificate. ISO certification is independently issued and is separate from Government of India recognition."
   },
   "valueProps": {
     "kicker": "Why this works",
@@ -158,6 +180,10 @@
         "answer": "The Adamant offers UI/UX design, website development, landing page design, technical SEO foundations, mobile app development, and digital marketing services including social media management, brand boosting, and paid ad campaign support for startups and expanding teams."
       },
       {
+        "question": "Is The Adamant a registered company and a DPIIT-recognized startup?",
+        "answer": "Yes. JSSS Adamant Technologies Private Limited was incorporated in India on 27 April 2026 and is recognized as a startup by the Department for Promotion of Industry and Internal Trade under certificate number DIPP260656. The certificate can be viewed on this website and verified through the official Startup India portal."
+      },
+      {
         "question": "Can you build an SEO-friendly website from day one?",
         "answer": "Yes. Metadata, semantic structure, internal linking, keyword-aware copy, responsive performance, and technical SEO foundations can all be built into the website before launch instead of being added later as cleanup."
       },
@@ -247,6 +273,7 @@
         "links": [
           {"name": "Home", "anchor": ""},
           {"name": "Services", "anchor": "services"},
+          {"name": "Credentials", "anchor": "credentials"},
           {"name": "Process", "anchor": "process"},
           {"name": "FAQ", "anchor": "faq"},
           {"name": "Contact", "anchor": "contact"}

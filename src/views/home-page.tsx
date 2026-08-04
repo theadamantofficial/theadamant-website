@@ -5,6 +5,7 @@ import {SiteCopy} from "@/lib/site-copy";
 import {SiteLocale} from "@/lib/site-locale";
 
 const HeroSection = dynamic(() => import("@/components/sections/hero-section"));
+const CompanyCredentialsSection = dynamic(() => import("@/components/sections/company-credentials-section"));
 const PartnerProofStrip = dynamic(() => import("@/components/sections/partner-proof-strip"));
 const ValuePropsSection = dynamic(() => import("@/components/sections/value-props-section"));
 const ServicesSection = dynamic(() => import("@/components/sections/services-section"));
@@ -35,8 +36,16 @@ export default function HomePage({
             "@context": "https://schema.org",
             "@type": "Organization",
             name: "The Adamant",
+            legalName: "JSSS Adamant Technologies Private Limited",
+            foundingDate: "2026-04-27",
             description: copy.schema.organizationDescription,
             inLanguage: locale,
+            identifier: {
+                "@type": "PropertyValue",
+                propertyID: "DPIIT Certificate Number",
+                value: "DIPP260656",
+            },
+            award: "DPIIT Startup Recognition - DIPP260656",
             sameAs: [
                 "https://www.instagram.com/theadamantofficial/",
                 "https://www.linkedin.com/company/the-adamant",
@@ -74,6 +83,8 @@ export default function HomePage({
         {locale === "en" && <SeoChatFab/>}
 
         <HeroSection copy={copy.hero} locale={locale}/>
+
+        <CompanyCredentialsSection copy={copy.credentials}/>
 
         <PartnerProofStrip copy={copy.services.proofStrip} items={proofItems}/>
 

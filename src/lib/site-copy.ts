@@ -77,6 +77,27 @@ export interface SiteCopy {
         floatingBadges: string[];
         featureCards: LabeledItem[];
     };
+    credentials?: {
+        kicker: string;
+        title: string;
+        description: string;
+        startupEyebrow: string;
+        startupTitle: string;
+        startupDescription: string;
+        recognitionNumberLabel: string;
+        issuedLabel: string;
+        validLabel: string;
+        incorporatedLabel: string;
+        viewCertificate: string;
+        verifyCertificate: string;
+        isoEyebrow: string;
+        isoTitle: string;
+        isoDescription: string;
+        certificationNumberLabel: string;
+        initialRegistrationLabel: string;
+        recertificationLabel: string;
+        disclaimer: string;
+    };
     valueProps: {
         kicker: string;
         title: string;
