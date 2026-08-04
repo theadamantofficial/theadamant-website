@@ -419,6 +419,18 @@
         @apply h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_0_8px_rgba(13,92,99,0.16)] dark:bg-primary;
     }
 
+    @media (orientation: landscape) and (max-height: 560px) {
+        .audit-fab,
+        .seo-chat-fab {
+            @apply bottom-3 h-11 w-11 justify-center gap-0 p-0;
+        }
+
+        .audit-fab > span,
+        .seo-chat-fab > span {
+            display: none;
+        }
+    }
+
     .audit-sheet {
         @apply fixed inset-x-4 bottom-4 top-24 z-[80] overflow-hidden rounded-[2rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.97),rgba(246,240,229,0.94))] shadow-[0_45px_120px_-55px_rgba(15,23,42,0.7)] backdrop-blur-2xl dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(15,19,20,0.98),rgba(10,13,14,0.94))] md:left-auto md:right-6 md:top-28 md:w-[min(34rem,calc(100vw-3rem))];
     }

@@ -54,7 +54,7 @@
   "credentials": {
     "kicker": "Company credentials",
     "title": "Registered in India. Recognized by Startup India.",
-    "description": "JSSS Adamant Technologies Private Limited is an incorporated Indian company recognized as a startup by DPIIT under the Government of India's Startup India initiative.",
+    "description": "JSSS Adamant Technologies Private Limited is an incorporated Indian company recognized as a startup by DPIIT under the Government of India's Startup India initiative, with independent certifications for quality and information security management.",
     "startupEyebrow": "Government recognition",
     "startupTitle": "DPIIT-recognized startup",
     "startupDescription": "Recognized by the Department for Promotion of Industry and Internal Trade, Ministry of Commerce & Industry, Government of India.",
@@ -67,10 +67,13 @@
     "isoEyebrow": "Quality management",
     "isoTitle": "ISO 9001:2015 certified",
     "isoDescription": "Our quality management system has been independently assessed for our software, web, mobile, design, marketing, automation, publishing, and technology consulting activities.",
+    "securityEyebrow": "Information security",
+    "securityTitle": "ISO/IEC 27001:2022 certified",
+    "securityDescription": "Our information security management system has been independently assessed for the same software, digital, automation, publishing, and technology consulting scope.",
     "certificationNumberLabel": "Certificate no.",
     "initialRegistrationLabel": "Initial registration",
     "recertificationLabel": "Re-certification due",
-    "disclaimer": "DPIIT recognition remains subject to the eligibility and turnover conditions printed on the certificate. ISO certification is independently issued and is separate from Government of India recognition."
+    "disclaimer": "DPIIT recognition remains subject to the eligibility and turnover conditions printed on the certificate. ISO certifications are independently issued and are separate from Government of India recognition."
   },
   "valueProps": {
     "kicker": "Why this works",

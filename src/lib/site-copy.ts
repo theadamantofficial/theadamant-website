@@ -93,6 +93,9 @@ export interface SiteCopy {
         isoEyebrow: string;
         isoTitle: string;
         isoDescription: string;
+        securityEyebrow: string;
+        securityTitle: string;
+        securityDescription: string;
         certificationNumberLabel: string;
         initialRegistrationLabel: string;
         recertificationLabel: string;

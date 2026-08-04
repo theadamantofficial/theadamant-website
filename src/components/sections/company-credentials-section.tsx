@@ -17,7 +17,7 @@ type CredentialsCopy = NonNullable<SiteCopy["credentials"]>;
 const DEFAULT_COPY: CredentialsCopy = {
     kicker: "Company credentials",
     title: "Registered in India. Recognized by Startup India.",
-    description: "JSSS Adamant Technologies Private Limited is an incorporated Indian company recognized as a startup by DPIIT under the Government of India's Startup India initiative.",
+    description: "JSSS Adamant Technologies Private Limited is an incorporated Indian company recognized as a startup by DPIIT under the Government of India's Startup India initiative, with independent certifications for quality and information security management.",
     startupEyebrow: "Government recognition",
     startupTitle: "DPIIT-recognized startup",
     startupDescription: "Recognized by the Department for Promotion of Industry and Internal Trade, Ministry of Commerce & Industry, Government of India.",
@@ -30,10 +30,13 @@ const DEFAULT_COPY: CredentialsCopy = {
     isoEyebrow: "Quality management",
     isoTitle: "ISO 9001:2015 certified",
     isoDescription: "Our quality management system has been independently assessed for our software, web, mobile, design, marketing, automation, publishing, and technology consulting activities.",
+    securityEyebrow: "Information security",
+    securityTitle: "ISO/IEC 27001:2022 certified",
+    securityDescription: "Our information security management system has been independently assessed for the same software, digital, automation, publishing, and technology consulting scope.",
     certificationNumberLabel: "Certificate no.",
     initialRegistrationLabel: "Initial registration",
     recertificationLabel: "Re-certification due",
-    disclaimer: "DPIIT recognition remains subject to the eligibility and turnover conditions printed on the certificate. ISO certification is independently issued and is separate from Government of India recognition.",
+    disclaimer: "DPIIT recognition remains subject to the eligibility and turnover conditions printed on the certificate. ISO certifications are independently issued and are separate from Government of India recognition.",
 };
 
 const STARTUP_INDIA_VERIFY_URL = "https://www.startupindia.gov.in/content/sih/en/startupgov/validate-startup-recognition.html";
@@ -54,7 +57,7 @@ export default function CompanyCredentialsSection({
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/30 to-transparent"/>
 
                 <div className="relative">
-                    <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                    <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                         <div className="max-w-3xl">
                             <p className="section-kicker">
                                 <BadgeCheck className="h-4 w-4 text-primary" aria-hidden="true"/>
@@ -74,13 +77,13 @@ export default function CompanyCredentialsSection({
                         </div>
                     </div>
 
-                    <StaggerGroup className="mt-10 grid gap-5 xl:grid-cols-[1.35fr_0.65fr]">
-                        <StaggerItem>
-                            <article className="h-full overflow-hidden rounded-[2rem] border border-black/10 bg-[#0d363a] text-white shadow-[0_35px_90px_-55px_rgba(13,54,58,0.88)] dark:border-white/10">
-                                <div className="grid h-full lg:grid-cols-[0.88fr_1.12fr]">
-                                    <div className="relative flex flex-col p-6 sm:p-8">
+                    <StaggerGroup className="mt-10 grid gap-5 md:grid-cols-2">
+                        <StaggerItem className="md:col-span-2">
+                            <article className="overflow-hidden rounded-[2rem] border border-black/10 bg-[#0d363a] p-4 text-white shadow-[0_35px_90px_-55px_rgba(13,54,58,0.88)] dark:border-white/10 sm:p-5">
+                                <div className="grid items-start gap-4 md:grid-cols-[0.82fr_1.18fr] md:gap-5">
+                                    <div className="relative flex flex-col justify-center overflow-hidden rounded-[1.5rem] p-5 sm:p-7 md:self-stretch lg:p-8">
                                         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,rgba(88,183,179,0.32),transparent_36%),radial-gradient(circle_at_100%_100%,rgba(214,106,69,0.2),transparent_32%)]"/>
-                                        <div className="relative flex h-full flex-col">
+                                        <div className="relative">
                                             <p className="flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-white/58">
                                                 <FileCheck2 className="h-4 w-4" aria-hidden="true"/>
                                                 {copy.startupEyebrow}
@@ -92,30 +95,7 @@ export default function CompanyCredentialsSection({
                                                 {copy.startupDescription}
                                             </p>
 
-                                            <dl className="mt-8 grid gap-3 sm:grid-cols-2">
-                                                <CredentialDetail
-                                                    icon={ShieldCheck}
-                                                    label={copy.recognitionNumberLabel}
-                                                    value="DIPP260656"
-                                                />
-                                                <CredentialDetail
-                                                    icon={CalendarDays}
-                                                    label={copy.issuedLabel}
-                                                    value="11 May 2026"
-                                                />
-                                                <CredentialDetail
-                                                    icon={Building2}
-                                                    label={copy.incorporatedLabel}
-                                                    value="27 April 2026"
-                                                />
-                                                <CredentialDetail
-                                                    icon={CalendarDays}
-                                                    label={copy.validLabel}
-                                                    value="26 April 2036"
-                                                />
-                                            </dl>
-
-                                            <div className="mt-8 flex flex-wrap gap-3 lg:mt-auto lg:pt-8">
+                                            <div className="mt-8 flex flex-wrap gap-3">
                                                 <Link
                                                     href="/certificates/startup-india-dpiit-recognition.pdf"
                                                     target="_blank"
@@ -138,90 +118,80 @@ export default function CompanyCredentialsSection({
                                         </div>
                                     </div>
 
-                                    <Link
-                                        href="/certificates/startup-india-dpiit-recognition.pdf"
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        aria-label={`${copy.viewCertificate}: ${copy.startupTitle}`}
-                                        className="group relative flex min-h-[18rem] items-start overflow-hidden border-t border-white/10 bg-[#e4ddd1] p-4 lg:border-l lg:border-t-0 sm:p-6"
-                                    >
-                                        <Image
-                                            src="/certificates/startup-india-dpiit-recognition.webp"
-                                            alt=""
-                                            fill
-                                            sizes="(max-width: 1024px) 100vw, 46vw"
-                                            aria-hidden="true"
-                                            className="scale-125 object-cover opacity-20 blur-2xl transition duration-500 group-hover:scale-[1.3] dark:opacity-15"
-                                        />
-                                        <Image
-                                            src="/certificates/startup-india-dpiit-recognition.webp"
-                                            alt="Government of India DPIIT Certificate of Recognition for JSSS Adamant Technologies Private Limited"
-                                            width={1600}
-                                            height={1131}
-                                            sizes="(max-width: 1024px) 100vw, 46vw"
-                                            className="relative z-10 h-auto w-full rounded-[1.25rem] border border-black/10 object-contain shadow-[0_28px_65px_-42px_rgba(15,23,42,0.72)] transition duration-500 group-hover:scale-[1.015]"
-                                        />
-                                        <span className="absolute bottom-7 right-7 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-foreground text-background shadow-lg transition duration-300 group-hover:-translate-y-1 group-hover:translate-x-1">
-                                            <ArrowUpRight className="h-5 w-5" aria-hidden="true"/>
-                                        </span>
-                                    </Link>
+                                    <div className="rounded-[1.5rem] bg-[#e4ddd1] p-4 text-[#172124] sm:p-5">
+                                        <Link
+                                            href="/certificates/startup-india-dpiit-recognition.pdf"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            aria-label={`${copy.viewCertificate}: ${copy.startupTitle}`}
+                                            className="group relative block overflow-hidden rounded-[1.25rem] border border-black/10 bg-[#f9f6ef] p-3 shadow-sm sm:p-4"
+                                        >
+                                            <Image
+                                                src="/certificates/startup-india-dpiit-recognition.webp"
+                                                alt="Government of India DPIIT Certificate of Recognition for JSSS Adamant Technologies Private Limited"
+                                                width={1600}
+                                                height={1131}
+                                                sizes="(max-width: 1024px) 100vw, 52vw"
+                                                className="h-auto w-full rounded-[0.9rem] object-contain transition duration-500 group-hover:scale-[1.012]"
+                                            />
+                                            <span className="absolute bottom-5 right-5 flex h-10 w-10 items-center justify-center rounded-full bg-[#172124] text-[#f9f6ef] shadow-lg transition duration-300 group-hover:-translate-y-1 group-hover:translate-x-1">
+                                                <ArrowUpRight className="h-4 w-4" aria-hidden="true"/>
+                                            </span>
+                                        </Link>
+
+                                        <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+                                            <RegistrationFact
+                                                icon={ShieldCheck}
+                                                label={copy.recognitionNumberLabel}
+                                                value="DIPP260656"
+                                            />
+                                            <RegistrationFact
+                                                icon={CalendarDays}
+                                                label={copy.issuedLabel}
+                                                value="11 May 2026"
+                                            />
+                                            <RegistrationFact
+                                                icon={Building2}
+                                                label={copy.incorporatedLabel}
+                                                value="27 April 2026"
+                                            />
+                                            <RegistrationFact
+                                                icon={CalendarDays}
+                                                label={copy.validLabel}
+                                                value="26 April 2036"
+                                            />
+                                        </dl>
+                                    </div>
                                 </div>
                             </article>
                         </StaggerItem>
 
                         <StaggerItem>
-                            <article className="flex h-full flex-col overflow-hidden rounded-[2rem] border border-black/10 bg-white/76 p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.05] sm:p-6">
-                                <div className="flex items-start justify-between gap-4">
-                                    <div>
-                                        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-foreground/48">
-                                            {copy.isoEyebrow}
-                                        </p>
-                                        <h3 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
-                                            {copy.isoTitle}
-                                        </h3>
-                                    </div>
-                                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
-                                        <ShieldCheck className="h-5 w-5" aria-hidden="true"/>
-                                    </span>
-                                </div>
+                            <IndependentCertificateCard
+                                eyebrow={copy.isoEyebrow}
+                                title={copy.isoTitle}
+                                description={copy.isoDescription}
+                                pdfPath="/certificates/iso-9001-quality-management-certificate.pdf"
+                                imagePath="/certificates/iso-9001-quality-management-certificate.webp"
+                                imageAlt="ISO 9001:2015 quality management system certificate for JSSS Adamant Technologies Private Limited"
+                                imageHeight={1557}
+                                certificateNumber="UK-ARCT-26-144122361"
+                                copy={copy}
+                            />
+                        </StaggerItem>
 
-                                <p className="mt-4 text-sm leading-6 text-foreground/68">
-                                    {copy.isoDescription}
-                                </p>
-
-                                <Link
-                                    href="/certificates/iso-9001-quality-management-certificate.pdf"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    aria-label={`${copy.viewCertificate}: ${copy.isoTitle}`}
-                                    className="group mt-6 block overflow-hidden rounded-[1.5rem] border border-black/10 bg-white p-3 dark:border-white/10"
-                                >
-                                    <Image
-                                        src="/certificates/iso-9001-quality-management-certificate.webp"
-                                        alt="ISO 9001:2015 quality management system certificate for JSSS Adamant Technologies Private Limited"
-                                        width={1100}
-                                        height={1557}
-                                        sizes="(max-width: 1280px) 100vw, 30vw"
-                                        className="h-[18rem] w-full object-contain transition duration-500 group-hover:scale-[1.02]"
-                                    />
-                                </Link>
-
-                                <dl className="mt-5 space-y-3">
-                                    <CompactCredentialDetail label={copy.certificationNumberLabel} value="UK-ARCT-26-144122361"/>
-                                    <CompactCredentialDetail label={copy.initialRegistrationLabel} value="4 July 2026"/>
-                                    <CompactCredentialDetail label={copy.recertificationLabel} value="3 July 2029"/>
-                                </dl>
-
-                                <Link
-                                    href="/certificates/iso-9001-quality-management-certificate.pdf"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="button-secondary mt-6 w-full"
-                                >
-                                    {copy.viewCertificate}
-                                    <ArrowUpRight className="h-4 w-4" aria-hidden="true"/>
-                                </Link>
-                            </article>
+                        <StaggerItem>
+                            <IndependentCertificateCard
+                                eyebrow={copy.securityEyebrow}
+                                title={copy.securityTitle}
+                                description={copy.securityDescription}
+                                pdfPath="/certificates/iso-27001-information-security-certificate.pdf"
+                                imagePath="/certificates/iso-27001-information-security-certificate.webp"
+                                imageAlt="ISO IEC 27001:2022 information security management system certificate for JSSS Adamant Technologies Private Limited"
+                                imageHeight={1550}
+                                certificateNumber="UK-ARCT-26-144122360"
+                                copy={copy}
+                            />
                         </StaggerItem>
                     </StaggerGroup>
 
@@ -234,7 +204,84 @@ export default function CompanyCredentialsSection({
     );
 }
 
-function CredentialDetail({
+function IndependentCertificateCard({
+    eyebrow,
+    title,
+    description,
+    pdfPath,
+    imagePath,
+    imageAlt,
+    imageHeight,
+    certificateNumber,
+    copy,
+}: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    pdfPath: string;
+    imagePath: string;
+    imageAlt: string;
+    imageHeight: number;
+    certificateNumber: string;
+    copy: CredentialsCopy;
+}) {
+    return (
+        <article className="flex h-full flex-col overflow-hidden rounded-[2rem] border border-black/10 bg-white/76 p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.05] sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-foreground/48">
+                        {eyebrow}
+                    </p>
+                    <h3 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
+                        {title}
+                    </h3>
+                </div>
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
+                    <ShieldCheck className="h-5 w-5" aria-hidden="true"/>
+                </span>
+            </div>
+
+            <p className="mt-4 text-sm leading-6 text-foreground/68">
+                {description}
+            </p>
+
+            <Link
+                href={pdfPath}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`${copy.viewCertificate}: ${title}`}
+                className="group mt-6 block overflow-hidden rounded-[1.5rem] border border-black/10 bg-white p-3 dark:border-white/10"
+            >
+                <Image
+                    src={imagePath}
+                    alt={imageAlt}
+                    width={1100}
+                    height={imageHeight}
+                    sizes="(max-width: 1280px) 100vw, 44vw"
+                    className="h-[20rem] w-full object-contain transition duration-500 group-hover:scale-[1.02] md:h-[15rem] lg:h-[18rem] xl:h-[20rem]"
+                />
+            </Link>
+
+            <dl className="mt-5 space-y-3">
+                <CompactCredentialDetail label={copy.certificationNumberLabel} value={certificateNumber}/>
+                <CompactCredentialDetail label={copy.initialRegistrationLabel} value="4 July 2026"/>
+                <CompactCredentialDetail label={copy.recertificationLabel} value="3 July 2029"/>
+            </dl>
+
+            <Link
+                href={pdfPath}
+                target="_blank"
+                rel="noreferrer"
+                className="button-secondary mt-6 w-full"
+            >
+                {copy.viewCertificate}
+                <ArrowUpRight className="h-4 w-4" aria-hidden="true"/>
+            </Link>
+        </article>
+    );
+}
+
+function RegistrationFact({
     icon: Icon,
     label,
     value,
@@ -244,12 +291,12 @@ function CredentialDetail({
     value: string;
 }) {
     return (
-        <div className="rounded-[1.15rem] border border-white/10 bg-white/[0.06] p-4">
-            <dt className="flex items-center gap-2 text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-white/46">
+        <div className="rounded-[1.1rem] border border-black/8 bg-white/48 p-4">
+            <dt className="flex items-center gap-2 text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-[#172124]/52">
                 <Icon className="h-3.5 w-3.5" aria-hidden="true"/>
                 {label}
             </dt>
-            <dd className="mt-2 text-sm font-semibold text-white">{value}</dd>
+            <dd className="mt-2 text-sm font-semibold text-[#172124]">{value}</dd>
         </div>
     );
 }

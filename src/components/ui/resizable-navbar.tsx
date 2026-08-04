@@ -110,7 +110,7 @@ export const NavBody = ({children, className, visible, hidden}: NavBodyProps) =>
                 ease: [0.22, 1, 0.36, 1],
             }}
             className={cn(
-                "relative z-[60] mx-auto hidden w-full max-w-6xl flex-row items-center justify-between rounded-full border border-transparent bg-transparent px-5 py-3 lg:flex",
+                "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center gap-4 rounded-full border border-transparent bg-transparent px-5 py-3 xl:flex",
                 visible && "border-black/8 bg-white/75 dark:border-white/10 dark:bg-neutral-950/72",
                 className,
             )}
@@ -130,7 +130,7 @@ export const NavItems = ({items, className, onItemClick}: NavItemsProps) => {
         <motion.div
             onMouseLeave={() => setHovered(null)}
             className={cn(
-                "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
+                "hidden min-w-0 flex-1 flex-row items-center justify-center text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 xl:flex",
                 className,
             )}
         >
@@ -139,7 +139,7 @@ export const NavItems = ({items, className, onItemClick}: NavItemsProps) => {
                     <a
                         onMouseEnter={() => setHovered(idx)}
                         onClick={onItemClick}
-                        className="relative px-4 py-2 text-neutral-600 dark:text-neutral-300"
+                        className="relative whitespace-nowrap px-3 py-2 text-neutral-600 dark:text-neutral-300 2xl:px-4"
                         key={`link-${idx}`}
                         href={item.link}
                         target="_blank"
@@ -157,7 +157,7 @@ export const NavItems = ({items, className, onItemClick}: NavItemsProps) => {
                     <Link
                         onMouseEnter={() => setHovered(idx)}
                         onClick={onItemClick}
-                        className="relative px-4 py-2 text-neutral-600 dark:text-neutral-300"
+                        className="relative whitespace-nowrap px-3 py-2 text-neutral-600 dark:text-neutral-300 2xl:px-4"
                         key={`link-${idx}`}
                         href={item.link}
                     >
@@ -193,7 +193,7 @@ export const MobileNav = ({children, className, visible, hidden}: MobileNavProps
                 ease: [0.22, 1, 0.36, 1],
             }}
             className={cn(
-                "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between border border-transparent bg-transparent px-3 py-3 lg:hidden",
+                "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between border border-transparent bg-transparent px-3 py-3 xl:hidden",
                 visible && "border-black/8 bg-white/75 dark:border-white/10 dark:bg-neutral-950/72",
                 className,
             )}

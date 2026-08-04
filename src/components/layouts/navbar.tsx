@@ -97,9 +97,9 @@ export function Navbar({
         <NavbarComponent
         >
             <NavBody>
-                <AppLogo className="mr-4 px-2" href={homeHref}/>
+                <AppLogo className="shrink-0 px-2" href={homeHref}/>
                 <NavItems items={navItems}/>
-                <div className="flex items-center gap-3">
+                <div className="relative z-20 flex shrink-0 items-center gap-3">
                     <LanguageSwitcher/>
 
                     <button
