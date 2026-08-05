@@ -1,10 +1,10 @@
 "use client";
 
-import {ServiceCard} from "@/components/ui/services-card";
-import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
+import {Reveal} from "@/components/ui/reveal";
 import {SiteCopy} from "@/lib/site-copy";
 import Link from "next/link";
 import {SiteLocale} from "@/lib/site-locale";
+import {ServiceScrollStory} from "@/components/sections/service-scroll-story";
 
 const LANDING_LINKS = [
     {href: "/website-development", label: "Global SEO-friendly website development"},
@@ -50,22 +50,7 @@ export default function ServicesSection({
                 )}
             </Reveal>
 
-            <StaggerGroup className="mt-8 grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3">
-                {copy.items.map((service) => (
-                    <StaggerItem key={service.title} className="h-full">
-                        <ServiceCard
-                            title={service.title}
-                            description={service.description}
-                            detail={service.detail}
-                            image={service.image}
-                            imageAlt={service.imageAlt}
-                            badge={service.badge}
-                            href={service.href}
-                            ctaLabel={service.ctaLabel}
-                        />
-                    </StaggerItem>
-                ))}
-            </StaggerGroup>
+            <ServiceScrollStory items={copy.items}/>
         </section>
     );
 }

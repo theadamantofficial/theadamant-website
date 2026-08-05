@@ -1,12 +1,23 @@
+"use client";
+
 import {Compass, PencilRuler, Code2, Rocket} from "lucide-react";
 import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 import {SiteCopy} from "@/lib/site-copy";
+import {motion, useScroll} from "motion/react";
+import {useRef} from "react";
+import {useMotionCapability} from "@/hooks/use-motion-capability";
 
 export default function ProcessSection({copy}: { copy: SiteCopy["process"] }) {
+    const sectionRef = useRef<HTMLElement>(null);
     const icons = [Compass, PencilRuler, Code2, Rocket];
+    const {capability} = useMotionCapability();
+    const {scrollYProgress} = useScroll({
+        target: sectionRef,
+        offset: ["start 78%", "end 48%"],
+    });
 
     return (
-        <section id="process" className="section-shell py-24" aria-labelledby="process-heading">
+        <section ref={sectionRef} id="process" className="section-shell py-24" aria-labelledby="process-heading">
             <Reveal className="max-w-3xl">
                 <p className="section-kicker">{copy.kicker}</p>
                 <h2 id="process-heading" className="section-title">
@@ -17,7 +28,14 @@ export default function ProcessSection({copy}: { copy: SiteCopy["process"] }) {
                 </p>
             </Reveal>
 
-            <StaggerGroup className="mt-10 grid gap-4 lg:auto-rows-fr lg:grid-cols-4">
+            <div className="mt-10 h-1 overflow-hidden rounded-full bg-foreground/8">
+                <motion.div
+                    className="h-full origin-left rounded-full bg-gradient-to-r from-primary via-primary to-accent"
+                    style={{scaleX: capability === "reduced" ? 1 : scrollYProgress}}
+                />
+            </div>
+
+            <StaggerGroup className="mt-5 grid gap-4 lg:auto-rows-fr lg:grid-cols-4">
                 {copy.steps.map(({number, title, description}, index) => {
                     const Icon = icons[index];
                     return (

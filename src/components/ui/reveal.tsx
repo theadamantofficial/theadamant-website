@@ -2,6 +2,7 @@
 
 import {motion, type HTMLMotionProps} from "motion/react";
 import {ReactNode} from "react";
+import {cn} from "@/lib/utils";
 
 const smoothEase = [0.22, 1, 0.36, 1] as const;
 
@@ -13,9 +14,9 @@ type RevealProps = HTMLMotionProps<"div"> & {
 export function Reveal({children, className, delay = 0, ...props}: RevealProps) {
     return (
         <motion.div
-            className={className}
-            initial={{opacity: 0, y: 28, filter: "blur(8px)"}}
-            whileInView={{opacity: 1, y: 0, filter: "blur(0px)"}}
+            className={cn("motion-reveal", className)}
+            initial={{opacity: 0, y: 28}}
+            whileInView={{opacity: 1, y: 0}}
             viewport={{once: true, amount: 0.22}}
             transition={{duration: 0.65, ease: smoothEase, delay}}
             {...props}
@@ -32,7 +33,7 @@ type StaggerGroupProps = HTMLMotionProps<"div"> & {
 export function StaggerGroup({children, className, ...props}: StaggerGroupProps) {
     return (
         <motion.div
-            className={className}
+            className={cn("motion-reveal", className)}
             initial="hidden"
             whileInView="show"
             viewport={{once: true, amount: 0.18}}
@@ -58,13 +59,12 @@ type StaggerItemProps = HTMLMotionProps<"div"> & {
 export function StaggerItem({children, className, ...props}: StaggerItemProps) {
     return (
         <motion.div
-            className={className}
+            className={cn("motion-reveal", className)}
             variants={{
-                hidden: {opacity: 0, y: 24, filter: "blur(8px)"},
+                hidden: {opacity: 0, y: 24},
                 show: {
                     opacity: 1,
                     y: 0,
-                    filter: "blur(0px)",
                     transition: {
                         duration: 0.6,
                         ease: smoothEase,

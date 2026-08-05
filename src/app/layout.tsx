@@ -7,6 +7,7 @@ import {headers} from "next/headers";
 import {DEFAULT_SITE_LOCALE, isSiteLocale, localeToHtmlLang, SiteLocale} from "@/lib/site-locale";
 import {getSiteMetadataBase} from "@/lib/site-url";
 import {buildOpenGraphMetadata, buildTwitterMetadata} from "@/lib/social-metadata";
+import {MotionProvider} from "@/components/providers/motion-provider";
 
 export const metadata: Metadata = {
     title: {
@@ -73,13 +74,18 @@ export default async function RootLayout({children}: Readonly<{
 
     return (
         <html lang={localeToHtmlLang(siteLocale)} suppressHydrationWarning>
-        <body className={`${manrope.variable} ${spaceGrotesk.variable}`}>
-        <Toaster
-            position="top-right"
-            reverseOrder={false}
-            containerClassName="mt-14"/>
+        <body className={`${manrope.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+        <noscript>
+            <style>{`.motion-reveal{opacity:1!important;transform:none!important;filter:none!important}.animated-faq-panel{height:auto!important;opacity:1!important;transform:none!important}`}</style>
+        </noscript>
+        <MotionProvider>
+            <Toaster
+                position="top-right"
+                reverseOrder={false}
+                containerClassName="mt-14"/>
 
-        {children}
+            {children}
+        </MotionProvider>
         </body>
         </html>
     );

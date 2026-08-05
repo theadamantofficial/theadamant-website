@@ -68,7 +68,7 @@ export default function HomePage({
         },
     ];
 
-    return <main className="relative w-full overflow-hidden">
+    return <main className="relative w-full overflow-x-clip">
         {schemas.map((schema, index) => (
             <script
                 key={index}

@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import {motion} from "motion/react";
 import {Reveal} from "@/components/ui/reveal";
 import {SiteCopy} from "@/lib/site-copy";
+import {useMotionCapability} from "@/hooks/use-motion-capability";
 
 type ProofStripCopy = NonNullable<SiteCopy["services"]["proofStrip"]>;
 type ProofItem = SiteCopy["services"]["items"][number];
@@ -21,6 +23,9 @@ export default function PartnerProofStrip({
     copy?: ProofStripCopy;
     items: ProofItem[];
 }) {
+    const {capability, isReady} = useMotionCapability();
+    const hasRichMotion = isReady && capability === "full";
+
     if (!copy || items.length === 0) {
         return null;
     }
@@ -42,7 +47,10 @@ export default function PartnerProofStrip({
     ]);
 
     return (
-        <section className="section-shell py-6 sm:py-10" aria-labelledby="partner-proof-heading">
+        <section
+            className={`section-shell py-6 sm:py-10 ${hasRichMotion ? "" : "motion-effects-paused"}`}
+            aria-labelledby="partner-proof-heading"
+        >
             <Reveal className="relative overflow-hidden rounded-[2.25rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(242,234,223,0.74))] p-6 shadow-[0_40px_100px_-60px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(18,21,23,0.96),rgba(12,16,18,0.9))] sm:p-8">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(13,92,99,0.14),transparent_34%),radial-gradient(circle_at_86%_14%,rgba(214,106,69,0.12),transparent_28%)]"/>
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/30 to-transparent"/>
@@ -77,7 +85,7 @@ export default function PartnerProofStrip({
                                 </div>
                             </div>
                         )
-                        : <StaticProofShowcase item={primaryItem}/>}
+                        : <StaticProofShowcase item={primaryItem} hasRichMotion={hasRichMotion}/>}
                 </div>
             </Reveal>
         </section>
@@ -136,7 +144,13 @@ function BeltTileCard({tile}: {tile: BeltTile}) {
     );
 }
 
-function StaticProofShowcase({item}: {item: ProofItem}) {
+function StaticProofShowcase({
+    item,
+    hasRichMotion,
+}: {
+    item: ProofItem;
+    hasRichMotion: boolean;
+}) {
     const websiteLabel = getWebsiteLabel(item.href);
     const highlights = item.proofHighlights ?? [];
     const previewMetrics = [
@@ -184,7 +198,17 @@ function StaticProofShowcase({item}: {item: ProofItem}) {
             </div>
 
             <div className="space-y-5 px-5 py-5 sm:px-6 sm:py-6">
-                <div className="overflow-hidden rounded-[1.75rem] border border-black/10 bg-[linear-gradient(180deg,rgba(16,19,22,0.98),rgba(10,13,15,0.98))] p-4 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] dark:border-white/10 sm:p-5">
+                <div className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-[linear-gradient(180deg,rgba(16,19,22,0.98),rgba(10,13,15,0.98))] p-4 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] dark:border-white/10 sm:p-5">
+                    <motion.div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-x-5 top-[18%] z-10 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent shadow-[0_0_18px_rgba(88,183,179,0.45)]"
+                        animate={hasRichMotion
+                            ? {top: ["18%", "82%", "18%"], opacity: [0, 0.72, 0]}
+                            : {opacity: 0}}
+                        transition={hasRichMotion
+                            ? {duration: 6.5, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.2}
+                            : undefined}
+                    />
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <div>
                             <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-white/42">
@@ -210,28 +234,52 @@ function StaticProofShowcase({item}: {item: ProofItem}) {
                                         {item.detail}
                                     </p>
                                 </div>
-                                <div className="hidden h-10 w-10 shrink-0 rounded-full bg-[radial-gradient(circle,rgba(88,183,179,0.92),rgba(88,183,179,0.18))] lg:block"/>
+                                <motion.div
+                                    className="hidden h-10 w-10 shrink-0 rounded-full bg-[radial-gradient(circle,rgba(88,183,179,0.92),rgba(88,183,179,0.18))] lg:block"
+                                    animate={hasRichMotion
+                                        ? {scale: [1, 1.14, 1], opacity: [0.72, 1, 0.72]}
+                                        : undefined}
+                                    transition={hasRichMotion
+                                        ? {duration: 2.8, repeat: Infinity, ease: "easeInOut"}
+                                        : undefined}
+                                />
                             </div>
 
                             <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                                {highlights.map((highlight) => (
-                                    <div key={highlight} className="rounded-2xl border border-white/8 bg-white/[0.04] px-3 py-3 text-sm text-white/80">
+                                {highlights.map((highlight, index) => (
+                                    <motion.div
+                                        key={highlight}
+                                        className="rounded-2xl border border-white/8 bg-white/[0.04] px-3 py-3 text-sm text-white/80"
+                                        initial={{opacity: 0, y: 12}}
+                                        whileInView={{opacity: 1, y: 0}}
+                                        viewport={{once: true, amount: 0.6}}
+                                        whileHover={hasRichMotion ? {y: -3, backgroundColor: "rgba(255,255,255,0.08)"} : undefined}
+                                        transition={{duration: 0.42, delay: index * 0.08, ease: [0.22, 1, 0.36, 1]}}
+                                    >
                                         {highlight}
-                                    </div>
+                                    </motion.div>
                                 ))}
                             </div>
                         </div>
 
                         <div className="grid gap-3">
-                            {previewMetrics.map((metric) => (
-                                <div key={metric.label} className="rounded-[1.2rem] border border-white/8 bg-white/[0.04] p-4">
+                            {previewMetrics.map((metric, index) => (
+                                <motion.div
+                                    key={metric.label}
+                                    className="rounded-[1.2rem] border border-white/8 bg-white/[0.04] p-4"
+                                    initial={{opacity: 0, x: 14}}
+                                    whileInView={{opacity: 1, x: 0}}
+                                    viewport={{once: true, amount: 0.6}}
+                                    whileHover={hasRichMotion ? {x: -4, backgroundColor: "rgba(255,255,255,0.08)"} : undefined}
+                                    transition={{duration: 0.42, delay: index * 0.09, ease: [0.22, 1, 0.36, 1]}}
+                                >
                                     <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-white/42">
                                         {metric.label}
                                     </p>
                                     <p className="mt-3 text-2xl font-semibold tracking-tight text-white">
                                         {metric.value}
                                     </p>
-                                </div>
+                                </motion.div>
                             ))}
                         </div>
                     </div>

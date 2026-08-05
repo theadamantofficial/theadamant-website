@@ -4,11 +4,12 @@ import {BackgroundRippleEffect} from "@/components/ui/background-ripple-effect";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import {ArrowRight, LayoutTemplate, Search, Sparkles, Zap} from "lucide-react";
-import {motion} from "motion/react";
-import {useEffect, useState} from "react";
+import {motion, useScroll, useTransform} from "motion/react";
+import {useRef} from "react";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 import {OpenAuditButton} from "@/components/ui/open-audit-button";
+import {useMotionCapability} from "@/hooks/use-motion-capability";
 
 const smoothEase = [0.22, 1, 0.36, 1] as const;
 const DotLottieReact = dynamic(
@@ -26,7 +27,18 @@ export default function HeroSection({
     copy: SiteCopy["hero"];
     locale: SiteLocale;
 }) {
-    const [showEnhancedVisuals, setShowEnhancedVisuals] = useState(false);
+    const sectionRef = useRef<HTMLElement>(null);
+    const {capability, isReady} = useMotionCapability();
+    const showEnhancedVisuals = isReady && capability === "full";
+    const {scrollYProgress} = useScroll({
+        target: sectionRef,
+        offset: ["start start", "end start"],
+    });
+    const copyY = useTransform(scrollYProgress, [0, 1], [0, -34]);
+    const copyOpacity = useTransform(scrollYProgress, [0, 0.78, 1], [1, 1, 0.72]);
+    const visualY = useTransform(scrollYProgress, [0, 1], [0, 44]);
+    const visualScale = useTransform(scrollYProgress, [0, 1], [1, 0.965]);
+    const visualRotate = useTransform(scrollYProgress, [0, 1], [0, -1.2]);
     const featureCardIcons = [LayoutTemplate, Search, Zap];
     const floatingBadgeLayouts = [
         {
@@ -43,54 +55,28 @@ export default function HeroSection({
         },
     ];
 
-    useEffect(() => {
-        const reducedMotionMediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-        const navigatorWithConnection = navigator as Navigator & {
-            connection?: {
-                effectiveType?: string;
-                saveData?: boolean;
-            };
-            deviceMemory?: number;
-        };
-
-        const updateVisualMode = () => {
-            const saveDataEnabled = Boolean(navigatorWithConnection.connection?.saveData);
-            const lowMemoryDevice = typeof navigatorWithConnection.deviceMemory === "number"
-                && navigatorWithConnection.deviceMemory <= 4;
-            const slowConnection = ["slow-2g", "2g"].includes(navigatorWithConnection.connection?.effectiveType ?? "");
-
-            setShowEnhancedVisuals(!reducedMotionMediaQuery.matches && !saveDataEnabled && !lowMemoryDevice && !slowConnection);
-        };
-
-        updateVisualMode();
-
-        if (typeof reducedMotionMediaQuery.addEventListener === "function") {
-            reducedMotionMediaQuery.addEventListener("change", updateVisualMode);
-
-            return () => reducedMotionMediaQuery.removeEventListener("change", updateVisualMode);
-        }
-
-        reducedMotionMediaQuery.addListener(updateVisualMode);
-        return () => reducedMotionMediaQuery.removeListener(updateVisualMode);
-    }, []);
-
-    return <section className="hero-section px-6 pb-20 pt-28 sm:px-8 lg:px-12" aria-labelledby="hero-heading">
+    return <section
+        ref={sectionRef}
+        className={`hero-section px-6 pb-20 pt-28 sm:px-8 lg:px-12 ${showEnhancedVisuals ? "" : "motion-effects-paused"}`}
+        aria-labelledby="hero-heading"
+    >
         <BackgroundRippleEffect/>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(13,92,99,0.18),transparent_32%),radial-gradient(circle_at_80%_20%,rgba(214,106,69,0.14),transparent_26%)]"/>
         <motion.div
             className="ambient-orb ambient-orb-left"
-            animate={{x: [0, 28, 0], y: [0, 16, 0], scale: [1, 1.08, 1]}}
-            transition={{duration: 12, repeat: Infinity, ease: "easeInOut"}}
+            animate={showEnhancedVisuals ? {x: [0, 28, 0], y: [0, 16, 0], scale: [1, 1.08, 1]} : undefined}
+            transition={showEnhancedVisuals ? {duration: 12, repeat: Infinity, ease: "easeInOut"} : undefined}
         />
         <motion.div
             className="ambient-orb ambient-orb-right"
-            animate={{x: [0, -22, 0], y: [0, -18, 0], scale: [1, 0.94, 1]}}
-            transition={{duration: 14, repeat: Infinity, ease: "easeInOut"}}
+            animate={showEnhancedVisuals ? {x: [0, -22, 0], y: [0, -18, 0], scale: [1, 0.94, 1]} : undefined}
+            transition={showEnhancedVisuals ? {duration: 14, repeat: Infinity, ease: "easeInOut"} : undefined}
         />
 
         <div className="section-shell relative z-10 grid items-center gap-16 pb-10 pt-8 lg:grid-cols-[1.12fr_0.88fr] lg:pt-16">
             <motion.div
                 className="max-w-3xl"
+                style={showEnhancedVisuals ? {y: copyY, opacity: copyOpacity} : undefined}
                 initial="hidden"
                 animate="show"
                 variants={{
@@ -103,7 +89,7 @@ export default function HeroSection({
                 }}
             >
                 <motion.p
-                    className="section-kicker"
+                    className="section-kicker motion-reveal"
                     variants={heroItemVariants}
                 >
                     <Sparkles className="h-4 w-4"/>
@@ -112,7 +98,7 @@ export default function HeroSection({
 
                 {copy.tagline && (
                     <motion.p
-                        className="mt-4 text-sm font-semibold uppercase tracking-[0.28em] text-foreground/60"
+                        className="motion-reveal mt-4 text-sm font-semibold uppercase tracking-[0.28em] text-foreground/60"
                         variants={heroItemVariants}
                     >
                         {copy.tagline}
@@ -121,17 +107,17 @@ export default function HeroSection({
 
                 <motion.h1
                     id="hero-heading"
-                    className="hero-heading mt-8"
+                    className="hero-heading motion-reveal mt-8"
                     variants={heroItemVariants}
                 >
                     {copy.title}
                 </motion.h1>
 
-                <motion.p className="hero-sub-heading mt-6" variants={heroItemVariants}>
+                <motion.p className="hero-sub-heading motion-reveal mt-6" variants={heroItemVariants}>
                     {copy.description}
                 </motion.p>
 
-                <motion.div className="mt-8 flex flex-wrap gap-4" variants={heroItemVariants}>
+                <motion.div className="motion-reveal mt-8 flex flex-wrap gap-4" variants={heroItemVariants}>
                     <Link href={getLocalizedPath(locale, "contact")} className="button-primary">
                         {copy.primaryCta}
                         <ArrowRight className="h-4 w-4"/>
@@ -148,7 +134,7 @@ export default function HeroSection({
                     </Link>
                 </motion.div>
 
-                <motion.div className="mt-10 grid gap-3 sm:grid-cols-3" variants={heroItemVariants}>
+                <motion.div className="motion-reveal mt-10 grid gap-3 sm:grid-cols-3" variants={heroItemVariants}>
                     {copy.positioningPoints.map((point, index) => (
                         <motion.div
                             key={point}
@@ -165,16 +151,21 @@ export default function HeroSection({
             </motion.div>
 
             <motion.div
-                className="relative"
+                className="motion-reveal relative"
                 initial={{opacity: 0, x: 28, rotate: 1.5}}
                 animate={{opacity: 1, x: 0, rotate: 0}}
                 transition={{duration: 0.85, delay: 0.2, ease: smoothEase}}
             >
                 <motion.div
-                    className="hero-preview-panel relative overflow-hidden p-5 sm:p-6"
-                    whileHover={showEnhancedVisuals ? {y: -6} : undefined}
-                    transition={{duration: 0.3, ease: "easeOut"}}
+                    style={showEnhancedVisuals
+                        ? {y: visualY, scale: visualScale, rotate: visualRotate}
+                        : undefined}
                 >
+                    <motion.div
+                        className="hero-preview-panel relative overflow-hidden p-5 sm:p-6"
+                        whileHover={showEnhancedVisuals ? {y: -6} : undefined}
+                        transition={{duration: 0.3, ease: "easeOut"}}
+                    >
                     <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-foreground/25 to-transparent"/>
 
                     <div className="flex items-center justify-between text-sm text-foreground/65">
@@ -231,6 +222,7 @@ export default function HeroSection({
                             );
                         })}
                     </div>
+                    </motion.div>
                 </motion.div>
             </motion.div>
         </div>
@@ -262,11 +254,10 @@ function StaticHeroVisual({
 }
 
 const heroItemVariants = {
-    hidden: {opacity: 0, y: 26, filter: "blur(8px)"},
+    hidden: {opacity: 0, y: 26},
     show: {
         opacity: 1,
         y: 0,
-        filter: "blur(0px)",
         transition: {
             duration: 0.72,
             ease: smoothEase,

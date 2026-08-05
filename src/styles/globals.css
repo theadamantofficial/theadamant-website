@@ -292,6 +292,15 @@
         animation: rotateHalo 18s linear infinite;
     }
 
+    .motion-effects-paused .ambient-orb,
+    .motion-effects-paused .hero-visual-ring,
+    .motion-effects-paused .animate-float,
+    .motion-effects-paused .proof-marquee,
+    .motion-effects-paused .proof-marquee-reverse {
+        animation: none;
+        transform: translate3d(0, 0, 0);
+    }
+
     .hero-floating-chip {
         @apply absolute z-20 rounded-full border border-white/12 bg-black/35 px-3 py-2 text-xs font-semibold tracking-[0.18em] text-white/80 uppercase shadow-lg backdrop-blur-md;
     }
@@ -419,6 +428,18 @@
         @apply h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_0_8px_rgba(13,92,99,0.16)] dark:bg-primary;
     }
 
+    @media (max-width: 480px) {
+        .audit-fab,
+        .seo-chat-fab {
+            @apply h-12 w-12 justify-center gap-0 p-0;
+        }
+
+        .audit-fab > span,
+        .seo-chat-fab > span {
+            display: none;
+        }
+    }
+
     @media (orientation: landscape) and (max-height: 560px) {
         .audit-fab,
         .seo-chat-fab {
@@ -492,6 +513,7 @@
 
 @layer base {
     html {
+        position: relative;
         scroll-behavior: smooth;
     }
 
