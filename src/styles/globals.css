@@ -146,19 +146,6 @@
         animation: fadeIn 1s ease-in forwards;
     }
 
-    @keyframes float {
-        0%, 100% {
-            transform: translateY(0px);
-        }
-        50% {
-            transform: translateY(-10px);
-        }
-    }
-
-    .animate-float {
-        animation: float 6s ease-in-out infinite;
-    }
-
     @keyframes drift {
         0%, 100% {
             transform: translate3d(0, 0, 0);
@@ -174,15 +161,6 @@
         }
         50% {
             transform: translate3d(0, -4px, 0);
-        }
-    }
-
-    @keyframes rotateHalo {
-        from {
-            transform: rotate(0deg);
-        }
-        to {
-            transform: rotate(360deg);
         }
     }
 
@@ -267,42 +245,32 @@
         @apply rounded-[2rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(246,239,229,0.7))] shadow-[0_40px_90px_-55px_rgba(15,23,42,0.5)] backdrop-blur-xl dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(13,16,18,0.92),rgba(8,11,13,0.84))];
     }
 
+    .hero-background-sphere {
+        @apply pointer-events-none absolute left-1/2 top-1/2 z-0 aspect-square w-[min(72rem,105vw)] -translate-x-1/2 -translate-y-1/2 opacity-[0.16] sm:left-[58%] sm:w-[min(72rem,82vw)] dark:opacity-[0.2];
+        filter: saturate(0.88) contrast(0.9);
+    }
+
+    .hero-background-sphere-fallback {
+        @apply absolute inset-[13%] rounded-full border border-primary/18;
+        background:
+            radial-gradient(circle, rgba(88, 183, 179, 0.2) 0%, rgba(13, 92, 99, 0.08) 42%, transparent 70%),
+            conic-gradient(from 20deg, transparent, rgba(88, 183, 179, 0.32), transparent 42%, rgba(214, 106, 69, 0.2), transparent 72%);
+        box-shadow: inset 0 0 5rem rgba(13, 92, 99, 0.12);
+    }
+
     .hero-visual-shell {
         @apply relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-[radial-gradient(circle_at_top,rgba(13,92,99,0.18),transparent_55%),linear-gradient(180deg,rgba(215,237,232,0.86),rgba(194,225,221,0.66))] dark:border-[#274247] dark:bg-[radial-gradient(circle_at_top,rgba(88,183,179,0.16),transparent_48%),linear-gradient(180deg,rgba(11,24,27,0.98),rgba(11,21,24,0.9))];
     }
 
-    .hero-visual-grid {
-        @apply absolute inset-0 opacity-45;
-        background-image:
-            linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-        background-size: 44px 44px;
-        mask-image: radial-gradient(circle at center, black 42%, transparent 88%);
-    }
-
-    .hero-visual-glow {
-        @apply pointer-events-none absolute inset-x-16 top-10 h-40 rounded-full blur-3xl;
-        background: radial-gradient(circle, rgba(88, 183, 179, 0.35) 0%, rgba(88, 183, 179, 0) 72%);
-    }
-
-    .hero-visual-ring {
-        @apply pointer-events-none absolute inset-[14%] rounded-full opacity-55;
-        background: conic-gradient(from 120deg, rgba(88, 183, 179, 0) 0deg, rgba(88, 183, 179, 0.55) 110deg, rgba(238, 141, 108, 0.45) 210deg, rgba(88, 183, 179, 0) 360deg);
-        mask: radial-gradient(farthest-side, transparent calc(100% - 2px), black calc(100% - 1px));
-        animation: rotateHalo 18s linear infinite;
+    .hero-video-sound-toggle {
+        @apply absolute bottom-3 right-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/45 text-white shadow-lg backdrop-blur-md transition duration-200 hover:scale-105 hover:bg-black/60 focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black/50;
     }
 
     .motion-effects-paused .ambient-orb,
-    .motion-effects-paused .hero-visual-ring,
-    .motion-effects-paused .animate-float,
     .motion-effects-paused .proof-marquee,
     .motion-effects-paused .proof-marquee-reverse {
         animation: none;
         transform: translate3d(0, 0, 0);
-    }
-
-    .hero-floating-chip {
-        @apply absolute z-20 rounded-full border border-white/12 bg-black/35 px-3 py-2 text-xs font-semibold tracking-[0.18em] text-white/80 uppercase shadow-lg backdrop-blur-md;
     }
 
     .hero-mini-card {
@@ -361,47 +329,6 @@
     .hero-sub-heading {
         @apply relative z-10 mt-4 max-w-2xl text-lg leading-8 text-foreground/75 sm:text-xl;
         text-wrap: pretty;
-    }
-
-    .hero-lite-sphere {
-        @apply relative flex h-56 w-56 items-center justify-center rounded-full border border-white/20 bg-[radial-gradient(circle,rgba(248,251,249,0.95),rgba(209,231,227,0.78))] shadow-[0_24px_70px_-35px_rgba(13,92,99,0.55)] dark:border-white/10 dark:bg-[radial-gradient(circle,rgba(18,34,37,0.98),rgba(10,18,20,0.94))];
-    }
-
-    .hero-lite-core {
-        @apply h-20 w-20 rounded-full;
-        background: radial-gradient(circle, rgba(88, 183, 179, 0.85) 0%, rgba(13, 92, 99, 0.58) 72%, rgba(13, 92, 99, 0.18) 100%);
-    }
-
-    .hero-lite-ring {
-        @apply absolute rounded-full border;
-    }
-
-    .hero-lite-ring-primary {
-        @apply inset-4 border-primary/20;
-    }
-
-    .hero-lite-ring-accent {
-        @apply inset-[-0.35rem] border-accent/18;
-    }
-
-    .hero-lite-panel {
-        @apply absolute rounded-2xl border border-black/8 bg-white/84 px-4 py-3 text-left shadow-sm dark:border-white/10 dark:bg-white/[0.05];
-    }
-
-    .hero-lite-panel-top {
-        @apply left-[-2rem] top-8;
-    }
-
-    .hero-lite-panel-bottom {
-        @apply bottom-8 right-[-2rem];
-    }
-
-    .hero-lite-label {
-        @apply block text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-foreground/48;
-    }
-
-    .hero-lite-value {
-        @apply mt-1 block text-sm font-semibold text-foreground;
     }
 
     .social-link {

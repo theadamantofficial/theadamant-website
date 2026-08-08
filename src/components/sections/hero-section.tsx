@@ -3,9 +3,9 @@
 import {BackgroundRippleEffect} from "@/components/ui/background-ripple-effect";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import {ArrowRight, LayoutTemplate, Search, Sparkles, Zap} from "lucide-react";
+import {ArrowRight, LayoutTemplate, Search, Sparkles, Volume2, VolumeX, Zap} from "lucide-react";
 import {motion, useScroll, useTransform} from "motion/react";
-import {useRef} from "react";
+import {useRef, useState} from "react";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 import {OpenAuditButton} from "@/components/ui/open-audit-button";
@@ -16,7 +16,7 @@ const DotLottieReact = dynamic(
     () => import("@lottiefiles/dotlottie-react").then((module) => module.DotLottieReact),
     {
         ssr: false,
-        loading: () => <div className="relative z-10 h-[320px] w-full animate-pulse rounded-full bg-primary/8 dark:bg-primary/10"/>,
+        loading: () => <div className="hero-background-sphere-fallback"/>,
     },
 );
 
@@ -28,6 +28,8 @@ export default function HeroSection({
     locale: SiteLocale;
 }) {
     const sectionRef = useRef<HTMLElement>(null);
+    const introVideoRef = useRef<HTMLVideoElement>(null);
+    const [isVideoMuted, setIsVideoMuted] = useState(true);
     const {capability, isReady} = useMotionCapability();
     const showEnhancedVisuals = isReady && capability === "full";
     const {scrollYProgress} = useScroll({
@@ -40,20 +42,41 @@ export default function HeroSection({
     const visualScale = useTransform(scrollYProgress, [0, 1], [1, 0.965]);
     const visualRotate = useTransform(scrollYProgress, [0, 1], [0, -1.2]);
     const featureCardIcons = [LayoutTemplate, Search, Zap];
-    const floatingBadgeLayouts = [
-        {
-            className: "-left-3 top-6 hidden md:flex",
-            animation: {y: [0, -8, 0], x: [0, 5, 0]},
-        },
-        {
-            className: "right-4 top-5 hidden sm:flex",
-            animation: {y: [0, 8, 0], x: [0, -4, 0]},
-        },
-        {
-            className: "bottom-5 left-5 hidden lg:flex",
-            animation: {y: [0, -10, 0]},
-        },
-    ];
+
+    const enableVideoSound = () => {
+        const video = introVideoRef.current;
+
+        if (!video) {
+            return;
+        }
+
+        video.muted = false;
+        setIsVideoMuted(false);
+        void video.play().catch(() => {
+            video.muted = true;
+            setIsVideoMuted(true);
+        });
+    };
+
+    const muteVideo = () => {
+        const video = introVideoRef.current;
+
+        if (!video) {
+            return;
+        }
+
+        video.muted = true;
+        setIsVideoMuted(true);
+    };
+
+    const toggleVideoSound = () => {
+        if (isVideoMuted) {
+            enableVideoSound();
+            return;
+        }
+
+        muteVideo();
+    };
 
     return <section
         ref={sectionRef}
@@ -72,6 +95,18 @@ export default function HeroSection({
             animate={showEnhancedVisuals ? {x: [0, -22, 0], y: [0, -18, 0], scale: [1, 0.94, 1]} : undefined}
             transition={showEnhancedVisuals ? {duration: 14, repeat: Infinity, ease: "easeInOut"} : undefined}
         />
+        <div className="hero-background-sphere" aria-hidden="true">
+            {showEnhancedVisuals ? (
+                <DotLottieReact
+                    src="/animations/tech-sphere.lottie"
+                    loop
+                    autoplay
+                    className="h-full w-full"
+                />
+            ) : (
+                <div className="hero-background-sphere-fallback"/>
+            )}
+        </div>
 
         <div className="section-shell relative z-10 grid items-center gap-16 pb-10 pt-8 lg:grid-cols-[1.12fr_0.88fr] lg:pt-16">
             <motion.div
@@ -173,32 +208,39 @@ export default function HeroSection({
                         <span>{copy.previewEyebrowRight}</span>
                     </div>
 
-                    <div className="hero-visual-shell mt-6">
-                        <div className="hero-visual-grid"/>
-                        <div className="hero-visual-glow"/>
-                        <div className="hero-visual-ring"/>
-                        {copy.floatingBadges.map((badgeLabel, index) => (
-                            <motion.div
-                                key={badgeLabel}
-                                className={`hero-floating-chip ${floatingBadgeLayouts[index]?.className ?? ""}`}
-                                animate={showEnhancedVisuals ? floatingBadgeLayouts[index]?.animation : undefined}
-                                transition={showEnhancedVisuals
-                                    ? {duration: 5.5 + index, repeat: Infinity, ease: "easeInOut"}
-                                    : undefined}
-                            >
-                                {badgeLabel}
-                            </motion.div>
-                        ))}
-                        {showEnhancedVisuals ? (
-                            <DotLottieReact
-                                src="/animations/tech-sphere.lottie"
-                                loop
-                                autoplay
-                                className="relative z-10 h-[320px] w-full animate-float"
-                            />
-                        ) : (
-                            <StaticHeroVisual featureCards={copy.featureCards}/>
-                        )}
+                    <div
+                        className="hero-visual-shell group mt-6 aspect-video"
+                        onMouseEnter={enableVideoSound}
+                        onMouseLeave={muteVideo}
+                    >
+                        <video
+                            ref={introVideoRef}
+                            className="absolute inset-0 h-full w-full object-cover"
+                            poster="/videos/adamant-logo-reveal-poster.jpg"
+                            autoPlay
+                            loop
+                            muted={isVideoMuted}
+                            playsInline
+                            preload="auto"
+                            controlsList="nodownload noplaybackrate"
+                            disablePictureInPicture
+                            aria-label="The Adamant logo film"
+                        >
+                            <source src="/videos/adamant-logo-reveal.mp4" type="video/mp4"/>
+                            Your browser does not support HTML5 video.
+                        </video>
+                        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(3,28,32,0.08),transparent_62%,rgba(3,28,32,0.3))]"/>
+                        <button
+                            type="button"
+                            className="hero-video-sound-toggle"
+                            onClick={toggleVideoSound}
+                            aria-label={isVideoMuted ? "Turn logo film sound on" : "Turn logo film sound off"}
+                            aria-pressed={!isVideoMuted}
+                        >
+                            {isVideoMuted
+                                ? <VolumeX className="h-4 w-4"/>
+                                : <Volume2 className="h-4 w-4"/>}
+                        </button>
                     </div>
 
                     <div className="mt-6 grid gap-3 md:grid-cols-2">
@@ -227,30 +269,6 @@ export default function HeroSection({
             </motion.div>
         </div>
     </section>;
-}
-
-function StaticHeroVisual({
-    featureCards,
-}: {
-    featureCards: SiteCopy["hero"]["featureCards"];
-}) {
-    return (
-        <div className="relative z-10 flex h-[320px] w-full items-center justify-center px-6">
-            <div className="hero-lite-sphere">
-                <div className="hero-lite-core"/>
-                <div className="hero-lite-ring hero-lite-ring-primary"/>
-                <div className="hero-lite-ring hero-lite-ring-accent"/>
-                <div className="hero-lite-panel hero-lite-panel-top">
-                    <span className="hero-lite-label">Lean build</span>
-                    <span className="hero-lite-value">Fast first load</span>
-                </div>
-                <div className="hero-lite-panel hero-lite-panel-bottom">
-                    <span className="hero-lite-label">Focus</span>
-                    <span className="hero-lite-value">{featureCards[0]?.title ?? "SEO-ready UX"}</span>
-                </div>
-            </div>
-        </div>
-    );
 }
 
 const heroItemVariants = {
