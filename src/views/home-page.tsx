@@ -3,6 +3,7 @@ import Footer from "@/components/layouts/footer";
 import dynamic from "next/dynamic";
 import {SiteCopy} from "@/lib/site-copy";
 import {SiteLocale} from "@/lib/site-locale";
+import BrandIntroOverlay from "@/components/sections/brand-intro-overlay";
 
 const HeroSection = dynamic(() => import("@/components/sections/hero-section"));
 const CompanyCredentialsSection = dynamic(() => import("@/components/sections/company-credentials-section"));
@@ -76,6 +77,8 @@ export default function HomePage({
                 dangerouslySetInnerHTML={{__html: JSON.stringify(schema)}}
             />
         ))}
+
+        <BrandIntroOverlay/>
 
         <Navbar copy={copy.navbar} locale={locale}/>
 
