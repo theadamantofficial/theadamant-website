@@ -97,7 +97,11 @@ async function getContextFromToken(accessToken: string): Promise<{client: Supaba
 
 function getCrmSupabaseConfig() {
     const url = normalize(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL);
-    const publicKey = normalize(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY);
+    const publicKey = normalize(
+        process.env.SUPABASE_PUBLISHABLE_KEY
+        || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+        || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    );
     if (!url || !publicKey) throw new CrmApiError("Supabase Auth is not configured.", 503);
     return {url, publicKey};
 }
