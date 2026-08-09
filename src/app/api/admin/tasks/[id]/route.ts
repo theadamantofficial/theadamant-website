@@ -1,5 +1,5 @@
 import {NextRequest, NextResponse} from "next/server";
-import {crmErrorResponse, CrmApiError, getCrmRequestContext} from "@/lib/crm/auth";
+import {crmErrorResponse, CrmApiError, getCrmRequestContext, requireCrmRoles} from "@/lib/crm/auth";
 import {TASK_WITH_RELATIONS} from "@/lib/crm/queries";
 import {parseTaskInput} from "@/lib/crm/validation";
 
@@ -9,10 +9,10 @@ export const dynamic = "force-dynamic";
 export async function PATCH(request: NextRequest, context: {params: Promise<{id: string}>}) {
     try {
         const {client, actor} = await getCrmRequestContext(request);
+        requireCrmRoles(actor, ["super_admin", "admin"]);
         const {id} = await context.params;
         const payload = await request.json() as Record<string, unknown>;
         const input = parseTaskInput(payload, true);
-        if (actor.role === "sales") delete input.assigned_to;
         if (input.status === "completed") input.completed_at = new Date().toISOString();
         else if (Object.hasOwn(input, "status")) input.completed_at = null;
         const {data, error} = await client.from("tasks").update(input).eq("id", id).select(TASK_WITH_RELATIONS).maybeSingle();

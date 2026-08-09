@@ -14,16 +14,18 @@ export const metadata: Metadata = {
     },
 };
 
-export default function LocalizedBlogAdminPage({
+export default async function LocalizedBlogAdminPage({
     params,
 }: {
-    params: { locale: string };
+    params: Promise<{ locale: string }>;
 }) {
-    if (!isSiteLocale(params.locale) || params.locale === "en") {
+    const {locale: localeParam} = await params;
+
+    if (!isSiteLocale(localeParam) || localeParam === "en") {
         notFound();
     }
 
-    const locale = params.locale as SiteLocale;
+    const locale = localeParam as SiteLocale;
     const copy = getSiteCopy(locale);
 
     return <BlogAdminPage copy={copy} locale={locale}/>;

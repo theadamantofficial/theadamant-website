@@ -7,6 +7,7 @@ import {usePathname, useRouter} from "next/navigation";
 import {Bell, BriefcaseBusiness, Building2, CheckSquare2, ChevronRight, LayoutDashboard, LogOut, Menu, Moon, PanelLeftClose, PanelLeftOpen, Plus, Search, Settings, Sun, Users, Workflow, X} from "lucide-react";
 import type {CrmActor} from "@/features/crm/types";
 import {ROLE_LABELS} from "@/features/crm/constants";
+import {canManageLeads} from "@/features/crm/permissions";
 import {AdminThemeProvider, useAdminTheme} from "@/components/admin/admin-theme-provider";
 import {UserAvatar} from "@/components/admin/admin-ui";
 
@@ -39,6 +40,8 @@ function AdminShellInner({actor, children}: {actor: CrmActor; children: ReactNod
     const [quickOpen, setQuickOpen] = useState(false);
     const quickRef = useRef<HTMLDivElement>(null);
     const {theme, setTheme} = useAdminTheme();
+    const canCreate = canManageLeads(actor.role);
+    const visibleNavItems = actor.role === "employee" ? NAV_ITEMS.filter((item) => item.href !== "/admin/team") : NAV_ITEMS;
 
     useEffect(() => {
         setCollapsed(window.localStorage.getItem("adamant-crm-sidebar") === "collapsed");
@@ -87,7 +90,7 @@ function AdminShellInner({actor, children}: {actor: CrmActor; children: ReactNod
                 </div>
 
                 <nav className="mt-5 space-y-1">
-                    {NAV_ITEMS.map((item) => {
+                    {visibleNavItems.map((item) => {
                         const Icon = item.icon;
                         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
                         return <Link key={item.href} href={item.href} title={collapsed ? item.label : undefined} onClick={() => setMobileOpen(false)} className={`group flex h-10 items-center rounded-lg text-xs font-medium transition duration-150 ${collapsed ? "justify-center" : "gap-3 px-3"} ${active ? "bg-white/11 text-white" : "text-white/54 hover:bg-white/[.07] hover:text-white"}`}><Icon className="h-4 w-4 shrink-0"/>{!collapsed ? <span>{item.label}</span> : null}{active && !collapsed ? <ChevronRight className="ml-auto h-3.5 w-3.5 text-white/35"/> : null}</Link>;
@@ -113,8 +116,8 @@ function AdminShellInner({actor, children}: {actor: CrmActor; children: ReactNod
                 <form onSubmit={search} className="relative ml-auto hidden w-full max-w-xs md:block"><Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--crm-muted)]"/><input name="query" placeholder="Search CRM…" className="crm-control w-full pl-9"/></form>
                 <button title="Notifications will be added in a later phase" aria-label="Notifications placeholder" className="crm-icon-button"><Bell className="h-4 w-4"/></button>
                 <div className="relative" ref={quickRef}>
-                    <button onClick={() => setQuickOpen((current) => !current)} className="crm-button-primary"><Plus className="h-3.5 w-3.5"/><span className="hidden sm:inline">New</span></button>
-                    {quickOpen ? <div className="absolute right-0 top-11 w-48 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] p-1.5 shadow-xl"><Link onClick={() => setQuickOpen(false)} href="/admin/leads/new" className="crm-menu-item"><BriefcaseBusiness className="h-3.5 w-3.5"/> New lead</Link><Link onClick={() => setQuickOpen(false)} href="/admin/tasks?new=1" className="crm-menu-item"><CheckSquare2 className="h-3.5 w-3.5"/> New task</Link><Link onClick={() => setQuickOpen(false)} href="/admin/leads" className="crm-menu-item"><Plus className="h-3.5 w-3.5"/> Note to a lead</Link></div> : null}
+                    <button onClick={() => setQuickOpen((current) => !current)} className="crm-button-primary"><Plus className="h-3.5 w-3.5"/><span className="hidden sm:inline">{canCreate ? "New" : "Comment"}</span></button>
+                    {quickOpen ? <div className="absolute right-0 top-11 w-52 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] p-1.5 shadow-xl">{canCreate ? <><Link onClick={() => setQuickOpen(false)} href="/admin/leads/new" className="crm-menu-item"><BriefcaseBusiness className="h-3.5 w-3.5"/> New lead</Link><Link onClick={() => setQuickOpen(false)} href="/admin/tasks?new=1" className="crm-menu-item"><CheckSquare2 className="h-3.5 w-3.5"/> New task</Link></> : null}<Link onClick={() => setQuickOpen(false)} href="/admin/leads" className="crm-menu-item"><Plus className="h-3.5 w-3.5"/> {canCreate ? "Comment on a lead" : "Comment on assigned lead"}</Link></div> : null}
                 </div>
                 <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Toggle light and dark mode" className="crm-icon-button">{theme === "dark" ? <Sun className="h-4 w-4"/> : <Moon className="h-4 w-4"/>}</button>
                 <UserAvatar name={actor.fullName} imageUrl={actor.avatarUrl}/>

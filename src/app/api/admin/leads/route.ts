@@ -1,7 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
 import {LEAD_SOURCES, LEAD_STATUSES, PRIORITIES} from "@/features/crm/constants";
 import type {LeadSource, LeadStatus, Priority} from "@/features/crm/types";
-import {crmErrorResponse, CrmApiError, getCrmRequestContext} from "@/lib/crm/auth";
+import {crmErrorResponse, CrmApiError, getCrmRequestContext, requireCrmRoles} from "@/lib/crm/auth";
 import {LEAD_WITH_RELATIONS} from "@/lib/crm/queries";
 import {cleanSearch, parseLeadInput, parsePage} from "@/lib/crm/validation";
 
@@ -41,9 +41,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const {client, actor} = await getCrmRequestContext(request);
+        requireCrmRoles(actor, ["super_admin", "admin"]);
         const payload = await request.json() as Record<string, unknown>;
         const input = parseLeadInput(payload);
-        if (actor.role === "sales") input.assigned_to = actor.id;
         const {data, error} = await client.from("leads").insert({...input, created_by: actor.id}).select(LEAD_WITH_RELATIONS).single();
         if (error) throw new CrmApiError(error.message, 400);
         return NextResponse.json({lead: data}, {status: 201});

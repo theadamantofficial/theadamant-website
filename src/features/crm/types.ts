@@ -1,4 +1,4 @@
-export type CrmRole = "super_admin" | "admin" | "manager" | "sales";
+export type CrmRole = "super_admin" | "admin" | "employee";
 export type LeadStatus = "new" | "contacted" | "meeting_scheduled" | "requirement_discussion" | "proposal_sent" | "negotiation" | "won" | "lost";
 export type LeadSource = "website" | "whatsapp" | "instagram" | "linkedin" | "referral" | "email" | "phone" | "other";
 export type Priority = "low" | "medium" | "high" | "urgent";

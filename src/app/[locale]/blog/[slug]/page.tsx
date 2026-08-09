@@ -18,19 +18,21 @@ export const revalidate = 1800;
 export async function generateMetadata({
     params,
 }: {
-    params: { locale: string; slug: string };
+    params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-    if (!isSiteLocale(params.locale) || params.locale === "en") {
+    const {locale: localeParam, slug} = await params;
+
+    if (!isSiteLocale(localeParam) || localeParam === "en") {
         return {};
     }
 
-    const post = await getInternalBlogPostBySlug(params.slug);
+    const post = await getInternalBlogPostBySlug(slug);
 
     if (!post) {
         return {};
     }
 
-    const locale = params.locale as SiteLocale;
+    const locale = localeParam as SiteLocale;
     const pathname = `blog/${post.slug}`;
     const siteUrl = getSiteUrl();
     const url = `${siteUrl}${getLocalizedPagePath(locale, pathname)}`;
@@ -70,19 +72,21 @@ export async function generateMetadata({
 export default async function LocalizedInternalBlogPostRoute({
     params,
 }: {
-    params: { locale: string; slug: string };
+    params: Promise<{ locale: string; slug: string }>;
 }) {
-    if (!isSiteLocale(params.locale) || params.locale === "en") {
+    const {locale: localeParam, slug} = await params;
+
+    if (!isSiteLocale(localeParam) || localeParam === "en") {
         notFound();
     }
 
-    const post = await getInternalBlogPostBySlug(params.slug);
+    const post = await getInternalBlogPostBySlug(slug);
 
     if (!post) {
         notFound();
     }
 
-    const locale = params.locale as SiteLocale;
+    const locale = localeParam as SiteLocale;
     const copy = getSiteCopy(locale);
 
     return <InternalBlogPostPage copy={copy} locale={locale} post={post}/>;

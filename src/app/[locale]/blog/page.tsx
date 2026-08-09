@@ -21,16 +21,18 @@ export function generateStaticParams() {
     return INDEXABLE_SITE_LOCALES.map((locale) => ({locale}));
 }
 
-export function generateMetadata({
+export async function generateMetadata({
     params,
 }: {
-    params: { locale: string };
-}): Metadata {
-    if (!isSiteLocale(params.locale) || params.locale === "en") {
+    params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+    const {locale: localeParam} = await params;
+
+    if (!isSiteLocale(localeParam) || localeParam === "en") {
         return {};
     }
 
-    const locale = params.locale as SiteLocale;
+    const locale = localeParam as SiteLocale;
     const localizedPath = getLocalizedPagePath(locale, "blog");
 
     return {
@@ -58,13 +60,15 @@ export function generateMetadata({
 export default async function LocalizedBlogPage({
     params,
 }: {
-    params: { locale: string };
+    params: Promise<{ locale: string }>;
 }) {
-    if (!isSiteLocale(params.locale) || params.locale === "en") {
+    const {locale: localeParam} = await params;
+
+    if (!isSiteLocale(localeParam) || localeParam === "en") {
         notFound();
     }
 
-    const locale = params.locale as SiteLocale;
+    const locale = localeParam as SiteLocale;
     const copy = getSiteCopy(locale);
     const [mediumPosts, internalPosts] = await Promise.all([
         fetchMediumPosts(),

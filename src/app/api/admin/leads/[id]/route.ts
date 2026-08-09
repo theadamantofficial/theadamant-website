@@ -34,8 +34,9 @@ export async function PATCH(request: NextRequest, context: Context) {
         const {client, actor} = await getCrmRequestContext(request);
         const {id} = await context.params;
         const payload = await request.json() as Record<string, unknown>;
-        const input = parseLeadInput(payload, true);
-        if (actor.role === "sales") delete input.assigned_to;
+        const input = actor.role === "employee"
+            ? parseEmployeeLeadStatusInput(payload)
+            : parseLeadInput(payload, true);
         const {data, error} = await client.from("leads").update(input).eq("id", id).select(LEAD_WITH_RELATIONS).maybeSingle();
         if (error) throw new CrmApiError(error.message, 400);
         if (!data) throw new CrmApiError("Lead not found or unavailable.", 404);
@@ -44,6 +45,14 @@ export async function PATCH(request: NextRequest, context: Context) {
         const {message, status} = crmErrorResponse(error);
         return NextResponse.json({error: message}, {status});
     }
+}
+
+function parseEmployeeLeadStatusInput(payload: Record<string, unknown>) {
+    const keys = Object.keys(payload);
+    if (keys.length !== 1 || keys[0] !== "status") {
+        throw new CrmApiError("Employees can only change the status of leads assigned to them.", 403);
+    }
+    return parseLeadInput({status: payload.status}, true);
 }
 
 export async function DELETE(request: NextRequest, context: Context) {

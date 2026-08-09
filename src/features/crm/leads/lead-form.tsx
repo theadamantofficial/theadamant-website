@@ -9,6 +9,7 @@ import {useAdminActor} from "@/components/admin/admin-shell";
 import {ADAMANT_SERVICES, LEAD_SOURCE_LABELS, LEAD_SOURCES, LEAD_STATUS_LABELS, LEAD_STATUSES, PRIORITIES} from "@/features/crm/constants";
 import type {Lead, Profile} from "@/features/crm/types";
 import {crmFetch} from "@/features/crm/api";
+import {canManageLeads} from "@/features/crm/permissions";
 import {toDateTimeLocal} from "@/features/crm/format";
 
 type TeamMember = Pick<Profile, "id" | "full_name" | "email" | "active">;
@@ -57,7 +58,7 @@ export function LeadForm({initialLead}: {initialLead?: Lead}) {
         }
     }
 
-    const canAssign = actor.role !== "sales";
+    const canAssign = canManageLeads(actor.role);
 
     return <form onSubmit={submit} className="space-y-5">
         <FormSection title="Contact" description="Primary contact and company information.">
@@ -75,7 +76,7 @@ export function LeadForm({initialLead}: {initialLead?: Lead}) {
                 <FormField label="Lead source"><select name="lead_source" defaultValue={initialLead?.lead_source || "other"} className="admin-input">{LEAD_SOURCES.map((source) => <option key={source} value={source}>{LEAD_SOURCE_LABELS[source]}</option>)}</select></FormField>
                 <FormField label="Estimated deal value" hint="Amounts are stored and displayed in INR."><div className="relative"><span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[var(--crm-muted)]">₹</span><input name="estimated_value" type="number" min="0" step="1000" defaultValue={initialLead?.estimated_value || 0} className="admin-input pl-7"/></div></FormField>
                 <FormField label="Status"><select name="status" defaultValue={initialLead?.status || "new"} className="admin-input">{LEAD_STATUSES.map((status) => <option key={status} value={status}>{LEAD_STATUS_LABELS[status]}</option>)}</select></FormField>
-                <FormField label="Assigned to"><select name="assigned_to" disabled={!canAssign} defaultValue={initialLead?.assigned_to || (actor.role === "sales" ? actor.id : "")} className="admin-input"><option value="">Unassigned</option>{members.filter((member) => member.active).map((member) => <option key={member.id} value={member.id}>{member.full_name || member.email}</option>)}</select></FormField>
+                <FormField label="Assigned to"><select name="assigned_to" disabled={!canAssign} defaultValue={initialLead?.assigned_to || ""} className="admin-input"><option value="">Unassigned</option>{members.filter((member) => member.active).map((member) => <option key={member.id} value={member.id}>{member.full_name || member.email}</option>)}</select></FormField>
                 <FormField label="Priority"><select name="priority" defaultValue={initialLead?.priority || "medium"} className="admin-input">{PRIORITIES.map((priority) => <option key={priority} value={priority}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</option>)}</select></FormField>
             </div>
         </FormSection>

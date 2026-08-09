@@ -5,14 +5,18 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import {GripVertical, Plus, RefreshCw} from "lucide-react";
 import {DataError, EmptyState, PageHeader, Skeleton, UserAvatar} from "@/components/admin/admin-ui";
+import {useAdminActor} from "@/components/admin/admin-shell";
 import {LEAD_STATUS_LABELS, LEAD_STATUSES} from "@/features/crm/constants";
 import type {Lead, LeadStatus, PipelineSummary} from "@/features/crm/types";
 import {crmFetch} from "@/features/crm/api";
 import {formatInr, formatRelativeDate} from "@/features/crm/format";
+import {canManageLeads} from "@/features/crm/permissions";
 
 type PipelineColumn = {status: LeadStatus; count: number; leads: Lead[]};
 
 export function PipelineBoard() {
+    const actor = useAdminActor();
+    const canManage = canManageLeads(actor.role);
     const [columns, setColumns] = useState<PipelineColumn[]>([]);
     const [summary, setSummary] = useState<PipelineSummary[]>([]);
     const [loading, setLoading] = useState(true);
@@ -51,7 +55,7 @@ export function PipelineBoard() {
     }
 
     return <div className="space-y-5">
-        <PageHeader title="Sales pipeline" description="Move opportunities through each stage as conversations progress." actions={<><button onClick={() => void load()} className="crm-button-secondary"><RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}/> Refresh</button><Link href="/admin/leads/new" className="crm-button-primary"><Plus className="h-3.5 w-3.5"/> Add lead</Link></>}/>
+        <PageHeader title="Sales pipeline" description={canManage ? "Move opportunities through each stage as conversations progress." : "Move your assigned leads as their conversations progress."} actions={<><button onClick={() => void load()} className="crm-button-secondary"><RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}/> Refresh</button>{canManage ? <Link href="/admin/leads/new" className="crm-button-primary"><Plus className="h-3.5 w-3.5"/> Add lead</Link> : null}</>}/>
         {error ? <DataError message={error} onRetry={() => void load()}/> : null}
         {loading && !columns.length ? <div className="flex gap-3 overflow-hidden">{Array.from({length: 5}).map((_, index) => <div key={index} className="w-[17.5rem] shrink-0"><Skeleton className="h-[32rem] w-full"/></div>)}</div> : <div className="-mx-4 overflow-x-auto px-4 pb-3 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"><div className="flex min-w-max gap-3">{LEAD_STATUSES.map((status) => {
             const column = columns.find((item) => item.status === status) || {status, count: 0, leads: []};
@@ -61,6 +65,6 @@ export function PipelineBoard() {
                 <div className="min-h-[26rem] space-y-2 p-2">{column.leads.map((lead) => <article key={lead.id} draggable onDragStart={(event) => startDrag(event, lead)} onDragEnd={() => { setDraggedId(null); setDropTarget(null); }} className={`group cursor-grab rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] p-3 shadow-[0_1px_2px_rgba(15,23,42,.03)] transition duration-150 hover:border-[#9eb7b5] active:cursor-grabbing ${draggedId === lead.id ? "scale-[.98] opacity-45" : ""}`}><div className="flex items-start gap-2"><div className="min-w-0 flex-1"><Link href={`/admin/leads/${lead.id}`} className="block truncate text-xs font-semibold hover:text-[#0d5c63]">{lead.customer_name}</Link><p className="mt-0.5 truncate text-[10px] text-[var(--crm-muted)]">{lead.company_name || "Individual lead"}</p></div><GripVertical className="h-3.5 w-3.5 shrink-0 text-[var(--crm-muted)] opacity-0 transition group-hover:opacity-100"/></div><p className="mt-3 truncate text-[11px]">{lead.service_required}</p><p className="mt-1.5 text-xs font-semibold">{formatInr(lead.estimated_value)}</p><div className="mt-3 flex items-center justify-between gap-2">{lead.assigned_profile ? <UserAvatar size="sm" name={lead.assigned_profile.full_name || lead.assigned_profile.email} imageUrl={lead.assigned_profile.avatar_url}/> : <span className="h-7 w-7 rounded-full border border-dashed border-[var(--crm-border)]"/>}<span className={`max-w-40 truncate text-[10px] ${lead.next_followup && new Date(lead.next_followup) < new Date() ? "text-rose-600" : "text-[var(--crm-muted)]"}`}>{formatRelativeDate(lead.next_followup)}</span></div></article>)}{!column.leads.length ? <div className="flex h-36 flex-col items-center justify-center text-center"><p className="text-[11px] font-medium text-[var(--crm-muted)]">No leads in this stage</p><p className="mt-1 text-[10px] text-[var(--crm-muted)]">Drop a card here</p></div> : null}{column.count > column.leads.length ? <p className="py-2 text-center text-[10px] text-[var(--crm-muted)]">Showing the 60 most recently updated leads</p> : null}</div>
             </section>;
         })}</div></div>}
-        {!loading && !columns.some((column) => column.leads.length) ? <EmptyState title="Pipeline is empty" description="Add a lead to start building your sales pipeline." actionHref="/admin/leads/new" actionLabel="Add lead"/> : null}
+        {!loading && !columns.some((column) => column.leads.length) ? <EmptyState title="Pipeline is empty" description={canManage ? "Add a lead to start building your sales pipeline." : "No leads are currently assigned to you."} actionHref={canManage ? "/admin/leads/new" : undefined} actionLabel={canManage ? "Add lead" : undefined}/> : null}
     </div>;
 }

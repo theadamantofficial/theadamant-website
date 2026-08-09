@@ -8,7 +8,8 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
     try {
-        const {client} = await getCrmRequestContext(request);
+        const {client, actor} = await getCrmRequestContext(request);
+        requireCrmRoles(actor, ["super_admin", "admin"]);
         const {data, error} = await client.rpc("crm_team_directory");
         if (error) throw new CrmApiError("Team members could not be loaded.", 502);
         return NextResponse.json({members: data || []});
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
     try {
         const {client, actor} = await getCrmRequestContext(request);
-        requireCrmRoles(actor, ["super_admin", "admin"]);
+        requireCrmRoles(actor, ["super_admin"]);
         const payload = await request.json() as {id?: string; role?: CrmRole; active?: boolean};
         if (!payload.id) throw new CrmApiError("Choose a team member.");
         const {data: target} = await client.from("profiles").select("email,role").eq("id", payload.id).maybeSingle();
@@ -29,7 +30,9 @@ export async function PATCH(request: NextRequest) {
         const changes: Record<string, unknown> = {};
         if (payload.role !== undefined) {
             if (!CRM_ROLES.includes(payload.role)) throw new CrmApiError("Choose a valid role.");
-            if (payload.role === "super_admin" && actor.role !== "super_admin") throw new CrmApiError("Only the super admin can assign that role.", 403);
+            if (payload.role === "super_admin" && target.email !== "admin@theadamant.com") {
+                throw new CrmApiError("The super admin role is reserved for admin@theadamant.com.", 403);
+            }
             changes.role = target.email === "admin@theadamant.com" ? "super_admin" : payload.role;
         }
         if (typeof payload.active === "boolean") changes.active = target.email === "admin@theadamant.com" ? true : payload.active;

@@ -18,9 +18,10 @@ export const revalidate = 1800;
 export async function generateMetadata({
     params,
 }: {
-    params: { slug: string };
+    params: Promise<{slug: string}>;
 }): Promise<Metadata> {
-    const post = await getInternalBlogPostBySlug(params.slug);
+    const {slug} = await params;
+    const post = await getInternalBlogPostBySlug(slug);
 
     if (!post) {
         return {};
@@ -64,9 +65,10 @@ export async function generateMetadata({
 export default async function InternalBlogPostRoute({
     params,
 }: {
-    params: { slug: string };
+    params: Promise<{slug: string}>;
 }) {
-    const post = await getInternalBlogPostBySlug(params.slug);
+    const {slug} = await params;
+    const post = await getInternalBlogPostBySlug(slug);
 
     if (!post) {
         notFound();
