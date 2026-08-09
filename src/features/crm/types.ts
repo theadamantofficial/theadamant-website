@@ -38,7 +38,7 @@ export type Lead = {
     priority: Priority;
     description: string;
     external_reference: string | null;
-    created_by: string;
+    created_by: string | null;
     created_at: string;
     updated_at: string;
     assigned_profile?: Pick<Profile, "id" | "full_name" | "email" | "avatar_url"> | null;

@@ -1,5 +1,6 @@
 import {NextRequest, NextResponse} from "next/server";
 import {extractAuditResult} from "@/lib/website-audit";
+import {buildWebsiteAuditExternalReference, capturePublicCrmLead, nameFromEmail} from "@/lib/crm/public-lead-ingestion";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,6 +34,24 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({error: "Enter a valid email address."}, {status: 400});
     }
 
+    const crmCapturePromise = capturePublicCrmLead({
+        externalReference: buildWebsiteAuditExternalReference(normalizedEmail, normalizedUrl),
+        customerName: nameFromEmail(normalizedEmail),
+        email: normalizedEmail,
+        serviceRequired: "SEO",
+        leadSource: "website",
+        priority: "medium",
+        description: `Free website audit requested for ${normalizedUrl}`,
+        originMetadata: {
+            channel: "website_audit",
+            website_url: normalizedUrl,
+            submitted_at: new Date().toISOString(),
+        },
+    }).catch((error) => {
+        console.error("Website audit CRM capture failed unexpectedly.", error);
+        return {captured: false, configured: true} as const;
+    });
+
     try {
         const webhookResponse = await fetch(N8N_AUDIT_WEBHOOK_URL, {
             method: "POST",
@@ -50,19 +69,25 @@ export async function POST(request: NextRequest) {
         const webhookPayload = await parseWebhookResponse(webhookResponse);
 
         if (!webhookResponse.ok) {
+            const crmCapture = await crmCapturePromise;
             return NextResponse.json(
                 {
                     error: extractErrorMessage(webhookPayload) ?? FALLBACK_ERROR_MESSAGE,
+                    crmCaptured: crmCapture.captured,
                 },
                 {status: normalizeErrorStatus(webhookResponse.status)},
             );
         }
 
+        const crmCapture = await crmCapturePromise;
         return NextResponse.json({
             message: "Report sent to your email",
             result: extractAuditResult(webhookPayload, normalizedUrl),
+            crmCaptured: crmCapture.captured,
+            crmConfigured: crmCapture.configured,
         });
     } catch (error) {
+        await crmCapturePromise;
         return NextResponse.json(
             {
                 error: error instanceof Error ? error.message : FALLBACK_ERROR_MESSAGE,

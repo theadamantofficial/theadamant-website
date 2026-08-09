@@ -1,4 +1,5 @@
 import {NextRequest, NextResponse} from "next/server";
+import {capturePublicCrmLead, mapContactInquiryToService} from "@/lib/crm/public-lead-ingestion";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -102,6 +103,25 @@ export async function POST(request: NextRequest) {
         source: "website_contact_form",
         status: "new",
     };
+    const crmCapturePromise = capturePublicCrmLead({
+        externalReference: `website_contact:${referenceId}`,
+        customerName: name,
+        email,
+        serviceRequired: mapContactInquiryToService(inquiryType),
+        leadSource: "website",
+        priority: inquiryType === "quote" || inquiryType === "demo" ? "high" : "medium",
+        description: message,
+        originMetadata: {
+            channel: "website_contact_form",
+            reference_id: referenceId,
+            order_id: orderId,
+            inquiry_type: inquiryType,
+            submitted_at: submittedAt,
+        },
+    }).catch((error) => {
+        console.error("Website contact CRM capture failed unexpectedly.", error);
+        return {captured: false, configured: true} as const;
+    });
 
     try {
         let firebaseSaved = false;
@@ -128,14 +148,18 @@ export async function POST(request: NextRequest) {
             }
         }
 
+        const crmCapture = await crmCapturePromise;
         return NextResponse.json({
             success: true,
             referenceId,
             firebaseSaved,
             webhookDelivered,
             webhookError,
+            crmCaptured: crmCapture.captured,
+            crmConfigured: crmCapture.configured,
         });
     } catch (error) {
+        await crmCapturePromise;
         console.error("Failed to persist project details.", error);
         return NextResponse.json({success: false, error: "Project details delivery failed."}, {status: 502});
     }

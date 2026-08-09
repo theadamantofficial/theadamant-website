@@ -66,6 +66,11 @@ has its own protected layout and uses Supabase Auth plus PostgreSQL row-level se
 CRM sessions are stored only in secure, HTTP-only cookies. Normal CRM data requests use the signed-in user's Supabase
 access token, so RLS remains authoritative. The Supabase secret key is never sent to the browser.
 
+Public contact-form, website-audit, and completed SEO-chat submissions are also captured as unassigned CRM leads.
+This server-side capture uses `SUPABASE_SECRET_KEY` (or `SUPABASE_SERVICE_ROLE_KEY`) and runs independently from the
+existing EmailJS, Firebase, n8n, and Discord flows. A CRM capture failure therefore does not suppress the existing
+email or Discord notification. Website references are deduplicated through `leads.external_reference`.
+
 ## Vercel Blob recovery on 27 August 2026
 
 After the suspended store becomes readable, download `blog/internal-blog-posts.json` without deleting or modifying the Blob store. Run the importer against that downloaded file first in dry-run mode and then with `--apply` plus a new backup path. Keep the source export and Blob store until the final count and historical blog URLs have been checked.
