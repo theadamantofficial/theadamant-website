@@ -9,6 +9,7 @@ import {
     SITE_LOCALE_COOKIE,
     SiteLocale,
 } from "@/lib/site-locale";
+import {CRM_ACCESS_COOKIE, CRM_REFRESH_COOKIE} from "@/lib/crm/auth-cookies";
 
 export function middleware(request: NextRequest) {
     const {pathname} = request.nextUrl;
@@ -20,6 +21,32 @@ export function middleware(request: NextRequest) {
         redirectUrl.protocol = "https";
         redirectUrl.hostname = "theadamant.com";
         return NextResponse.redirect(redirectUrl, 308);
+    }
+
+    if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+        const accessToken = request.cookies.get(CRM_ACCESS_COOKIE)?.value;
+        const refreshToken = request.cookies.get(CRM_REFRESH_COOKIE)?.value;
+        const hasCurrentAccess = Boolean(accessToken && !isJwtExpired(accessToken));
+
+        if (pathname === "/admin") {
+            return NextResponse.redirect(new URL(hasCurrentAccess ? "/admin/dashboard" : "/admin/login", request.url));
+        }
+
+        if (pathname === "/admin/login") {
+            return hasCurrentAccess
+                ? NextResponse.redirect(new URL("/admin/dashboard", request.url))
+                : NextResponse.next();
+        }
+
+        if (!hasCurrentAccess) {
+            const nextPath = `${pathname}${request.nextUrl.search}`;
+            const destination = refreshToken
+                ? `/api/admin/refresh?next=${encodeURIComponent(nextPath)}`
+                : `/admin/login?next=${encodeURIComponent(nextPath)}`;
+            return NextResponse.redirect(new URL(destination, request.url));
+        }
+
+        return NextResponse.next();
     }
 
     const requestHeaders = new Headers(request.headers);
@@ -82,3 +109,14 @@ export function middleware(request: NextRequest) {
 export const config = {
     matcher: ["/((?!api|_next|favicon.ico|images|vectors|animations).*)"],
 };
+
+function isJwtExpired(token: string) {
+    try {
+        const encoded = token.split(".")[1].replaceAll("-", "+").replaceAll("_", "/");
+        const padded = encoded.padEnd(Math.ceil(encoded.length / 4) * 4, "=");
+        const payload = JSON.parse(atob(padded)) as {exp?: number};
+        return !payload.exp || payload.exp <= Math.floor(Date.now() / 1000) + 30;
+    } catch {
+        return true;
+    }
+}

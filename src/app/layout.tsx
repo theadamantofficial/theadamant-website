@@ -1,7 +1,6 @@
 import type {Metadata} from "next";
 import "../styles/globals.css";
 import {ReactNode} from "react";
-import {Manrope, Space_Grotesk} from "next/font/google";
 import {Toaster} from "react-hot-toast";
 import {headers} from "next/headers";
 import {DEFAULT_SITE_LOCALE, isSiteLocale, localeToHtmlLang, SiteLocale} from "@/lib/site-locale";
@@ -53,16 +52,6 @@ export const metadata: Metadata = {
     metadataBase: getSiteMetadataBase(),
 };
 
-const manrope = Manrope({
-    subsets: ["latin"],
-    variable: "--font-sans",
-});
-
-const spaceGrotesk = Space_Grotesk({
-    subsets: ["latin"],
-    variable: "--font-display",
-});
-
 export default async function RootLayout({children}: Readonly<{
     children: ReactNode;
 }>) {
@@ -74,7 +63,7 @@ export default async function RootLayout({children}: Readonly<{
 
     return (
         <html lang={localeToHtmlLang(siteLocale)} suppressHydrationWarning>
-        <body className={`${manrope.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+        <body suppressHydrationWarning>
         <noscript>
             <style>{`.motion-reveal{opacity:1!important;transform:none!important;filter:none!important}.animated-faq-panel{height:auto!important;opacity:1!important;transform:none!important}`}</style>
         </noscript>

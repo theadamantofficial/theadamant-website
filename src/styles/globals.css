@@ -59,6 +59,8 @@
 }
 
 :root {
+    --font-sans: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    --font-display: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     --radius: 1rem;
     --background: #f6f0e5;
     --foreground: #1d1d1a;
@@ -94,6 +96,16 @@
     --cursor-pointer: url("/vectors/cursor-pointer.svg"), pointer;
     --cursor-default: url("/vectors/cursor-default.svg"), default;
     --cursor-text: url("/vectors/cursor-text.svg"), text;
+    --crm-bg: #f5f5f2;
+    --crm-surface: #ffffff;
+    --crm-header: rgba(245, 245, 242, 0.9);
+    --crm-sidebar: #112f31;
+    --crm-sidebar-border: rgba(255, 255, 255, 0.08);
+    --crm-text: #182220;
+    --crm-muted: #727d79;
+    --crm-border: #dedfda;
+    --crm-subtle: #f6f7f4;
+    --crm-skeleton: #e8e9e4;
 }
 
 .dark {
@@ -128,6 +140,19 @@
     --sidebar-accent-foreground: #f3ede5;
     --sidebar-border: #283034;
     --sidebar-ring: #58b7b3;
+}
+
+.crm-dark {
+    --crm-bg: #111716;
+    --crm-surface: #171e1d;
+    --crm-header: rgba(17, 23, 22, 0.9);
+    --crm-sidebar: #0c2426;
+    --crm-sidebar-border: rgba(255, 255, 255, 0.07);
+    --crm-text: #edf1ef;
+    --crm-muted: #929d99;
+    --crm-border: #2b3432;
+    --crm-subtle: #1d2624;
+    --crm-skeleton: #26302e;
 }
 
 @layer utilities {
@@ -175,6 +200,66 @@
 }
 
 @layer components {
+    .admin-input {
+        @apply h-10 w-full rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] px-3 text-sm text-[var(--crm-text)] outline-none transition duration-150 placeholder:text-[var(--crm-muted)] focus:border-[#0d5c63] focus:ring-3 focus:ring-[#0d5c63]/8 disabled:cursor-not-allowed disabled:opacity-60;
+    }
+
+    .crm-card {
+        @apply rounded-xl border border-[var(--crm-border)] bg-[var(--crm-surface)] shadow-[0_1px_2px_rgba(15,23,42,0.025)];
+    }
+
+    .crm-control {
+        @apply h-9 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] px-3 text-xs text-[var(--crm-text)] outline-none transition duration-150 placeholder:text-[var(--crm-muted)] focus:border-[#0d5c63] focus:ring-3 focus:ring-[#0d5c63]/8;
+    }
+
+    .crm-button-primary {
+        @apply inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-[#0d5c63] px-3.5 text-xs font-semibold text-white transition duration-150 hover:bg-[#0a4e54] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#0d5c63]/20 disabled:pointer-events-none disabled:opacity-55;
+    }
+
+    .crm-button-secondary {
+        @apply inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] px-3.5 text-xs font-semibold text-[var(--crm-text)] transition duration-150 hover:bg-[var(--crm-subtle)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#0d5c63]/10 disabled:pointer-events-none disabled:opacity-55;
+    }
+
+    .crm-icon-button {
+        @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] text-[var(--crm-muted)] transition duration-150 hover:bg-[var(--crm-subtle)] hover:text-[var(--crm-text)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#0d5c63]/10;
+    }
+
+    .crm-menu-item {
+        @apply flex h-9 items-center gap-2 rounded-md px-2.5 text-xs font-medium text-[var(--crm-text)] transition duration-150 hover:bg-[var(--crm-subtle)];
+    }
+
+    .crm-status,
+    .crm-priority {
+        @apply inline-flex whitespace-nowrap rounded-md border px-2 py-1 text-[10px] font-semibold leading-none;
+    }
+
+    .crm-status-new { @apply border-slate-200 bg-slate-50 text-slate-600; }
+    .crm-status-contacted { @apply border-cyan-200/70 bg-cyan-50 text-cyan-700; }
+    .crm-status-meeting_scheduled { @apply border-blue-200/70 bg-blue-50 text-blue-700; }
+    .crm-status-requirement_discussion { @apply border-violet-200/70 bg-violet-50 text-violet-700; }
+    .crm-status-proposal_sent { @apply border-amber-200/70 bg-amber-50 text-amber-700; }
+    .crm-status-negotiation { @apply border-orange-200/70 bg-orange-50 text-orange-700; }
+    .crm-status-won { @apply border-emerald-200/70 bg-emerald-50 text-emerald-700; }
+    .crm-status-lost { @apply border-rose-200/70 bg-rose-50 text-rose-700; }
+    .crm-priority-low { @apply border-slate-200 bg-slate-50 text-slate-600; }
+    .crm-priority-medium { @apply border-blue-200/70 bg-blue-50 text-blue-700; }
+    .crm-priority-high { @apply border-orange-200/70 bg-orange-50 text-orange-700; }
+    .crm-priority-urgent { @apply border-rose-200/70 bg-rose-50 text-rose-700; }
+
+    .crm-dark .crm-status,
+    .crm-dark .crm-priority {
+        @apply border-white/10 bg-white/[.06] text-[#cdd5d2];
+    }
+
+    .pipeline-dot-new { @apply bg-slate-400; }
+    .pipeline-dot-contacted { @apply bg-cyan-500; }
+    .pipeline-dot-meeting_scheduled { @apply bg-blue-500; }
+    .pipeline-dot-requirement_discussion { @apply bg-violet-500; }
+    .pipeline-dot-proposal_sent { @apply bg-amber-500; }
+    .pipeline-dot-negotiation { @apply bg-orange-500; }
+    .pipeline-dot-won { @apply bg-emerald-500; }
+    .pipeline-dot-lost { @apply bg-rose-500; }
+
     .section-shell {
         @apply relative mx-auto w-full max-w-6xl px-6 sm:px-8 lg:px-10;
     }
