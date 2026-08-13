@@ -8,12 +8,15 @@
     "src/features/crm/**/*.tsx",
     "src/components/admin/**/*.tsx",
     "src/lib/crm/**/*.ts",
+    "src/types/**/*.d.ts",
     "src/app/api/admin/**/*.ts",
     "src/app/(admin)/**/*.tsx",
     "middleware.ts",
     "next-env.d.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "**/* 2.ts",
+    "**/* 2.tsx"
   ]
 }

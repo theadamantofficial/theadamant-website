@@ -75,7 +75,7 @@ async function getContextFromToken(accessToken: string): Promise<{client: Supaba
 
     const {data, error} = await client
         .from("profiles")
-        .select("id,full_name,email,role,avatar_url,active,created_at,updated_at")
+        .select("id,full_name,email,role,avatar_url,active,can_access_prospect_database,created_at,updated_at")
         .eq("id", userData.user.id)
         .maybeSingle();
 
@@ -91,6 +91,7 @@ async function getContextFromToken(accessToken: string): Promise<{client: Supaba
             fullName: profile.full_name || profile.email.split("@")[0],
             role: profile.role,
             avatarUrl: profile.avatar_url,
+            canAccessProspectDatabase: profile.can_access_prospect_database || false,
         },
     };
 }

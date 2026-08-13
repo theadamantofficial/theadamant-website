@@ -25,4 +25,19 @@ describe("CRM route protection", () => {
         const response = await GET(new NextRequest("https://theadamant.com/api/admin/dashboard"));
         expect(response.status).toBe(401);
     });
+
+    it("does not expose the external prospect database without a valid session", async () => {
+        const {GET} = await import("@/app/api/admin/prospects/route");
+        const response = await GET(new NextRequest("https://theadamant.com/api/admin/prospects"));
+        expect(response.status).toBe(401);
+    });
+
+    it("does not initiate WhatsApp outreach without a valid session", async () => {
+        const {POST} = await import("@/app/api/admin/prospects/whatsapp/route");
+        const response = await POST(new NextRequest("https://theadamant.com/api/admin/prospects/whatsapp", {
+            method: "POST",
+            body: JSON.stringify({recordId: 1, message: "Hello"}),
+        }));
+        expect(response.status).toBe(401);
+    });
 });

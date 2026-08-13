@@ -2,12 +2,12 @@
 
 import {useCallback, useEffect, useState} from "react";
 import toast from "react-hot-toast";
-import {ChevronDown, Loader2, LockKeyhole, ShieldCheck} from "lucide-react";
+import {ChevronDown, Database, Loader2, LockKeyhole, ShieldCheck} from "lucide-react";
 import {useAdminActor} from "@/components/admin/admin-shell";
 import {DataError, EmptyState, PageHeader, Skeleton, UserAvatar} from "@/components/admin/admin-ui";
 import {CRM_ROLES, ROLE_LABELS} from "@/features/crm/constants";
 import type {CrmRole} from "@/features/crm/types";
-import {canManageTeam} from "@/features/crm/permissions";
+import {canGrantProspectAccess, canManageTeam} from "@/features/crm/permissions";
 import {crmFetch} from "@/features/crm/api";
 import {formatCrmDate} from "@/features/crm/format";
 
@@ -18,6 +18,7 @@ type TeamMember = {
     role: CrmRole;
     avatar_url: string | null;
     active: boolean;
+    can_access_prospect_database: boolean;
     created_at: string;
     active_leads: number;
     open_tasks: number;
@@ -32,6 +33,7 @@ export function TeamScreen() {
     const [saving, setSaving] = useState("");
     const [error, setError] = useState("");
     const canManage = canManageTeam(actor.role);
+    const canGrantDatabase = canGrantProspectAccess(actor.role);
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -78,6 +80,7 @@ export function TeamScreen() {
                         <th className="w-44 px-3 py-2.5 font-medium">Role</th>
                         <th className="px-3 py-2.5 font-medium">Active leads</th>
                         <th className="px-3 py-2.5 font-medium">Open tasks</th>
+                        <th className="px-3 py-2.5 font-medium">Lead database</th>
                         <th className="px-3 py-2.5 font-medium">Joined</th>
                         <th className="px-5 py-2.5 font-medium">Access</th>
                     </tr>
@@ -109,6 +112,17 @@ export function TeamScreen() {
                             </td>
                             <td className="px-3 py-3 font-semibold">{member.active_leads}</td>
                             <td className="px-3 py-3 font-semibold">{member.open_tasks}</td>
+                            <td className="px-3 py-3">
+                                <button
+                                    disabled={!canGrantDatabase || member.role !== "employee" || !member.active || isSaving}
+                                    onClick={() => void update(member.id, {canAccessProspectDatabase: !member.can_access_prospect_database})}
+                                    title={member.role !== "employee" ? "Admins already have access" : "Allow this user to view leads and initiate WhatsApp outreach"}
+                                    className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[10px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${member.role !== "employee" || member.can_access_prospect_database ? "bg-sky-50 text-sky-700" : "bg-[var(--crm-subtle)] text-[var(--crm-muted)]"}`}
+                                >
+                                    <Database className="h-3 w-3"/>
+                                    {member.role !== "employee" ? "Included" : member.can_access_prospect_database ? "Allowed" : "No access"}
+                                </button>
+                            </td>
                             <td className="px-3 py-3 text-[var(--crm-muted)]">{formatCrmDate(member.created_at)}</td>
                             <td className="px-5 py-3">
                                 <button

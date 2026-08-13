@@ -71,6 +71,24 @@ This server-side capture uses `SUPABASE_SECRET_KEY` (or `SUPABASE_SERVICE_ROLE_K
 existing EmailJS, Firebase, n8n, and Discord flows. A CRM capture failure therefore does not suppress the existing
 email or Discord notification. Website references are deduplicated through `leads.external_reference`.
 
+### External USA lead database
+
+The protected `/admin/prospects` section reads the supplied SQLite database directly in read-only mode. Configure
+`USA_LEADS_DATABASE_PATH` with an absolute path that is mounted on every production application instance. Because the
+source currently contains more than ten million records (about 5.3 GB), it is intentionally not bundled in Git or
+copied into the operational CRM tables.
+
+Super admins and admins always have access. Either role can grant or remove access for an employee in the Team screen.
+That permission is enforced in both the page and API. Initiating a WhatsApp message opens the standard `wa.me` flow
+and writes an auditable `prospect_outreach_events` record. The table already includes CRM lead and provider message
+fields so a future WhatsApp Business API integration can update delivery status without replacing this workflow.
+
+Apply the latest Supabase migration before using this feature:
+
+```bash
+supabase db push
+```
+
 ## Vercel Blob recovery on 27 August 2026
 
 After the suspended store becomes readable, download `blog/internal-blog-posts.json` without deleting or modifying the Blob store. Run the importer against that downloaded file first in dry-run mode and then with `--apply` plus a new backup path. Keep the source export and Blob store until the final count and historical blog URLs have been checked.

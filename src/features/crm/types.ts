@@ -11,6 +11,7 @@ export type Profile = {
     role: CrmRole;
     avatar_url: string | null;
     active: boolean;
+    can_access_prospect_database: boolean;
     created_at: string;
     updated_at: string;
 };
@@ -21,6 +22,39 @@ export type CrmActor = {
     fullName: string;
     role: CrmRole;
     avatarUrl: string | null;
+    canAccessProspectDatabase: boolean;
+};
+
+export type Prospect = {
+    record_id: number;
+    source_file: string | null;
+    source_sheet: string | null;
+    external_id: string | null;
+    name: string | null;
+    first_name: string | null;
+    last_name: string | null;
+    job_title: string | null;
+    business_name: string | null;
+    company_name: string | null;
+    contact_person: string | null;
+    email: string | null;
+    corporate_email: string | null;
+    company_email: string | null;
+    phone: string | null;
+    company_phone: string | null;
+    phone_type: string | null;
+    website: string | null;
+    linkedin_url: string | null;
+    address: string | null;
+    city: string | null;
+    state: string | null;
+    postal_code: string | null;
+    country: string | null;
+    industry: string | null;
+    sub_industry: string | null;
+    employees: string | null;
+    revenue: string | null;
+    location: string | null;
 };
 
 export type Lead = {

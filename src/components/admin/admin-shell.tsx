@@ -4,16 +4,17 @@ import {createContext, FormEvent, ReactNode, useContext, useEffect, useRef, useS
 import Image from "next/image";
 import Link from "next/link";
 import {usePathname, useRouter} from "next/navigation";
-import {Bell, BriefcaseBusiness, Building2, CheckSquare2, ChevronRight, LayoutDashboard, LogOut, Menu, Moon, PanelLeftClose, PanelLeftOpen, Plus, Search, Settings, Sun, Users, Workflow, X} from "lucide-react";
+import {Bell, BriefcaseBusiness, Building2, CheckSquare2, ChevronRight, Database, LayoutDashboard, LogOut, Menu, Moon, PanelLeftClose, PanelLeftOpen, Plus, Search, Settings, Sun, Users, Workflow, X} from "lucide-react";
 import type {CrmActor} from "@/features/crm/types";
 import {ROLE_LABELS} from "@/features/crm/constants";
-import {canManageLeads} from "@/features/crm/permissions";
+import {canManageLeads, canViewProspectDatabase} from "@/features/crm/permissions";
 import {AdminThemeProvider, useAdminTheme} from "@/components/admin/admin-theme-provider";
 import {UserAvatar} from "@/components/admin/admin-ui";
 
 const NAV_ITEMS = [
     {href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard},
     {href: "/admin/leads", label: "Leads", icon: BriefcaseBusiness},
+    {href: "/admin/prospects", label: "Lead Database", icon: Database},
     {href: "/admin/pipeline", label: "Pipeline", icon: Workflow},
     {href: "/admin/tasks", label: "Tasks", icon: CheckSquare2},
     {href: "/admin/customers", label: "Customers", icon: Building2},
@@ -41,7 +42,11 @@ function AdminShellInner({actor, children}: {actor: CrmActor; children: ReactNod
     const quickRef = useRef<HTMLDivElement>(null);
     const {theme, setTheme} = useAdminTheme();
     const canCreate = canManageLeads(actor.role);
-    const visibleNavItems = actor.role === "employee" ? NAV_ITEMS.filter((item) => item.href !== "/admin/team") : NAV_ITEMS;
+    const visibleNavItems = NAV_ITEMS.filter((item) => {
+        if (actor.role === "employee" && item.href === "/admin/team") return false;
+        if (item.href === "/admin/prospects" && !canViewProspectDatabase(actor)) return false;
+        return true;
+    });
 
     useEffect(() => {
         setCollapsed(window.localStorage.getItem("adamant-crm-sidebar") === "collapsed");
@@ -129,6 +134,7 @@ function AdminShellInner({actor, children}: {actor: CrmActor; children: ReactNod
 
 function getPageTitle(pathname: string) {
     if (pathname.includes("/leads/new")) return "New lead";
+    if (pathname.startsWith("/admin/prospects")) return "Lead Database";
     if (/\/leads\/[^/]+\/edit$/.test(pathname)) return "Edit lead";
     if (/\/leads\/[^/]+$/.test(pathname)) return "Lead details";
     return NAV_ITEMS.find((item) => pathname.startsWith(item.href))?.label || (pathname.startsWith("/admin/settings") ? "Settings" : "Admin");
