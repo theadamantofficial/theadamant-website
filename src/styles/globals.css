@@ -424,6 +424,19 @@
         @apply h-5 w-5;
     }
 
+    .legal-copy a {
+        @apply font-semibold text-primary underline decoration-primary/35 underline-offset-4 transition hover:decoration-primary;
+    }
+
+    .legal-copy ul {
+        @apply grid gap-2 pl-5;
+        list-style: disc;
+    }
+
+    .legal-copy li {
+        @apply pl-1;
+    }
+
     .audit-fab {
         @apply fixed bottom-5 right-5 z-[70] inline-flex items-center gap-3 rounded-full border border-black/10 bg-white/86 px-4 py-3 text-sm font-semibold text-foreground shadow-[0_24px_60px_-30px_rgba(15,23,42,0.55)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 dark:border-white/10 dark:bg-[#11181c]/88;
     }

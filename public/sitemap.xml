@@ -42,6 +42,21 @@
   <priority>0.80</priority>
 </url>
 <url>
+  <loc>https://theadamant.com/privacy-policy</loc>
+  <lastmod>2026-08-14T00:00:00+00:00</lastmod>
+  <priority>0.30</priority>
+</url>
+<url>
+  <loc>https://theadamant.com/terms</loc>
+  <lastmod>2026-08-14T00:00:00+00:00</lastmod>
+  <priority>0.30</priority>
+</url>
+<url>
+  <loc>https://theadamant.com/data-deletion</loc>
+  <lastmod>2026-08-14T00:00:00+00:00</lastmod>
+  <priority>0.30</priority>
+</url>
+<url>
   <loc>https://theadamant.com/blog/how-to-improve-website-conversion-rate-with-faster-performance-better-ux</loc>
   <lastmod>2026-04-02T11:57:03+00:00</lastmod>
   <priority>0.64</priority>

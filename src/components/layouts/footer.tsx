@@ -185,9 +185,23 @@ export default function Footer({
                 ))}
             </div>
 
-            <div className="mt-10 flex flex-col gap-3 border-t border-black/10 pt-6 text-sm text-foreground/62 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mt-10 flex flex-col gap-4 border-t border-black/10 pt-6 text-sm text-foreground/62 dark:border-white/10 lg:flex-row lg:items-center lg:justify-between">
                 <p>&copy; {new Date().getFullYear()} {copy.copyright}</p>
-                <p>{copy.tagline}</p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
+                    <nav className="flex flex-wrap gap-x-4 gap-y-2" aria-label="Legal">
+                        <Link href="/privacy-policy" className="transition hover:text-foreground hover:underline">
+                            Privacy Policy
+                        </Link>
+                        <Link href="/terms" className="transition hover:text-foreground hover:underline">
+                            Terms of Service
+                        </Link>
+                        <Link href="/data-deletion" className="transition hover:text-foreground hover:underline">
+                            Data Deletion
+                        </Link>
+                    </nav>
+                    <span className="hidden h-1 w-1 rounded-full bg-foreground/30 sm:block" aria-hidden="true"/>
+                    <p>{copy.tagline}</p>
+                </div>
             </div>
         </div>
     </footer>
