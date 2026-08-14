@@ -4,7 +4,7 @@ import {createContext, FormEvent, ReactNode, useContext, useEffect, useRef, useS
 import Image from "next/image";
 import Link from "next/link";
 import {usePathname, useRouter} from "next/navigation";
-import {Bell, BriefcaseBusiness, Building2, CheckSquare2, ChevronRight, Database, LayoutDashboard, LogOut, Menu, Moon, PanelLeftClose, PanelLeftOpen, Plus, Search, Settings, Sun, Users, Workflow, X} from "lucide-react";
+import {Bell, BriefcaseBusiness, Building2, CheckSquare2, ChevronRight, Database, LayoutDashboard, LogOut, Menu, MessageCircle, Moon, PanelLeftClose, PanelLeftOpen, Plus, Search, Settings, Sun, Users, Workflow, X} from "lucide-react";
 import type {CrmActor} from "@/features/crm/types";
 import {ROLE_LABELS} from "@/features/crm/constants";
 import {canManageLeads, canViewProspectDatabase} from "@/features/crm/permissions";
@@ -14,6 +14,7 @@ import {UserAvatar} from "@/components/admin/admin-ui";
 const NAV_ITEMS = [
     {href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard},
     {href: "/admin/leads", label: "Leads", icon: BriefcaseBusiness},
+    {href: "/admin/whatsapp", label: "WhatsApp", icon: MessageCircle},
     {href: "/admin/prospects", label: "Lead Database", icon: Database},
     {href: "/admin/pipeline", label: "Pipeline", icon: Workflow},
     {href: "/admin/tasks", label: "Tasks", icon: CheckSquare2},

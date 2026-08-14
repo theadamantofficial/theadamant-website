@@ -40,4 +40,10 @@ describe("CRM route protection", () => {
         }));
         expect(response.status).toBe(401);
     });
+
+    it("does not expose the WhatsApp inbox without a valid session", async () => {
+        const {GET} = await import("@/app/api/admin/whatsapp/conversations/route");
+        const response = await GET(new NextRequest("https://theadamant.com/api/admin/whatsapp/conversations"));
+        expect(response.status).toBe(401);
+    });
 });

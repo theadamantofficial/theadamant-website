@@ -149,3 +149,43 @@ export type CustomerDirectoryItem = {
     won_value: number;
     last_interaction: string;
 };
+
+export type WhatsAppMessageStatus = "queued" | "received" | "sent" | "delivered" | "read" | "failed";
+
+export type WhatsAppConversation = {
+    id: string;
+    whatsapp_business_account_id: string | null;
+    phone_number_id: string;
+    wa_id: string;
+    contact_name: string;
+    lead_id: string | null;
+    assigned_to: string | null;
+    status: "open" | "closed";
+    unread_count: number;
+    customer_service_window_expires_at: string | null;
+    last_message_at: string | null;
+    last_message_preview: string;
+    last_message_direction: "inbound" | "outbound" | null;
+    created_at: string;
+    updated_at: string;
+    lead?: Pick<Lead, "id" | "customer_name" | "phone" | "email" | "company_name" | "status" | "assigned_to"> | null;
+    assigned_profile?: Pick<Profile, "id" | "full_name" | "email" | "avatar_url"> | null;
+};
+
+export type WhatsAppMessage = {
+    id: string;
+    conversation_id: string;
+    whatsapp_message_id: string | null;
+    direction: "inbound" | "outbound";
+    message_type: string;
+    body: string;
+    media_id: string | null;
+    status: WhatsAppMessageStatus;
+    error_code: string | null;
+    error_message: string | null;
+    sent_by: string | null;
+    message_timestamp: string;
+    created_at: string;
+    updated_at: string;
+    sender?: Pick<Profile, "id" | "full_name" | "email" | "avatar_url"> | null;
+};

@@ -89,6 +89,38 @@ Apply the latest Supabase migration before using this feature:
 supabase db push
 ```
 
+### WhatsApp Cloud API inbox
+
+The protected `/admin/whatsapp` screen stores inbound Meta WhatsApp messages, links a new sender to an unassigned CRM
+lead, lets administrators assign the linked lead and conversation, and lets the assigned employee reply during Meta's
+24-hour customer-service window. Delivery, read, and failure webhooks update the message status in the inbox. Existing
+website email, Firebase, n8n, and Discord notification flows are unchanged.
+
+1. Apply the WhatsApp tables and role-aware RLS policies:
+
+   ```bash
+   supabase db push
+   ```
+
+2. Add these server-only values in Vercel for Production and Preview, then redeploy:
+   - `META_APP_ID`
+   - `META_APP_SECRET`
+   - `WHATSAPP_ACCESS_TOKEN` (a permanent system-user token, not the temporary test token)
+   - `WHATSAPP_PHONE_NUMBER_ID`
+   - `WHATSAPP_BUSINESS_ACCOUNT_ID`
+   - `WHATSAPP_WEBHOOK_VERIFY_TOKEN` (a new random value that is also entered in Meta)
+   - `WHATSAPP_GRAPH_API_VERSION=v25.0`
+
+3. In the Meta app's WhatsApp webhook configuration, use:
+   - Callback URL: `https://theadamant.com/api/webhooks/whatsapp`
+   - Verify token: the exact value stored as `WHATSAPP_WEBHOOK_VERIFY_TOKEN`
+4. Click **Verify and save**, subscribe the WhatsApp Business Account to webhooks, and subscribe the `messages` field.
+5. Publish the Meta app. Unpublished apps only deliver dashboard test webhooks.
+
+Webhook POST requests are accepted only when the `x-hub-signature-256` HMAC matches `META_APP_SECRET`. Access tokens,
+the app secret, and the webhook verify token are never returned to the browser. The CRM Settings screen reports only
+whether each value exists and provides the public callback URL.
+
 ## Vercel Blob recovery on 27 August 2026
 
 After the suspended store becomes readable, download `blog/internal-blog-posts.json` without deleting or modifying the Blob store. Run the importer against that downloaded file first in dry-run mode and then with `--apply` plus a new backup path. Keep the source export and Blob store until the final count and historical blog URLs have been checked.
