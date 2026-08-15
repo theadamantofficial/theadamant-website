@@ -110,6 +110,10 @@ website email, Firebase, n8n, and Discord notification flows are unchanged.
    - `WHATSAPP_BUSINESS_ACCOUNT_ID`
    - `WHATSAPP_WEBHOOK_VERIFY_TOKEN` (a new random value that is also entered in Meta)
    - `WHATSAPP_GRAPH_API_VERSION=v25.0`
+   - `WHATSAPP_PAYMENT_CONFIGURATION=Adamant.Technologies` (optional override; the current Adamant configuration is the default and the value must exactly match WhatsApp Manager)
+   - `WHATSAPP_AUTO_REPLY_ENABLED=true` (optional; defaults to enabled)
+   - `WHATSAPP_AUTO_REPLY_MESSAGE` (optional; overrides the default first-contact acknowledgement)
+   - `WHATSAPP_AUTO_REPLY_GAP_HOURS=48` (optional; minimum time between acknowledgements for a returning contact)
 
 3. In the Meta app's WhatsApp webhook configuration, use:
    - Callback URL: `https://theadamant.com/api/webhooks/whatsapp`
@@ -117,9 +121,30 @@ website email, Firebase, n8n, and Discord notification flows are unchanged.
 4. Click **Verify and save**, subscribe the WhatsApp Business Account to webhooks, and subscribe the `messages` field.
 5. Publish the Meta app. Unpublished apps only deliver dashboard test webhooks.
 
+The inbox automatically acknowledges a contact's first inbound message, then acknowledges them again only when their
+previous message was at least 48 hours earlier. It does not reply to ordinary follow-up messages. Set
+`WHATSAPP_AUTO_REPLY_ENABLED=false` to disable it, customize the wording with `WHATSAPP_AUTO_REPLY_MESSAGE`, or change
+the return gap with `WHATSAPP_AUTO_REPLY_GAP_HOURS` (for example, `72` for three days).
+
+The webhook also answers the WhatsApp Manager ice breakers for services, website development, mobile apps, and
+quotations. The `/services`, `/website`, `/app`, `/quote`, `/portfolio`, `/contact`, and `/support` commands receive an
+immediate informational reply every time they are sent. These command replies use the same `WHATSAPP_AUTO_REPLY_ENABLED`
+switch as the first-contact acknowledgement.
+
 Webhook POST requests are accepted only when the `x-hub-signature-256` HMAC matches `META_APP_SECRET`. Access tokens,
 the app secret, and the webhook verify token are never returned to the browser. The CRM Settings screen reports only
 whether each value exists and provides the public callback URL.
+
+Inbound WhatsApp audio messages are played through a signed-in CRM-only proxy. The server uses the stored media ID to
+request a fresh, short-lived download URL from Meta and streams the audio without exposing `WHATSAPP_ACCESS_TOKEN` to
+the browser. This uses the same permanent token and `whatsapp_business_messaging` permission as the messaging setup.
+
+WhatsApp payment orders are available to administrators and to the employee assigned to the conversation. Staff can
+save and edit drafts, control line items, tax, discounts, expiry and the final INR amount, and send Meta `order_details`
+messages through the active payment configuration. Sent amounts are immutable. Payment confirmation is deliberately
+manual: staff must first verify the reference and amount in Razorpay or the settlement account, then use **Confirm
+paid** to notify the customer and move the order to processing. Apply
+`supabase/migrations/20260815093000_add_whatsapp_payment_orders.sql` before using these controls.
 
 ## Vercel Blob recovery on 27 August 2026
 

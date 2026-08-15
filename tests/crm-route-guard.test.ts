@@ -46,4 +46,43 @@ describe("CRM route protection", () => {
         const response = await GET(new NextRequest("https://theadamant.com/api/admin/whatsapp/conversations"));
         expect(response.status).toBe(401);
     });
+
+    it("does not expose WhatsApp media without a valid session", async () => {
+        const {GET} = await import("@/app/api/admin/whatsapp/messages/[id]/media/route");
+        const response = await GET(
+            new NextRequest("https://theadamant.com/api/admin/whatsapp/messages/message-1/media"),
+            {params: Promise.resolve({id: "message-1"})},
+        );
+        expect(response.status).toBe(401);
+    });
+
+    it("does not expose WhatsApp payment drafts without a valid session", async () => {
+        const {GET} = await import("@/app/api/admin/whatsapp/conversations/[id]/payments/route");
+        const response = await GET(
+            new NextRequest("https://theadamant.com/api/admin/whatsapp/conversations/conversation-1/payments"),
+            {params: Promise.resolve({id: "conversation-1"})},
+        );
+        expect(response.status).toBe(401);
+    });
+
+    it("does not create WhatsApp payment drafts without a valid session", async () => {
+        const {POST} = await import("@/app/api/admin/whatsapp/conversations/[id]/payments/route");
+        const response = await POST(
+            new NextRequest("https://theadamant.com/api/admin/whatsapp/conversations/conversation-1/payments", {
+                method: "POST",
+                body: JSON.stringify({body: "Please pay", items: [{name: "Service", amount: "100", quantity: 1}]}),
+            }),
+            {params: Promise.resolve({id: "conversation-1"})},
+        );
+        expect(response.status).toBe(401);
+    });
+
+    it("does not allow WhatsApp payment status changes without a valid session", async () => {
+        const {PATCH} = await import("@/app/api/admin/whatsapp/payments/[id]/route");
+        const response = await PATCH(
+            new NextRequest("https://theadamant.com/api/admin/whatsapp/payments/order-1", {method: "PATCH", body: JSON.stringify({status: "processing"})}),
+            {params: Promise.resolve({id: "order-1"})},
+        );
+        expect(response.status).toBe(401);
+    });
 });

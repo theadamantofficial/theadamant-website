@@ -189,3 +189,36 @@ export type WhatsAppMessage = {
     updated_at: string;
     sender?: Pick<Profile, "id" | "full_name" | "email" | "avatar_url"> | null;
 };
+
+export type WhatsAppPaymentOrderStatus = "draft" | "sending" | "pending" | "processing" | "completed" | "canceled";
+
+export type WhatsAppPaymentOrder = {
+    id: string;
+    conversation_id: string;
+    reference_id: string;
+    body: string;
+    footer: string;
+    items: Array<{name: string; amount_paise: number; quantity: number}>;
+    subtotal_paise: number;
+    tax_paise: number;
+    discount_paise: number;
+    total_paise: number;
+    currency: "INR";
+    quick_pay: boolean;
+    expires_in_minutes: number;
+    status: WhatsAppPaymentOrderStatus;
+    whatsapp_message_id: string | null;
+    last_status_message_id: string | null;
+    last_status_description: string | null;
+    last_error: string | null;
+    created_by: string | null;
+    updated_by: string | null;
+    sent_at: string | null;
+    payment_confirmed_at: string | null;
+    completed_at: string | null;
+    canceled_at: string | null;
+    created_at: string;
+    updated_at: string;
+    creator?: Pick<Profile, "id" | "full_name" | "email" | "avatar_url"> | null;
+    updater?: Pick<Profile, "id" | "full_name" | "email" | "avatar_url"> | null;
+};

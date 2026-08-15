@@ -31,6 +31,41 @@ export type WhatsAppWebhookEvent = WhatsAppInboundEvent | WhatsAppStatusEvent;
 
 type JsonRecord = Record<string, unknown>;
 
+type StoredConversation = {
+    id: string;
+    contact_name: string;
+    unread_count: number;
+    customer_service_window_expires_at: string | null;
+};
+
+export const DEFAULT_WHATSAPP_AUTO_REPLY = "Hi! 👋 Thank you for contacting Adamant Technologies. We've received your message and our team will get back to you shortly.";
+
+export const WHATSAPP_AUTOMATION_REPLIES = {
+    services: "Here’s what Adamant Technologies can help with:\n\n• UI/UX design\n• SEO-friendly websites and landing pages\n• Mobile apps for Android and iOS\n• SaaS and digital product development\n• Digital marketing, social media and paid ads\n\nExplore our services: https://theadamant.com/#services\n\nReply with the service you need and a short description of your project.",
+    website: "Great — we’d be happy to help with your website. Please share:\n\n1. Business or brand name\n2. Type of website you need\n3. Required pages and features\n4. Reference websites you like\n5. Target launch date\n6. Approximate budget range\n\nOur team will review the details and reply with the next steps.",
+    app: "Great — we design and develop mobile apps for Android and iOS. Please share:\n\n1. A short description of the app\n2. Your target users\n3. The main features you need\n4. Android, iOS or both\n5. Any reference apps\n6. Target timeline and budget range\n\nOur team will review your idea and get back to you.",
+    quote: "To prepare an accurate quotation, please share:\n\n• The service you need\n• Project scope and required features\n• Target launch date\n• Reference links, if available\n• Approximate budget range\n\nYou can also submit your brief at https://theadamant.com/#contact. Our team will review it and reply with the next steps.",
+    portfolio: "You can explore our work and capabilities at https://theadamant.com/#services\n\nOur in-house SEO product: https://aetherseo.com/en\n\nTell us what type of project you are planning and our team can share the most relevant examples.",
+    contact: "You can contact Adamant Technologies here:\n\n• WhatsApp: +91 93154 14827\n• Email: admin@theadamant.com\n• Website: https://theadamant.com\n\nYou can also share your requirement directly in this chat and our team will help you.",
+    support: "For technical support, please send:\n\n• Project or website name\n• A description of the issue\n• A screenshot or screen recording, if possible\n• When the issue started\n• Your preferred contact details\n\nPlease do not share passwords, OTPs or API keys in this chat. Our team will review the issue and assist you.",
+} as const;
+
+type WhatsAppAutomationReply = keyof typeof WHATSAPP_AUTOMATION_REPLIES;
+
+const WHATSAPP_AUTOMATION_TRIGGERS: Record<string, WhatsAppAutomationReply> = {
+    "/services": "services",
+    "/website": "website",
+    "/app": "app",
+    "/quote": "quote",
+    "/portfolio": "portfolio",
+    "/contact": "contact",
+    "/support": "support",
+    "what services do you offer": "services",
+    "i want to build a website": "website",
+    "i need a mobile application": "app",
+    "how can i get a quotation": "quote",
+};
+
 export function getWhatsAppWebhookChallenge(searchParams: URLSearchParams, expectedToken = env("WHATSAPP_WEBHOOK_VERIFY_TOKEN")) {
     const mode = searchParams.get("hub.mode");
     const token = searchParams.get("hub.verify_token") || "";
@@ -130,6 +165,35 @@ export async function processWhatsAppWebhook(events: WhatsAppWebhookEvent[]) {
     return processed;
 }
 
+export function shouldSendWhatsAppAutoReply(previousWindowExpiresAt: string | null, inboundTimestamp: string, gapHours = getWhatsAppAutoReplyGapHours()) {
+    if (!previousWindowExpiresAt) return true;
+    const previousExpiry = new Date(previousWindowExpiresAt).getTime();
+    const inboundTime = new Date(inboundTimestamp).getTime();
+    const previousInboundTime = previousExpiry - 24 * 60 * 60 * 1000;
+    const gapMilliseconds = gapHours * 60 * 60 * 1000;
+    return !Number.isFinite(previousExpiry) || !Number.isFinite(inboundTime) || inboundTime - previousInboundTime >= gapMilliseconds;
+}
+
+export function isWhatsAppAutoReplyEnabled(configuredValue = env("WHATSAPP_AUTO_REPLY_ENABLED")) {
+    return !["0", "false", "no", "off"].includes(configuredValue.toLowerCase());
+}
+
+export function getWhatsAppAutoReplyMessage(configuredValue = env("WHATSAPP_AUTO_REPLY_MESSAGE")) {
+    return truncate(configuredValue || DEFAULT_WHATSAPP_AUTO_REPLY, 4096);
+}
+
+export function getWhatsAppAutoReplyGapHours(configuredValue = env("WHATSAPP_AUTO_REPLY_GAP_HOURS")) {
+    const hours = Number(configuredValue);
+    return Number.isFinite(hours) && hours >= 24 ? hours : 48;
+}
+
+export function getWhatsAppAutomationReply(messageBody: string) {
+    const normalized = messageBody.trim().toLowerCase().replace(/\s+/g, " ").replace(/[?.!]+$/g, "");
+    const trigger = normalized.startsWith("/") ? normalized.split(" ", 1)[0] : normalized;
+    const replyKey = WHATSAPP_AUTOMATION_TRIGGERS[trigger];
+    return replyKey ? WHATSAPP_AUTOMATION_REPLIES[replyKey] : null;
+}
+
 export function getWhatsAppIntegrationStatus() {
     const accessToken = env("WHATSAPP_ACCESS_TOKEN");
     const phoneNumberId = env("WHATSAPP_PHONE_NUMBER_ID");
@@ -147,6 +211,17 @@ export function getWhatsAppIntegrationStatus() {
 }
 
 export async function sendWhatsAppText(to: string, body: string) {
+    return sendWhatsAppMessage(to, {
+        type: "text",
+        text: {preview_url: false, body},
+    });
+}
+
+export async function sendWhatsAppInteractive(to: string, interactive: JsonRecord) {
+    return sendWhatsAppMessage(to, {type: "interactive", interactive});
+}
+
+async function sendWhatsAppMessage(to: string, content: JsonRecord) {
     const accessToken = env("WHATSAPP_ACCESS_TOKEN");
     const phoneNumberId = env("WHATSAPP_PHONE_NUMBER_ID");
     const version = env("WHATSAPP_GRAPH_API_VERSION") || "v25.0";
@@ -164,8 +239,7 @@ export async function sendWhatsAppText(to: string, body: string) {
             messaging_product: "whatsapp",
             recipient_type: "individual",
             to,
-            type: "text",
-            text: {preview_url: false, body},
+            ...content,
         }),
         cache: "no-store",
     });
@@ -180,6 +254,58 @@ export async function sendWhatsAppText(to: string, body: string) {
     const messageId = text(firstMessage.id);
     if (!messageId) throw new CrmApiError("Meta accepted the request without returning a message ID.", 502);
     return {messageId};
+}
+
+export async function downloadWhatsAppMedia(
+    mediaId: string,
+    phoneNumberId: string,
+    range: string | null = null,
+    fetcher: typeof fetch = fetch,
+) {
+    const accessToken = env("WHATSAPP_ACCESS_TOKEN");
+    const version = env("WHATSAPP_GRAPH_API_VERSION") || "v25.0";
+    if (!accessToken) throw new CrmApiError("WhatsApp media playback is not configured.", 503);
+    if (!mediaId) throw new CrmApiError("This WhatsApp message has no media attachment.", 404);
+
+    const metadataUrl = new URL(`https://graph.facebook.com/${version}/${encodeURIComponent(mediaId)}`);
+    if (phoneNumberId) metadataUrl.searchParams.set("phone_number_id", phoneNumberId);
+    const metadataResponse = await fetcher(metadataUrl, {
+        headers: {Authorization: `Bearer ${accessToken}`},
+        cache: "no-store",
+    });
+    const metadata = await metadataResponse.json().catch(() => ({})) as JsonRecord;
+    if (!metadataResponse.ok) {
+        const providerError = isRecord(metadata.error) ? metadata.error : {};
+        const providerMessage = truncate(text(providerError.message), 300);
+        throw new CrmApiError(providerMessage || "Meta could not retrieve this WhatsApp media.", metadataResponse.status === 404 ? 404 : 502);
+    }
+
+    const downloadUrl = text(metadata.url);
+    if (!downloadUrl) throw new CrmApiError("Meta did not return a WhatsApp media URL.", 502);
+    let parsedDownloadUrl: URL;
+    try {
+        parsedDownloadUrl = new URL(downloadUrl);
+    } catch {
+        throw new CrmApiError("Meta returned an invalid WhatsApp media URL.", 502);
+    }
+    if (parsedDownloadUrl.protocol !== "https:") throw new CrmApiError("Meta returned an insecure WhatsApp media URL.", 502);
+
+    const downloadHeaders = new Headers({Authorization: `Bearer ${accessToken}`});
+    if (range && /^bytes=\d*-\d*$/.test(range)) downloadHeaders.set("Range", range);
+    const mediaResponse = await fetcher(parsedDownloadUrl, {
+        headers: downloadHeaders,
+        cache: "no-store",
+    });
+    if (!mediaResponse.ok) {
+        throw new CrmApiError("This WhatsApp media could not be downloaded from Meta.", mediaResponse.status === 404 ? 404 : 502);
+    }
+
+    const metadataFileSize = Number(metadata.file_size);
+    return {
+        response: mediaResponse,
+        mimeType: mediaResponse.headers.get("content-type") || text(metadata.mime_type) || "application/octet-stream",
+        fileSize: Number.isFinite(metadataFileSize) && metadataFileSize >= 0 ? metadataFileSize : null,
+    };
 }
 
 async function ingestInboundMessage(client: SupabaseClient, event: WhatsAppInboundEvent) {
@@ -206,6 +332,11 @@ async function ingestInboundMessage(client: SupabaseClient, event: WhatsAppInbou
 
     const unreadCount = Math.max(0, Number(conversation.unread_count) || 0) + 1;
     const serviceWindow = new Date(new Date(event.timestamp).getTime() + 24 * 60 * 60 * 1000).toISOString();
+    const autoReplyEnabled = isWhatsAppAutoReplyEnabled();
+    const automationReply = autoReplyEnabled ? getWhatsAppAutomationReply(event.body) : null;
+    const shouldAutoReply = !automationReply && autoReplyEnabled
+        && shouldSendWhatsAppAutoReply(conversation.customer_service_window_expires_at, event.timestamp)
+        && await claimAutoReplyWindow(client, conversation, serviceWindow);
     const {error: conversationError} = await client.from("whatsapp_conversations").update({
         contact_name: event.contactName || conversation.contact_name,
         lead_id: lead.id,
@@ -218,7 +349,73 @@ async function ingestInboundMessage(client: SupabaseClient, event: WhatsAppInbou
         last_message_direction: "inbound",
     }).eq("id", conversation.id);
     if (conversationError) throw new CrmApiError("The WhatsApp conversation could not be updated.", 502);
+
+    if (automationReply || shouldAutoReply) {
+        try {
+            await sendAndStoreWhatsAppAutoReply(
+                client,
+                conversation.id,
+                event.waId,
+                automationReply || getWhatsAppAutoReplyMessage(),
+                automationReply ? {automatic_automation_reply: true, trigger: event.body} : {automatic_acknowledgement: true},
+            );
+        } catch (error) {
+            console.error("WhatsApp automatic reply failed.", {
+                conversationId: conversation.id,
+                message: error instanceof Error ? error.message : "Unknown error",
+            });
+        }
+    }
     return true;
+}
+
+async function claimAutoReplyWindow(client: SupabaseClient, conversation: StoredConversation, serviceWindow: string) {
+    let query = client.from("whatsapp_conversations")
+        .update({customer_service_window_expires_at: serviceWindow})
+        .eq("id", conversation.id);
+    query = conversation.customer_service_window_expires_at
+        ? query.eq("customer_service_window_expires_at", conversation.customer_service_window_expires_at)
+        : query.is("customer_service_window_expires_at", null);
+    const {data, error} = await query.select("id").maybeSingle();
+    if (error) throw new CrmApiError("The WhatsApp automatic acknowledgement could not be scheduled.", 502);
+    return Boolean(data);
+}
+
+async function sendAndStoreWhatsAppAutoReply(client: SupabaseClient, conversationId: string, waId: string, body: string, metadata: JsonRecord) {
+    const timestamp = new Date().toISOString();
+    const queued = await client.from("whatsapp_messages").insert({
+        conversation_id: conversationId,
+        whatsapp_message_id: null,
+        direction: "outbound",
+        message_type: "text",
+        body,
+        status: "queued",
+        sent_by: null,
+        message_timestamp: timestamp,
+        metadata,
+    }).select("id").single();
+    if (queued.error || !queued.data) throw new CrmApiError("The WhatsApp automatic reply could not be queued.", 502);
+
+    const localMessageId = String(queued.data.id);
+    try {
+        const sent = await sendWhatsAppText(waId, body);
+        const {error: messageError} = await client.from("whatsapp_messages").update({
+            whatsapp_message_id: sent.messageId,
+            status: "sent",
+            message_timestamp: timestamp,
+        }).eq("id", localMessageId);
+        if (messageError) throw new CrmApiError("The WhatsApp automatic reply was sent but could not be saved.", 502);
+        const {error: conversationError} = await client.from("whatsapp_conversations").update({
+            last_message_at: timestamp,
+            last_message_preview: truncate(body, 180),
+            last_message_direction: "outbound",
+        }).eq("id", conversationId);
+        if (conversationError) throw new CrmApiError("The WhatsApp automatic reply summary could not be saved.", 502);
+    } catch (error) {
+        const message = error instanceof Error ? truncate(error.message, 500) : "Meta could not send the automatic reply.";
+        await client.from("whatsapp_messages").update({status: "failed", error_message: message}).eq("id", localMessageId);
+        throw error;
+    }
 }
 
 async function findOrCreateWhatsAppLead(client: SupabaseClient, event: WhatsAppInboundEvent) {
@@ -264,10 +461,10 @@ async function findOrCreateWhatsAppLead(client: SupabaseClient, event: WhatsAppI
 }
 
 async function findOrCreateConversation(client: SupabaseClient, event: WhatsAppInboundEvent, leadId: string, assignedTo: string | null) {
-    const existing = await client.from("whatsapp_conversations").select("id,contact_name,unread_count")
+    const existing = await client.from("whatsapp_conversations").select("id,contact_name,unread_count,customer_service_window_expires_at")
         .eq("phone_number_id", event.phoneNumberId).eq("wa_id", event.waId).maybeSingle();
     if (existing.error) throw new CrmApiError("The WhatsApp conversation could not be matched.", 502);
-    if (existing.data) return existing.data as {id: string; contact_name: string; unread_count: number};
+    if (existing.data) return existing.data as StoredConversation;
 
     const inserted = await client.from("whatsapp_conversations").insert({
         whatsapp_business_account_id: event.businessAccountId || env("WHATSAPP_BUSINESS_ACCOUNT_ID") || null,
@@ -277,14 +474,14 @@ async function findOrCreateConversation(client: SupabaseClient, event: WhatsAppI
         lead_id: leadId,
         assigned_to: assignedTo,
         unread_count: 0,
-    }).select("id,contact_name,unread_count").single();
+    }).select("id,contact_name,unread_count,customer_service_window_expires_at").single();
     if (inserted.error?.code === "23505") {
-        const raced = await client.from("whatsapp_conversations").select("id,contact_name,unread_count")
+        const raced = await client.from("whatsapp_conversations").select("id,contact_name,unread_count,customer_service_window_expires_at")
             .eq("phone_number_id", event.phoneNumberId).eq("wa_id", event.waId).single();
-        if (!raced.error && raced.data) return raced.data as {id: string; contact_name: string; unread_count: number};
+        if (!raced.error && raced.data) return raced.data as StoredConversation;
     }
     if (inserted.error || !inserted.data) throw new CrmApiError("The WhatsApp conversation could not be created.", 502);
-    return inserted.data as {id: string; contact_name: string; unread_count: number};
+    return inserted.data as StoredConversation;
 }
 
 async function updateMessageStatus(client: SupabaseClient, event: WhatsAppStatusEvent) {

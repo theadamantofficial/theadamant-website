@@ -3,13 +3,14 @@
 import {FormEvent, useCallback, useEffect, useMemo, useState} from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import {AlertCircle, Check, CheckCheck, ChevronDown, Clock3, Loader2, RefreshCw, Search, Send, UserRound} from "lucide-react";
+import {AlertCircle, AudioLines, BadgeIndianRupee, Check, CheckCheck, ChevronDown, Clock3, Loader2, Phone, PhoneIncoming, RefreshCw, Search, Send, UserRound} from "lucide-react";
 import {useAdminActor} from "@/components/admin/admin-shell";
 import {DataError, EmptyState, PageHeader, Skeleton, UserAvatar} from "@/components/admin/admin-ui";
 import {crmFetch} from "@/features/crm/api";
 import {canManageLeads} from "@/features/crm/permissions";
 import type {WhatsAppConversation, WhatsAppMessage} from "@/features/crm/types";
 import {formatCrmDate} from "@/features/crm/format";
+import {WhatsAppPaymentModal} from "@/features/crm/whatsapp/whatsapp-payment-modal";
 
 type TeamMember = {id: string; full_name: string; email: string; active: boolean};
 
@@ -25,6 +26,7 @@ export function WhatsAppInboxScreen({initialLeadId = ""}: {initialLeadId?: strin
     const [messageLoading, setMessageLoading] = useState(false);
     const [sending, setSending] = useState(false);
     const [assigning, setAssigning] = useState(false);
+    const [paymentOpen, setPaymentOpen] = useState(false);
     const [error, setError] = useState("");
 
     const loadConversations = useCallback(async (silent = false) => {
@@ -144,9 +146,9 @@ export function WhatsAppInboxScreen({initialLeadId = ""}: {initialLeadId?: strin
                 </div>
             </aside>
 
-            <main className="flex min-h-[34rem] min-w-0 flex-col bg-[var(--crm-subtle)]/45">
+            <main className="flex min-h-[34rem] min-w-0 flex-col bg-[var(--crm-subtle)]/70">
                 {selected ? <>
-                    <ConversationHeader conversation={selected} canAssign={canAssign} members={members} assigning={assigning} onAssign={(id) => void assignConversation(id)}/>
+                    <ConversationHeader conversation={selected} canAssign={canAssign} members={members} assigning={assigning} onAssign={(id) => void assignConversation(id)} onPayment={() => setPaymentOpen(true)}/>
                     <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                         {messageLoading ? <div className="space-y-4">{Array.from({length: 5}).map((_, index) => <Skeleton key={index} className={`h-16 ${index % 2 ? "ml-auto w-2/3" : "w-3/5"}`}/>)}</div> : messages.length ? <div className="mx-auto flex max-w-3xl flex-col gap-3">{messages.map((message) => <MessageBubble key={message.id} message={message}/>)}</div> : <EmptyState title="No stored messages" description="Messages received after the webhook is connected will appear here."/>}
                     </div>
@@ -154,32 +156,58 @@ export function WhatsAppInboxScreen({initialLeadId = ""}: {initialLeadId?: strin
                 </> : <div className="flex flex-1 items-center justify-center"><EmptyState title="Select a conversation" description="Choose a WhatsApp conversation to view its messages and reply."/></div>}
             </main>
         </section>
+        {selected && paymentOpen ? <WhatsAppPaymentModal conversation={selected} onClose={() => setPaymentOpen(false)} onChanged={() => void Promise.all([loadMessages(selected.id, true), loadConversations(true)])}/> : null}
     </div>;
 }
 
 function ConversationRow({conversation, active, onClick}: {conversation: WhatsAppConversation; active: boolean; onClick: () => void}) {
     const name = conversation.contact_name || conversation.lead?.customer_name || `+${conversation.wa_id}`;
-    return <button onClick={onClick} className={`flex w-full gap-3 border-b border-[var(--crm-border)] p-3 text-left transition ${active ? "bg-[#e7f1f0] text-[#0d5c63] crm-dark:bg-white/[.08] crm-dark:text-white" : "hover:bg-[var(--crm-subtle)]"}`}>
+    const secondaryText = active ? "text-[#3e6668] crm-dark:text-white/75" : "text-[var(--crm-muted)]";
+    const tertiaryText = active ? "text-[#557476] crm-dark:text-white/60" : "text-[var(--crm-muted)]";
+    return <button type="button" aria-current={active ? "true" : undefined} onClick={onClick} className={`relative flex w-full gap-3 border-b border-[var(--crm-border)] p-3 text-left transition focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0d5c63] ${active ? "bg-[#dceceb] text-[#083f45] shadow-[inset_3px_0_0_#0d5c63] crm-dark:bg-[#193b3c] crm-dark:text-white crm-dark:shadow-[inset_3px_0_0_#5bc0bd]" : "hover:bg-[var(--crm-subtle)]"}`}>
         <UserAvatar name={name}/>
-        <span className="min-w-0 flex-1"><span className="flex items-center justify-between gap-2"><span className="truncate text-xs font-semibold">{name}</span><span className="shrink-0 text-[9px] text-[var(--crm-muted)]">{shortTime(conversation.last_message_at)}</span></span><span className="mt-1 block truncate text-[10px] text-[var(--crm-muted)]">{conversation.last_message_preview || "New conversation"}</span><span className="mt-1.5 flex items-center justify-between gap-2"><span className="truncate text-[9px] text-[var(--crm-muted)]">{conversation.assigned_profile?.full_name || "Unassigned"}</span>{conversation.unread_count > 0 ? <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#0d5c63] px-1 text-[9px] font-bold text-white">{Math.min(conversation.unread_count, 99)}</span> : null}</span></span>
+        <span className="min-w-0 flex-1"><span className="flex items-center justify-between gap-2"><span className="truncate text-xs font-semibold">{name}</span><span className={`shrink-0 text-[9px] font-medium ${tertiaryText}`}>{shortTime(conversation.last_message_at)}</span></span><span className={`mt-1 block truncate text-[10px] ${secondaryText}`}>{conversation.last_message_preview || "New conversation"}</span><span className="mt-1.5 flex items-center justify-between gap-2"><span className={`truncate text-[9px] ${tertiaryText}`}>{conversation.assigned_profile?.full_name || "Unassigned"}</span>{conversation.unread_count > 0 ? <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#0d5c63] px-1 text-[9px] font-bold text-white crm-dark:bg-[#5bc0bd] crm-dark:text-[#082f32]">{Math.min(conversation.unread_count, 99)}</span> : null}</span></span>
     </button>;
 }
 
-function ConversationHeader({conversation, canAssign, members, assigning, onAssign}: {conversation: WhatsAppConversation; canAssign: boolean; members: TeamMember[]; assigning: boolean; onAssign: (id: string) => void}) {
+function ConversationHeader({conversation, canAssign, members, assigning, onAssign, onPayment}: {conversation: WhatsAppConversation; canAssign: boolean; members: TeamMember[]; assigning: boolean; onAssign: (id: string) => void; onPayment: () => void}) {
     const name = conversation.contact_name || conversation.lead?.customer_name || `+${conversation.wa_id}`;
     return <header className="flex flex-wrap items-center gap-3 border-b border-[var(--crm-border)] bg-[var(--crm-surface)] px-4 py-3 sm:px-5">
         <UserAvatar name={name}/><div className="min-w-0"><p className="truncate text-sm font-semibold">{name}</p><p className="text-[10px] text-[var(--crm-muted)]">+{conversation.wa_id}{conversation.lead?.company_name ? ` · ${conversation.lead.company_name}` : ""}</p></div>
-        <div className="ml-auto flex items-center gap-2">{conversation.lead_id ? <Link href={`/admin/leads/${conversation.lead_id}`} className="crm-button-secondary">View lead</Link> : null}{canAssign ? <label className="relative"><span className="sr-only">Assign conversation</span><select aria-label="Assign conversation" value={conversation.assigned_to || ""} disabled={assigning} onChange={(event) => onAssign(event.target.value)} className="crm-control min-w-36 cursor-pointer appearance-none pr-9"><option value="">Unassigned</option>{members.map((member) => <option key={member.id} value={member.id}>{member.full_name || member.email}</option>)}</select>{assigning ? <Loader2 className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-[var(--crm-muted)]"/> : <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--crm-muted)]"/>}</label> : <span className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-subtle)] px-3 py-2 text-[10px] text-[var(--crm-muted)]"><UserRound className="h-3 w-3"/>{conversation.assigned_profile?.full_name || "Assigned to you"}</span>}</div>
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+            <button type="button" onClick={onPayment} className="crm-button-primary"><BadgeIndianRupee className="h-3.5 w-3.5"/><span>Payment</span></button>
+            <a href={`tel:+${conversation.wa_id}`} aria-label={`Call ${name} by phone`} title="Start a regular phone call" className="crm-button-secondary"><Phone className="h-3.5 w-3.5 text-[#0d5c63] crm-dark:text-[#70cbc7]"/><span>Call</span></a>
+            <span title="WhatsApp Calling API setup is required before this CRM can receive calls."><button type="button" disabled aria-label="Receive WhatsApp calls; setup required" className="crm-button-secondary"><PhoneIncoming className="h-3.5 w-3.5"/><span>Receive</span><span className="rounded bg-[var(--crm-subtle)] px-1.5 py-0.5 text-[8px] uppercase tracking-wide text-[var(--crm-muted)]">Setup</span></button></span>
+            {conversation.lead_id ? <Link href={`/admin/leads/${conversation.lead_id}`} className="crm-button-secondary">View lead</Link> : null}
+            {canAssign ? <label className="relative"><span className="sr-only">Assign conversation</span><select aria-label="Assign conversation" value={conversation.assigned_to || ""} disabled={assigning} onChange={(event) => onAssign(event.target.value)} className="crm-control min-w-36 cursor-pointer appearance-none pr-9"><option value="">Unassigned</option>{members.map((member) => <option key={member.id} value={member.id}>{member.full_name || member.email}</option>)}</select>{assigning ? <Loader2 className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-[var(--crm-muted)]"/> : <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--crm-muted)]"/>}</label> : <span className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-subtle)] px-3 py-2 text-[10px] text-[var(--crm-muted)]"><UserRound className="h-3 w-3"/>{conversation.assigned_profile?.full_name || "Assigned to you"}</span>}
+        </div>
     </header>;
 }
 
 function MessageBubble({message}: {message: WhatsAppMessage}) {
     const outbound = message.direction === "outbound";
-    return <div className={`flex ${outbound ? "justify-end" : "justify-start"}`}><div className={`max-w-[85%] rounded-xl px-3.5 py-2.5 shadow-sm sm:max-w-[72%] ${outbound ? "rounded-br-sm bg-[#0d5c63] text-white" : "rounded-bl-sm border border-[var(--crm-border)] bg-[var(--crm-surface)] text-[var(--crm-text)]"}`}>
-        <p className="whitespace-pre-wrap break-words text-xs leading-5">{message.body || `[${message.message_type} message]`}</p>
-        <span className={`mt-1.5 flex items-center justify-end gap-1 text-[9px] ${outbound ? "text-white/65" : "text-[var(--crm-muted)]"}`}>{formatCrmDate(message.message_timestamp, true)}{outbound ? <MessageStatus status={message.status}/> : null}</span>
+    return <div className={`flex ${outbound ? "justify-end" : "justify-start"}`}><div className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 shadow-[0_2px_8px_rgba(15,23,42,.06)] sm:max-w-[72%] ${outbound ? "rounded-br-sm bg-[#0d5c63] text-white crm-dark:bg-[#116b72]" : "rounded-bl-sm border border-[#d7dedb] bg-white text-[#172321] crm-dark:border-white/10 crm-dark:bg-[#24312f] crm-dark:text-white"}`}>
+        <MessageContent message={message}/>
+        <span className={`mt-1.5 flex items-center justify-end gap-1 text-[9px] ${outbound ? "text-white/70" : "text-[#61716d] crm-dark:text-white/55"}`}>{formatCrmDate(message.message_timestamp, true)}{outbound ? <MessageStatus status={message.status}/> : null}</span>
         {message.status === "failed" ? <p className={`mt-1 text-[9px] ${outbound ? "text-rose-100" : "text-rose-600"}`}>{message.error_message || "Delivery failed"}</p> : null}
     </div></div>;
+}
+
+function MessageContent({message}: {message: WhatsAppMessage}) {
+    if (message.message_type === "audio" && message.media_id) {
+        return <div className="w-64 max-w-full space-y-2 sm:w-72">
+            <span className="flex items-center gap-2 text-[11px] font-semibold"><AudioLines className="h-4 w-4"/>Voice message</span>
+            <audio
+                controls
+                preload="metadata"
+                className="h-10 w-full max-w-full"
+                aria-label="Play WhatsApp voice message"
+                src={`/api/admin/whatsapp/messages/${encodeURIComponent(message.id)}/media`}
+            >Your browser does not support audio playback.</audio>
+            {message.body && message.body !== "[Audio]" ? <p className="whitespace-pre-wrap break-words text-[13px] leading-5">{message.body}</p> : null}
+        </div>;
+    }
+    return <p className="whitespace-pre-wrap break-words text-[13px] leading-5">{message.body || `[${message.message_type} message]`}</p>;
 }
 
 function MessageStatus({status}: {status: WhatsAppMessage["status"]}) {
