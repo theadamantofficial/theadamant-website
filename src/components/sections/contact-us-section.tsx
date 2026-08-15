@@ -7,21 +7,23 @@ import {cn} from "@/lib/utils";
 import Image from "next/image";
 import {Dropdown} from "@/components/ui/dropdown";
 import {Textarea} from "@/components/ui/text-area";
-import {Calendar, CheckCircle2, Clock3, FileText, Mail, MessageSquareText, Target} from "lucide-react";
+import {Calendar, CheckCircle2, Clock3, FileText, Mail, MessageCircle, MessageSquareText, Target} from "lucide-react";
 import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 import toast from "react-hot-toast";
 import {loadEmailJs} from "@/lib/load-emailjs";
 import {SiteCopy} from "@/lib/site-copy";
+import {buildWhatsAppContactUrl} from "@/lib/whatsapp-contact";
 
 const SUCCESS_RESET_MS = 4000;
 const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "default_service";
 const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
 const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 
-export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) {
+export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["contact"]; serviceType?: string}) {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submissionError, setSubmissionError] = useState<string | null>(null);
+    const [whatsAppUrl, setWhatsAppUrl] = useState(() => buildWhatsAppContactUrl({service: serviceType}));
 
     useEffect(() => {
         if (!isSubmitted) {
@@ -70,6 +72,7 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
             );
 
             form.reset();
+            setWhatsAppUrl(buildWhatsAppContactUrl({service: serviceType}));
             setIsSubmitted(true);
             toast.success(copy.form.successToast);
         } catch (error) {
@@ -84,6 +87,19 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
 
     const highlightIcons = [MessageSquareText, Mail, Clock3];
     const briefIcons = [Target, Calendar, FileText];
+
+    function updateWhatsAppUrl(form: HTMLFormElement) {
+        const formData = new FormData(form);
+        const purpose = form.elements.namedItem("inquiry_type");
+        const selectedService = purpose instanceof HTMLSelectElement
+            ? purpose.selectedOptions[0]?.textContent?.trim()
+            : "";
+        setWhatsAppUrl(buildWhatsAppContactUrl({
+            name: String(formData.get("user_name") || ""),
+            service: purpose instanceof HTMLSelectElement && purpose.value ? selectedService : serviceType,
+            message: String(formData.get("message") || ""),
+        }));
+    }
 
     return (
         <section id="contact" className="section-shell pb-24 pt-10" aria-labelledby="contact-heading">
@@ -139,7 +155,8 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
 
                 <Reveal className="glass-panel h-full p-2 sm:p-3" delay={0.12}>
                     <form className="flex h-full flex-col rounded-[1.7rem] bg-white/88 px-6 py-8 dark:bg-zinc-950/90 lg:px-8 lg:py-10"
-                          onSubmit={handleSubmit}>
+                          onSubmit={handleSubmit}
+                          onInput={(event) => updateWhatsAppUrl(event.currentTarget)}>
                         <input type="hidden" name="site_name" value="The Adamant"/>
                         <input type="hidden" name="submitted_at" defaultValue=""/>
                         <input type="hidden" name="reference_id" defaultValue=""/>
@@ -235,6 +252,16 @@ export default function ContactUsSection({copy}: { copy: SiteCopy["contact"] }) 
                                     {isSubmitting ? copy.form.submittingLabel : copy.form.submitLabel}
                                 </button>
                             )}
+                            <a
+                                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-[#1ca851]/35 bg-[#25d366]/10 px-5 py-3 text-sm font-semibold text-[#127c3b] transition hover:border-[#1ca851]/55 hover:bg-[#25d366]/15 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#25d366]/20 dark:text-[#74e59b]"
+                                href={whatsAppUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <MessageCircle className="h-4 w-4"/>
+                                Contact on WhatsApp
+                            </a>
+                            <p className="text-center text-[11px] leading-5 text-foreground/52">Opens WhatsApp with an editable message based on the details above.</p>
                         </div>
                     </form>
                 </Reveal>

@@ -66,6 +66,10 @@ has its own protected layout and uses Supabase Auth plus PostgreSQL row-level se
 CRM sessions are stored only in secure, HTTP-only cookies. Normal CRM data requests use the signed-in user's Supabase
 access token, so RLS remains authoritative. The Supabase secret key is never sent to the browser.
 
+For CRM password recovery, add `https://theadamant.com/admin/reset-password` to the allowed redirect URLs in
+Supabase Auth. The login screen sends recovery email only to valid `@theadamant.com` addresses and the recovery page
+requires Supabase's short-lived access and refresh tokens before accepting a new password.
+
 Public contact-form, website-audit, and completed SEO-chat submissions are also captured as unassigned CRM leads.
 This server-side capture uses `SUPABASE_SECRET_KEY` (or `SUPABASE_SERVICE_ROLE_KEY`) and runs independently from the
 existing EmailJS, Firebase, n8n, and Discord flows. A CRM capture failure therefore does not suppress the existing

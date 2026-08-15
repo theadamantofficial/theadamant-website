@@ -153,7 +153,7 @@ export default function ServiceLandingPage({
                 <AnimatedFaqList items={page.faqs} className="mt-8" idPrefix={`${page.slug}-faq`}/>
             </ServiceGlideSection>
 
-            <ContactUsSection copy={copy.contact}/>
+            <ContactUsSection copy={copy.contact} serviceType={page.eyebrow}/>
             <Footer copy={copy.footer} locale={DEFAULT_SITE_LOCALE}/>
         </main>
     );

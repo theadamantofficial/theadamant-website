@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {parseCrmCompanyEmail, parseCrmSignupInput, parseLeadInput, parsePage, parseTaskInput} from "@/lib/crm/validation";
+import {parseCrmCompanyEmail, parseCrmPassword, parseCrmSignupInput, parseLeadInput, parsePage, parseTaskInput} from "@/lib/crm/validation";
 
 describe("CRM input validation", () => {
     it("normalizes a complete lead payload", () => {
@@ -55,5 +55,11 @@ describe("CRM input validation", () => {
             password: "securepass123",
         });
         expect(() => parseCrmSignupInput({fullName: "A", email: "a@theadamant.com", password: "short"})).toThrow("full name");
+    });
+
+    it("enforces password length for password recovery", () => {
+        expect(parseCrmPassword("securepass123")).toBe("securepass123");
+        expect(() => parseCrmPassword("short")).toThrow("at least 8");
+        expect(() => parseCrmPassword("x".repeat(129))).toThrow("128 characters");
     });
 });

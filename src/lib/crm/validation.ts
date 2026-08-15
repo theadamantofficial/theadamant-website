@@ -14,18 +14,22 @@ export function parseCrmCompanyEmail(value: unknown) {
 
 export function parseCrmSignupInput(payload: Record<string, unknown>) {
     const fullName = typeof payload.fullName === "string" ? payload.fullName.trim() : "";
-    const password = typeof payload.password === "string" ? payload.password : "";
 
     if (fullName.length < 2) throw new CrmApiError("Enter your full name.");
     if (fullName.length > 100) throw new CrmApiError("Name must be 100 characters or fewer.");
-    if (password.length < 8) throw new CrmApiError("Use a password with at least 8 characters.");
-    if (password.length > 128) throw new CrmApiError("Password must be 128 characters or fewer.");
 
     return {
         fullName,
         email: parseCrmCompanyEmail(payload.email),
-        password,
+        password: parseCrmPassword(payload.password),
     };
+}
+
+export function parseCrmPassword(value: unknown) {
+    const password = typeof value === "string" ? value : "";
+    if (password.length < 8) throw new CrmApiError("Use a password with at least 8 characters.");
+    if (password.length > 128) throw new CrmApiError("Password must be 128 characters or fewer.");
+    return password;
 }
 
 export function parseLeadInput(payload: Record<string, unknown>, partial = false) {

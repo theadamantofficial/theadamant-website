@@ -38,6 +38,10 @@ export function middleware(request: NextRequest) {
                 : NextResponse.next();
         }
 
+        if (pathname === "/admin/reset-password") {
+            return NextResponse.next();
+        }
+
         if (!hasCurrentAccess) {
             const nextPath = `${pathname}${request.nextUrl.search}`;
             const destination = refreshToken
