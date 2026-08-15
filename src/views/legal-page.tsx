@@ -40,7 +40,7 @@ export default function LegalPage({
                     className="relative z-10 inline-flex items-center gap-2 text-sm font-semibold text-foreground/65 transition hover:text-foreground"
                 >
                     <ArrowLeft className="h-4 w-4"/>
-                    Back to The Adamant
+                    Back to Adamant
                 </Link>
 
                 <div className="relative z-10 mt-8 max-w-4xl">

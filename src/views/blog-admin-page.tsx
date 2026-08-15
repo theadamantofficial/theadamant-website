@@ -24,7 +24,7 @@ export default function BlogAdminPage({
                         Internal blog admin
                     </p>
                     <h1 className="section-title max-w-3xl">
-                        Publish articles on The Adamant without leaving the site workspace.
+                        Publish articles on Adamant without leaving the site workspace.
                     </h1>
                     <p className="section-copy max-w-3xl">
                         This admin page is meant for company members. It keeps a cookie-based session for sign-in and

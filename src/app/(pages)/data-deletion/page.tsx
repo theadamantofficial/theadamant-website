@@ -3,7 +3,7 @@ import LegalPage, {LegalSection} from "@/views/legal-page";
 import {buildOpenGraphMetadata, buildTwitterMetadata} from "@/lib/social-metadata";
 
 const title = "Data Deletion Instructions";
-const description = "How to request deletion of personal information held by The Adamant, including website enquiries, CRM records, and WhatsApp conversation data.";
+const description = "How to request deletion of personal information held by Adamant, including website enquiries, CRM records, and WhatsApp conversation data.";
 
 export const metadata: Metadata = {
     title,
@@ -19,10 +19,10 @@ const sections: LegalSection[] = [
         title: "Requesting deletion",
         content: (
             <p>
-                You may ask JSSS Adamant Technologies Private Limited, operating as The Adamant, to delete
+                You may ask JSSS Adamant Technologies Private Limited, operating as Adamant, to delete
                 personal information connected with your website enquiry, project communication, customer
                 record, authorised company account, or WhatsApp conversation. These instructions are also
-                provided for users of Meta and WhatsApp integrations connected to The Adamant.
+                provided for users of Meta and WhatsApp integrations connected to Adamant.
             </p>
         ),
     },
@@ -64,7 +64,7 @@ const sections: LegalSection[] = [
             <>
                 <p>Subject to the exceptions below, a verified request may cover:</p>
                 <ul>
-                    <li>Contact-form, enquiry, website-audit, and lead information stored by The Adamant.</li>
+                    <li>Contact-form, enquiry, website-audit, and lead information stored by Adamant.</li>
                     <li>WhatsApp contact details, message content, conversation metadata, and linked CRM records under our control.</li>
                     <li>Customer notes, assignments, comments, and service communications associated with the requester.</li>
                     <li>An authorised company user’s profile and access, after any required offboarding and security review.</li>
@@ -108,7 +108,7 @@ const sections: LegalSection[] = [
         title: "Meta, WhatsApp, and other providers",
         content: (
             <p>
-                We can delete information held in systems under The Adamant’s control. Meta, WhatsApp, and
+                We can delete information held in systems under Adamant’s control. Meta, WhatsApp, and
                 other providers may retain information independently under their own policies. Deleting a chat
                 from your WhatsApp application does not necessarily delete the corresponding business record
                 in our CRM, and deleting our CRM record does not control data held independently by Meta. You

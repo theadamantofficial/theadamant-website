@@ -10,14 +10,14 @@ import {MotionProvider} from "@/components/providers/motion-provider";
 
 export const metadata: Metadata = {
     title: {
-        default: "The Adamant | Web, App, SaaS and Digital Marketing",
-        template: "%s | The Adamant",
+        default: "Adamant | Web, App, SaaS and Digital Marketing",
+        template: "%s | Adamant",
     },
-    description: "The Adamant designs SEO-friendly websites, product interfaces, mobile experiences, and digital marketing campaigns for brands in India, the USA, UK, Japan, and global markets.",
-    applicationName: "The Adamant",
-    authors: [{name: "The Adamant"}],
-    creator: "The Adamant",
-    publisher: "The Adamant",
+    description: "Adamant designs SEO-friendly websites, product interfaces, mobile experiences, and digital marketing campaigns for brands in India, the USA, UK, Japan, and global markets.",
+    applicationName: "Adamant",
+    authors: [{name: "Adamant"}],
+    creator: "Adamant",
+    publisher: "Adamant",
     keywords: [
         "web design",
         "website development",
@@ -40,13 +40,13 @@ export const metadata: Metadata = {
     },
     openGraph: {
         ...buildOpenGraphMetadata({
-            title: "The Adamant | Web, App, SaaS and Digital Marketing",
+            title: "Adamant | Web, App, SaaS and Digital Marketing",
             description: "Design-forward websites, UX systems, mobile experiences, and digital marketing campaigns with clear messaging, fast performance, and SEO-ready structure.",
             pagePath: "/",
         }),
     },
     twitter: buildTwitterMetadata({
-        title: "The Adamant | Web, App, SaaS and Digital Marketing",
+        title: "Adamant | Web, App, SaaS and Digital Marketing",
         description: "Design-forward websites, UX systems, mobile experiences, and digital marketing campaigns with clear messaging, fast performance, and SEO-ready structure.",
     }),
     metadataBase: getSiteMetadataBase(),

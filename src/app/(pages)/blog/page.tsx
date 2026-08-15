@@ -12,17 +12,17 @@ export const revalidate = 1800;
 
 export const metadata: Metadata = {
     title: {
-        absolute: "The Adamant Blog",
+        absolute: "Adamant Blog",
     },
-    description: "Read The Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
+    description: "Read Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
     openGraph: buildOpenGraphMetadata({
-        title: "The Adamant Blog",
-        description: "Read The Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
+        title: "Adamant Blog",
+        description: "Read Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
         pagePath: "/blog",
     }),
     twitter: buildTwitterMetadata({
-        title: "The Adamant Blog",
-        description: "Read The Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
+        title: "Adamant Blog",
+        description: "Read Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
     }),
     alternates: {
         canonical: "/blog",

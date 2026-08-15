@@ -7,7 +7,7 @@ const copy = getSiteCopy(DEFAULT_SITE_LOCALE);
 
 export const metadata: Metadata = {
     title: {
-        absolute: "The Adamant Blog Admin",
+        absolute: "Adamant Blog Admin",
     },
     robots: {
         index: false,

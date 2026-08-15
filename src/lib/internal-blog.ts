@@ -84,7 +84,11 @@ export function getEnhancedBlogSeoTitle(title: string, tags: string[] = []) {
 
     const preferredTitle = safeTitle.length > 54 ? `${safeTitle.slice(0, 51).trim()}...` : safeTitle;
 
-    return `${preferredTitle} | ${focus} | The Adamant`;
+    return `${preferredTitle} | ${focus} | Adamant`;
+}
+
+export function getBlogAuthorDisplayName(authorName: string) {
+    return authorName.replace(/\bthe adamant\b/gi, "Adamant");
 }
 
 export function getBlogAdminCredentials(): BlogAdminCredentials {
@@ -265,7 +269,7 @@ export async function createInternalBlogPost(input: CreateInternalBlogPostInput)
             content: resolvedDraft.content,
             coverImage: normalizeCoverImage(input.coverImage),
             tags,
-            authorName: input.authorName?.trim() || "The Adamant Team",
+            authorName: input.authorName?.trim() || "Adamant Team",
             createdAt: now,
             updatedAt: now,
             publishedAt: now,

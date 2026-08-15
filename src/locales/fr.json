@@ -2,11 +2,11 @@
   "locale": "fr",
   "dir": "ltr",
   "metadata": {
-    "title": "The Adamant | Design web, developpement et SEO",
-    "description": "The Adamant conçoit des sites web, des systemes UX et des experiences mobiles avec une meilleure premiere impression, un message plus clair et des bases pretes pour le SEO."
+    "title": "Adamant | Design web, developpement et SEO",
+    "description": "Adamant conçoit des sites web, des systemes UX et des experiences mobiles avec une meilleure premiere impression, un message plus clair et des bases pretes pour le SEO."
   },
   "schema": {
-    "organizationDescription": "The Adamant conçoit des sites web, des interfaces produit et des expériences mobiles avec des messages clairs, de bonnes performances et des fondations prêtes pour le SEO."
+    "organizationDescription": "Adamant conçoit des sites web, des interfaces produit et des expériences mobiles avec des messages clairs, de bonnes performances et des fondations prêtes pour le SEO."
   },
   "navbar": {
     "navItems": [
@@ -23,7 +23,7 @@
   "hero": {
     "kicker": "Design, developpement et structure prete pour le SEO",
     "title": "Rendez le premier ecran impossible a ignorer.",
-    "description": "The Adamant crée des sites web, des systèmes UX et des expériences mobiles qui paraissent premium, expliquent clairement votre offre et donnent aux moteurs de recherche la structure dont ils ont besoin dès le premier jour.",
+    "description": "Adamant crée des sites web, des systèmes UX et des expériences mobiles qui paraissent premium, expliquent clairement votre offre et donnent aux moteurs de recherche la structure dont ils ont besoin dès le premier jour.",
     "primaryCta": "Lancer votre projet",
     "secondaryCta": "Voir les services",
     "positioningPoints": [
@@ -127,8 +127,8 @@
     "description": "Ces réponses renforcent aussi la page sémantiquement et donnent plus de contexte aux moteurs de recherche.",
     "items": [
       {
-        "question": "Quels types de projets The Adamant prend-il en charge ?",
-        "answer": "The Adamant se concentre sur le design UI/UX, le développement web et les expériences mobiles pour les marques qui veulent une présence digitale plus forte et une meilleure première impression."
+        "question": "Quels types de projets Adamant prend-il en charge ?",
+        "answer": "Adamant se concentre sur le design UI/UX, le développement web et les expériences mobiles pour les marques qui veulent une présence digitale plus forte et une meilleure première impression."
       },
       {
         "question": "Peut-on rendre le site plus SEO-friendly des le depart ?",
@@ -229,7 +229,7 @@
         ]
       }
     ],
-    "copyright": "The Adamant. Tous droits réservés.",
+    "copyright": "Adamant. Tous droits réservés.",
     "tagline": "Pensé pour la clarté, la vitesse et une meilleure première impression."
   }
 }

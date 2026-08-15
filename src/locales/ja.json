@@ -2,11 +2,11 @@
   "locale": "ja",
   "dir": "ltr",
   "metadata": {
-    "title": "The Adamant | Webデザイン・開発・SEO",
-    "description": "The Adamantは、より強い第一印象、明確なメッセージ、SEOに強い土台を備えたWebサイト、UXシステム、モバイル体験を制作します。"
+    "title": "Adamant | Webデザイン・開発・SEO",
+    "description": "Adamantは、より強い第一印象、明確なメッセージ、SEOに強い土台を備えたWebサイト、UXシステム、モバイル体験を制作します。"
   },
   "schema": {
-    "organizationDescription": "The Adamantは、明確なメッセージ、高速なパフォーマンス、SEO対応の基盤を備えたWebサイト、プロダクトUI、モバイル体験を設計します。"
+    "organizationDescription": "Adamantは、明確なメッセージ、高速なパフォーマンス、SEO対応の基盤を備えたWebサイト、プロダクトUI、モバイル体験を設計します。"
   },
   "navbar": {
     "navItems": [
@@ -23,7 +23,7 @@
   "hero": {
     "kicker": "デザイン・開発・SEO対応構造",
     "title": "最初の画面を見逃せないものにする。",
-    "description": "The Adamantは、上質に見え、提供価値を明確に伝え、検索エンジンが初日から理解しやすい構造を持つWebサイト、UXシステム、モバイル体験を制作します。",
+    "description": "Adamantは、上質に見え、提供価値を明確に伝え、検索エンジンが初日から理解しやすい構造を持つWebサイト、UXシステム、モバイル体験を制作します。",
     "primaryCta": "プロジェクトを始める",
     "secondaryCta": "サービスを見る",
     "positioningPoints": [
@@ -127,8 +127,8 @@
     "description": "これらの回答はページの意味構造も強化し、検索エンジンに対してサービス内容の文脈をより明確に伝えます。",
     "items": [
       {
-        "question": "The Adamantはどのようなプロジェクトに対応していますか？",
-        "answer": "The Adamantは、より強いデジタルプレゼンスと第一印象を求めるブランド向けに、UI/UXデザイン、Web開発、モバイル体験を提供しています。"
+        "question": "Adamantはどのようなプロジェクトに対応していますか？",
+        "answer": "Adamantは、より強いデジタルプレゼンスと第一印象を求めるブランド向けに、UI/UXデザイン、Web開発、モバイル体験を提供しています。"
       },
       {
         "question": "最初からSEOに配慮したサイトにできますか？",
@@ -229,7 +229,7 @@
         ]
       }
     ],
-    "copyright": "The Adamant. All rights reserved.",
+    "copyright": "Adamant. All rights reserved.",
     "tagline": "明確さ、速さ、そして強い第一印象のために設計。"
   }
 }

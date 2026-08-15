@@ -3,7 +3,7 @@ import LegalPage, {LegalSection} from "@/views/legal-page";
 import {buildOpenGraphMetadata, buildTwitterMetadata} from "@/lib/social-metadata";
 
 const title = "Terms of Service";
-const description = "The terms governing use of The Adamant website, communications, digital services, and authorised internal CRM.";
+const description = "The terms governing use of Adamant website, communications, digital services, and authorised internal CRM.";
 
 export const metadata: Metadata = {
     title,
@@ -20,7 +20,7 @@ const sections: LegalSection[] = [
         content: (
             <p>
                 These Terms of Service (“Terms”) govern your use of theadamant.com and services provided by
-                JSSS Adamant Technologies Private Limited, operating as The Adamant (“The Adamant”, “we”,
+                JSSS Adamant Technologies Private Limited, operating as Adamant (“Adamant”, “we”,
                 “us”, or “our”). By accessing the website, submitting an enquiry, using an authorised company
                 account, or engaging us for services, you agree to these Terms. A separately signed proposal,
                 statement of work, or contract will control if it conflicts with these Terms.
@@ -32,7 +32,7 @@ const sections: LegalSection[] = [
         title: "Our services",
         content: (
             <p>
-                The Adamant provides services that may include website strategy and development, user
+                Adamant provides services that may include website strategy and development, user
                 experience and interface design, application development, search optimisation foundations,
                 digital marketing, social media support, paid advertising support, audits, consulting, and
                 related technology or creative work. The exact deliverables, schedule, dependencies, fees,
@@ -65,7 +65,7 @@ const sections: LegalSection[] = [
         title: "Company accounts and CRM access",
         content: (
             <p>
-                The internal CRM is restricted to authorised The Adamant personnel using approved company
+                The internal CRM is restricted to authorised Adamant personnel using approved company
                 email addresses. Users must protect their credentials, use only the permissions assigned to
                 them, and promptly report suspected unauthorised access. We may suspend or remove access when
                 a user leaves the company, violates policy, presents a security risk, or no longer requires
@@ -88,7 +88,7 @@ const sections: LegalSection[] = [
         title: "Content and intellectual property",
         content: (
             <>
-                <p>The Adamant owns the website, its branding, source materials, reusable tools, processes, know-how, templates, and content unless stated otherwise. You may not copy, resell, reverse engineer, scrape, or commercially exploit them without written permission.</p>
+                <p>Adamant owns the website, its branding, source materials, reusable tools, processes, know-how, templates, and content unless stated otherwise. You may not copy, resell, reverse engineer, scrape, or commercially exploit them without written permission.</p>
                 <p>You retain ownership of materials you provide and grant us permission to use them to perform the requested services. Ownership and licence terms for project deliverables will be defined in the applicable project agreement and may depend on full payment. Third-party materials remain subject to their respective licences.</p>
             </>
         ),
@@ -134,7 +134,7 @@ const sections: LegalSection[] = [
         title: "Limitation of liability",
         content: (
             <p>
-                To the maximum extent permitted by applicable law, The Adamant will not be liable for indirect,
+                To the maximum extent permitted by applicable law, Adamant will not be liable for indirect,
                 incidental, special, punitive, or consequential loss, including lost profits, revenue, data,
                 goodwill, or business opportunity. For a paid engagement, our aggregate liability arising from
                 that engagement will not exceed the amount paid to us for the specific services giving rise to

@@ -114,7 +114,7 @@ export default function BrandIntroOverlay() {
             }}
             role="dialog"
             aria-modal="true"
-            aria-label="The Adamant opening film"
+            aria-label="Adamant opening film"
         >
             <div
                 className={`absolute inset-0 will-change-transform transition-transform duration-[1150ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
@@ -132,7 +132,7 @@ export default function BrandIntroOverlay() {
                     preload="auto"
                     controlsList="nodownload noplaybackrate"
                     disablePictureInPicture
-                    aria-label="The Adamant logo reveal: Firm in vision, bold in action"
+                    aria-label="Adamant logo reveal: Firm in vision, bold in action"
                     onCanPlay={playVideo}
                     onTimeUpdate={() => {
                         const video = videoRef.current;

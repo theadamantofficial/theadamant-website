@@ -43,7 +43,7 @@ export async function generateMetadata({
             description: post.excerpt,
             type: "article",
             url,
-            siteName: "The Adamant",
+            siteName: "Adamant",
             images: getOpenGraphImages(post.coverImage, seoTitle),
             publishedTime: post.publishedAt,
             modifiedTime: post.updatedAt,

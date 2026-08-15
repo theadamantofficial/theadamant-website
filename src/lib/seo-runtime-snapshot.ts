@@ -20,7 +20,7 @@ export async function fetchSeoRuntimeSnapshot(url: string) {
     try {
         const response = await fetch(url, {
             headers: {
-                "User-Agent": "TheAdamantSEOAI/1.0 (+https://theadamant.com)",
+                "User-Agent": "AdamantSEOAI/1.0 (+https://theadamant.com)",
                 Accept: "text/html,application/xhtml+xml",
             },
             signal: AbortSignal.timeout(6500),

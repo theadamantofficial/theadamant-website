@@ -4,7 +4,7 @@ import {ArrowRight, ExternalLink, PenSquare} from "lucide-react";
 import {Navbar} from "@/components/layouts/navbar";
 import Footer from "@/components/layouts/footer";
 import {MEDIUM_URL} from "@/lib/blog-config";
-import {InternalBlogPost} from "@/lib/internal-blog";
+import {getBlogAuthorDisplayName, InternalBlogPost} from "@/lib/internal-blog";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPagePath, getLocalizedPath, localeToHtmlLang, SiteLocale} from "@/lib/site-locale";
 import {getSiteUrl} from "@/lib/site-url";
@@ -32,7 +32,7 @@ const BLOG_COPY: Record<SiteLocale, {
 }> = {
     en: {
         kicker: "Blog hub",
-        title: "Insights from The Adamant, published on-site and distributed through Medium.",
+        title: "Insights from Adamant, published on-site and distributed through Medium.",
         description: "This blog keeps your content discoverable on your own domain while still letting Medium support wider reach. Read internal articles and linked insights on web design, UX, SEO, and digital product strategy.",
         latestLabel: "Latest articles",
         emptyTitle: "New articles will appear here as soon as they are published on Medium.",
@@ -43,7 +43,7 @@ const BLOG_COPY: Record<SiteLocale, {
     },
     hi: {
         kicker: "ब्लॉग हब",
-        title: "The Adamant के लेख, Medium पर प्रकाशित।",
+        title: "Adamant के लेख, Medium पर प्रकाशित।",
         description: "यह पेज आपके content को आपकी अपनी domain पर discoverable रखता है, जबकि publishing workflow Medium पर बना रहता है। web design, UX, SEO और digital product strategy पर latest insights पढ़ें।",
         latestLabel: "नवीनतम लेख",
         emptyTitle: "जैसे ही Medium पर नए लेख प्रकाशित होंगे, वे यहाँ दिखाई देंगे।",
@@ -54,7 +54,7 @@ const BLOG_COPY: Record<SiteLocale, {
     },
     gu: {
         kicker: "બ્લોગ હબ",
-        title: "The Adamant ના લેખો, Medium પર પ્રકાશિત.",
+        title: "Adamant ના લેખો, Medium પર પ્રકાશિત.",
         description: "આ પેજ તમારા content ને તમારા પોતાના domain પર discoverable રાખે છે, જ્યારે publishing workflow Medium પર જ રહે છે. web design, UX, SEO અને digital product strategy વિષયક latest insights વાંચો.",
         latestLabel: "તાજેતરના લેખો",
         emptyTitle: "Medium પર નવા લેખો પ્રકાશિત થતા જ તેઓ અહીં દેખાશે.",
@@ -65,7 +65,7 @@ const BLOG_COPY: Record<SiteLocale, {
     },
     mr: {
         kicker: "ब्लॉग हब",
-        title: "The Adamant चे लेख, Medium वर प्रकाशित.",
+        title: "Adamant चे लेख, Medium वर प्रकाशित.",
         description: "हे पेज तुमचे content तुमच्या स्वतःच्या domain वर discoverable ठेवते, तर publishing workflow Medium वरच राहते. web design, UX, SEO आणि digital product strategy वरील latest insights वाचा.",
         latestLabel: "नवीन लेख",
         emptyTitle: "Medium वर नवीन लेख प्रकाशित होताच ते इथे दिसतील.",
@@ -76,7 +76,7 @@ const BLOG_COPY: Record<SiteLocale, {
     },
     bn: {
         kicker: "ব্লগ হাব",
-        title: "The Adamant-এর আর্টিকেল, Medium-এ প্রকাশিত।",
+        title: "Adamant-এর আর্টিকেল, Medium-এ প্রকাশিত।",
         description: "এই পেজ আপনার content-কে আপনার নিজের domain-এ discoverable রাখে, যখন publishing workflow Medium-এ থাকে। web design, UX, SEO এবং digital product strategy নিয়ে latest insights পড়ুন।",
         latestLabel: "সর্বশেষ আর্টিকেল",
         emptyTitle: "Medium-এ নতুন আর্টিকেল প্রকাশ হলেই সেগুলো এখানে দেখাবে।",
@@ -87,7 +87,7 @@ const BLOG_COPY: Record<SiteLocale, {
     },
     ta: {
         kicker: "ப்ளாக் ஹப்",
-        title: "The Adamant கட்டுரைகள், Medium-ல் வெளியிடப்பட்டவை.",
+        title: "Adamant கட்டுரைகள், Medium-ல் வெளியிடப்பட்டவை.",
         description: "இந்த பக்கம் உங்கள் content-ஐ உங்கள் சொந்த domain-ல் discoverable ஆக வைத்திருக்கிறது, publishing workflow மட்டும் Medium-ல் இருக்கும். web design, UX, SEO மற்றும் digital product strategy குறித்த latest insights-ஐ படிக்கலாம்.",
         latestLabel: "சமீபத்திய கட்டுரைகள்",
         emptyTitle: "Medium-ல் புதிய கட்டுரைகள் வெளியாகும் போது அவை இங்கே தோன்றும்.",
@@ -98,7 +98,7 @@ const BLOG_COPY: Record<SiteLocale, {
     },
     es: {
         kicker: "Blog hub",
-        title: "Articulos de The Adamant publicados en Medium.",
+        title: "Articulos de Adamant publicados en Medium.",
         description: "Esta pagina mantiene tu contenido visible en tu propio dominio mientras tu flujo de publicacion sigue en Medium. Lee ideas sobre web design, UX, SEO y estrategia digital.",
         latestLabel: "Ultimos articulos",
         emptyTitle: "Los nuevos articulos apareceran aqui en cuanto se publiquen en Medium.",
@@ -109,7 +109,7 @@ const BLOG_COPY: Record<SiteLocale, {
     },
     fr: {
         kicker: "Blog hub",
-        title: "Articles de The Adamant publies sur Medium.",
+        title: "Articles de Adamant publies sur Medium.",
         description: "Cette page rend votre contenu visible sur votre propre domaine tout en gardant votre flux de publication sur Medium. Lisez nos contenus sur le design web, l'UX, le SEO et la strategie digitale.",
         latestLabel: "Derniers articles",
         emptyTitle: "Les nouveaux articles apparaitront ici des qu'ils seront publies sur Medium.",
@@ -120,7 +120,7 @@ const BLOG_COPY: Record<SiteLocale, {
     },
     de: {
         kicker: "Blog hub",
-        title: "Artikel von The Adamant, veroffentlicht auf Medium.",
+        title: "Artikel von Adamant, veroffentlicht auf Medium.",
         description: "Diese Seite macht Ihre Inhalte auf Ihrer eigenen Domain auffindbar, wahrend Ihr Publishing-Workflow auf Medium bleibt. Lesen Sie Insights zu Webdesign, UX, SEO und digitaler Strategie.",
         latestLabel: "Neueste Artikel",
         emptyTitle: "Neue Artikel erscheinen hier, sobald sie auf Medium veroffentlicht werden.",
@@ -131,7 +131,7 @@ const BLOG_COPY: Record<SiteLocale, {
     },
     pt: {
         kicker: "Blog hub",
-        title: "Artigos da The Adamant publicados no Medium.",
+        title: "Artigos da Adamant publicados no Medium.",
         description: "Esta pagina mantem seu conteudo descobrivel no seu proprio dominio enquanto seu fluxo de publicacao continua no Medium. Leia insights sobre web design, UX, SEO e estrategia digital.",
         latestLabel: "Artigos recentes",
         emptyTitle: "Novos artigos aparecerao aqui assim que forem publicados no Medium.",
@@ -142,7 +142,7 @@ const BLOG_COPY: Record<SiteLocale, {
     },
     ja: {
         kicker: "ブログハブ",
-        title: "The Adamant の記事を Medium からまとめて読む。",
+        title: "Adamant の記事を Medium からまとめて読む。",
         description: "公開フローは Medium のままにしながら、このページでコンテンツを自社ドメイン上に見つけやすくします。Webデザイン、UX、SEO、デジタル戦略に関する記事をまとめて確認できます。",
         latestLabel: "最新記事",
         emptyTitle: "Medium に新しい記事が公開されると、ここに表示されます。",
@@ -154,10 +154,10 @@ const BLOG_COPY: Record<SiteLocale, {
 };
 
 const INTERFACE_COPY = {
-    sectionTitle: "Articles on The Adamant",
+    sectionTitle: "Articles on Adamant",
     sectionDescription: "Internal articles published on your site appear here first. Medium posts can still sit alongside them for discovery and internal linking.",
     adminAccess: "Company member login",
-    internalTitle: "Published on The Adamant",
+    internalTitle: "Published on Adamant",
     internalEmptyTitle: "No internal blog posts yet.",
     internalEmptyDescription: "Use the company member login to publish your first on-site article. It will appear in this section immediately.",
     mediumTitle: "From Medium",
@@ -166,7 +166,7 @@ const INTERFACE_COPY = {
     readArticle: "Read article",
     readOnMedium: "Read on Medium",
     mediumSourceLabel: "Medium",
-    internalSourceLabel: "The Adamant",
+    internalSourceLabel: "Adamant",
 };
 
 export default function BlogPage({
@@ -189,13 +189,13 @@ export default function BlogPage({
         {
             "@context": "https://schema.org",
             "@type": "Blog",
-            name: "The Adamant Blog",
+            name: "Adamant Blog",
             url: `${siteUrl}${pathname}`,
             inLanguage: locale,
             description: blogCopy.description,
             publisher: {
                 "@type": "Organization",
-                name: "The Adamant",
+                name: "Adamant",
                 sameAs: [MEDIUM_URL],
             },
             blogPost: [
@@ -207,7 +207,7 @@ export default function BlogPage({
                     description: post.excerpt,
                     author: {
                         "@type": "Person",
-                        name: post.authorName,
+                        name: getBlogAuthorDisplayName(post.authorName),
                     },
                 })),
                 ...mediumPosts.map((post) => ({

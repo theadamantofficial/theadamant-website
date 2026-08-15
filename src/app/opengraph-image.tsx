@@ -1,6 +1,6 @@
 import {ImageResponse} from "next/og";
 
-export const alt = "The Adamant | Web, App, SaaS and Digital Marketing";
+export const alt = "Adamant | Web, App, SaaS and Digital Marketing";
 export const size = {
     width: 1200,
     height: 630,
@@ -87,7 +87,7 @@ export default function OpenGraphImage() {
                                 textTransform: "uppercase",
                             }}
                         >
-                            The Adamant
+                            Adamant
                         </div>
                         <div
                             style={{

@@ -277,14 +277,19 @@ export const AppLogo = ({
         >
             <Image
                 src="/vectors/logo-the-adamant.svg"
-                alt="The Adamant logo"
+                alt="Adamant logo"
                 width={30}
                 height={30}
                 priority
             />
 
             {includeText && (
-                <span className="font-medium tracking-tight">The Adamant</span>
+                <span className="flex flex-col leading-none">
+                    <span className="font-semibold tracking-tight">Adamant</span>
+                    <span className="mt-1 whitespace-nowrap text-[9px] font-medium tracking-[0.08em] text-black/55 dark:text-white/55">
+                        Firm in vision, bold in action
+                    </span>
+                </span>
             )}
         </Link>
     );

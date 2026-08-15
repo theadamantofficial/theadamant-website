@@ -133,7 +133,7 @@ export function ProspectsScreen() {
 function WhatsAppModal({prospect, onClose}: {prospect: Prospect; onClose: () => void}) {
     const company = prospect.company_name || prospect.business_name || "your company";
     const firstName = prospect.first_name || firstNameFromDisplay(prospect.name || prospect.contact_person);
-    const [message, setMessage] = useState(`Hi${firstName ? ` ${firstName}` : ""}, I’m reaching out from The Adamant. I came across ${company} and would love to explore how our digital services could support your growth. Would you be open to a quick conversation?`);
+    const [message, setMessage] = useState(`Hi${firstName ? ` ${firstName}` : ""}, I’m reaching out from Adamant. I came across ${company} and would love to explore how our digital services could support your growth. Would you be open to a quick conversation?`);
     const [opening, setOpening] = useState(false);
 
     async function openWhatsApp() {

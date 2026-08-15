@@ -35,7 +35,7 @@ export default function HomePage({
         {
             "@context": "https://schema.org",
             "@type": "Organization",
-            name: "The Adamant",
+            name: "Adamant",
             legalName: "JSSS Adamant Technologies Private Limited",
             foundingDate: "2026-04-27",
             description: copy.schema.organizationDescription,

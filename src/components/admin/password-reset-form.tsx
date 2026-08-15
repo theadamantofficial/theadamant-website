@@ -61,7 +61,7 @@ export function PasswordResetForm() {
 
     return <main className="flex min-h-screen items-center justify-center bg-[#f5f3ee] px-6 py-12 text-[#17201f]">
         <section className="w-full max-w-md rounded-2xl border border-[#dfdcd4] bg-white p-6 shadow-[0_28px_80px_-52px_rgba(15,23,42,.48)] sm:p-8">
-            <Link href="/" className="flex w-fit items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0d5c63]"><Image src="/vectors/logo-the-adamant.svg" alt="The Adamant" width={27} height={27} className="brightness-0 invert"/></span><span className="text-sm font-semibold">Adamant CRM</span></Link>
+            <Link href="/" className="flex w-fit items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0d5c63]"><Image src="/vectors/logo-the-adamant.svg" alt="Adamant" width={27} height={27} className="brightness-0 invert"/></span><span className="text-sm font-semibold">Adamant CRM</span></Link>
             <span className="mt-10 flex h-10 w-10 items-center justify-center rounded-lg bg-[#0d5c63] text-white">{success ? <CheckCircle2 className="h-4 w-4"/> : <KeyRound className="h-4 w-4"/>}</span>
             <h1 className="mt-5 font-[var(--font-display)] text-3xl font-semibold tracking-[-.035em]">{success ? "Password updated" : "Choose a new password"}</h1>
             <p className="mt-2 text-sm leading-6 text-[#6f7977]">{success ? "Your new password is ready. You can now sign in to Adamant CRM." : "Use at least 8 characters and keep this password private."}</p>

@@ -17,7 +17,7 @@ export interface SeoChatMessage {
 
 type SeoChatGuardrailReason = "low_value" | "off_topic";
 
-const SEO_CHAT_CONTACT_CTA = "Contact The Adamant with your page URL, goals, and questions if you want deeper help or more detail.";
+const SEO_CHAT_CONTACT_CTA = "Contact Adamant with your page URL, goals, and questions if you want deeper help or more detail.";
 
 const SEO_CHAT_TOPIC_PATTERNS = [
     /\bseo\b/i,
@@ -138,7 +138,7 @@ export function validateSeoChatLead(lead: SeoChatLead) {
 
 export function buildSeoChatSystemPrompt(lead: SeoChatLead, snapshot: SeoRuntimeSnapshot | null, pagePath?: string) {
     return [
-        "You are The Adamant's in-site SEO, UX, and website strategy assistant.",
+        "You are Adamant's in-site SEO, UX, and website strategy assistant.",
         "Your job is to quickly diagnose issues, give concrete fixes, and move the conversation toward a useful next step.",
         "Focus on practical SEO, content structure, internal linking, local SEO, conversion UX, page speed, metadata, schema, landing-page strategy, and digital product positioning tied to website growth.",
         "Only answer questions related to SEO, website UX, landing pages, content structure, metadata, schema, local SEO, page speed, conversion issues, or product positioning connected to the visitor's website.",
@@ -150,7 +150,7 @@ export function buildSeoChatSystemPrompt(lead: SeoChatLead, snapshot: SeoRuntime
         "Do not claim you made code changes or ran tools on the user's website.",
         "If the user's request sounds like it needs a full audit, mention that a full audit is still available.",
         "Every reply must use exactly these section headings: Focus, Next steps, Need help?",
-        "Under Need help?, invite the visitor to contact The Adamant for deeper help or more detail.",
+        "Under Need help?, invite the visitor to contact Adamant for deeper help or more detail.",
         "",
         "Lead context:",
         `Name: ${lead.name}`,

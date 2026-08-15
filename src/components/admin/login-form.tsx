@@ -75,8 +75,8 @@ export function LoginForm({nextPath}: {nextPath: string}) {
         <section className="relative hidden overflow-hidden bg-[#0b3437] p-12 text-white lg:flex lg:flex-col xl:p-16">
             <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.05)_1px,transparent_1px)] [background-size:56px_56px]"/>
             <Link href="/" className="relative flex w-fit items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white"><Image src="/vectors/logo-the-adamant.svg" alt="The Adamant" width={28} height={28}/></span>
-                <span className="font-semibold">The Adamant</span>
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white"><Image src="/vectors/logo-the-adamant.svg" alt="Adamant" width={28} height={28}/></span>
+                <span className="font-semibold">Adamant</span>
             </Link>
             <div className="relative my-auto max-w-xl">
                 <p className="mb-5 text-xs font-semibold uppercase tracking-[.18em] text-[#9fd8d4]">Internal CRM</p>

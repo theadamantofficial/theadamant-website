@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import {ArrowLeft, ArrowRight, Clock3, PenSquare} from "lucide-react";
 import {Navbar} from "@/components/layouts/navbar";
 import Footer from "@/components/layouts/footer";
-import {InternalBlogPost} from "@/lib/internal-blog";
+import {getBlogAuthorDisplayName, InternalBlogPost} from "@/lib/internal-blog";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPagePath, getLocalizedPath, localeToHtmlLang, SiteLocale} from "@/lib/site-locale";
 import {getSiteUrl} from "@/lib/site-url";
@@ -35,6 +35,7 @@ export default function InternalBlogPostPage({
     }).format(new Date(post.publishedAt));
     const siteUrl = getSiteUrl();
     const articleUrl = `${siteUrl}${getLocalizedPagePath(locale, `blog/${post.slug}`)}`;
+    const authorName = getBlogAuthorDisplayName(post.authorName);
     const articleSchema = {
         "@context": "https://schema.org",
         "@type": "Article",
@@ -48,11 +49,11 @@ export default function InternalBlogPostPage({
         url: articleUrl,
         author: {
             "@type": "Person",
-            name: post.authorName,
+            name: authorName,
         },
         publisher: {
             "@type": "Organization",
-            name: "The Adamant",
+            name: "Adamant",
             url: siteUrl,
         },
         image: resolveOptionalUrl(post.coverImage, siteUrl),
@@ -79,7 +80,7 @@ export default function InternalBlogPostPage({
                     <div className="mt-8 max-w-4xl">
                         <p className="section-kicker">
                             <PenSquare className="h-4 w-4"/>
-                            The Adamant article
+                            Adamant article
                         </p>
                         <h1 className="section-title max-w-4xl">{post.title}</h1>
                         <p className="section-copy max-w-3xl">{post.excerpt}</p>
@@ -87,7 +88,7 @@ export default function InternalBlogPostPage({
                         <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-foreground/62">
                             <span>{formattedDate}</span>
                             <span className="h-1.5 w-1.5 rounded-full bg-foreground/24"/>
-                            <span>{post.authorName}</span>
+                            <span>{authorName}</span>
                             <span className="h-1.5 w-1.5 rounded-full bg-foreground/24"/>
                             <span className="inline-flex items-center gap-2">
                                 <Clock3 className="h-4 w-4"/>

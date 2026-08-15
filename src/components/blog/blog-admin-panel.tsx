@@ -31,7 +31,7 @@ interface BlogFormState {
 const initialFormState: BlogFormState = {
     title: "",
     excerpt: "",
-    authorName: "The Adamant Team",
+    authorName: "Adamant Team",
     coverImage: "",
     tags: "",
     content: "",
@@ -362,7 +362,7 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                         Member login
                     </p>
                     <h2 className="section-title max-w-xl">
-                        Sign in to publish and edit internal blog posts on The Adamant.
+                        Sign in to publish and edit internal blog posts on Adamant.
                     </h2>
                     <p className="section-copy max-w-xl">
                         This local publisher keeps a cookie-based admin session and writes articles straight into the
@@ -505,7 +505,7 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                             id="blog-author"
                             value={formState.authorName}
                             onChange={(event) => setFormState((current) => ({...current, authorName: event.target.value}))}
-                            placeholder="The Adamant Team"
+                            placeholder="Adamant Team"
                         />
                     </div>
 

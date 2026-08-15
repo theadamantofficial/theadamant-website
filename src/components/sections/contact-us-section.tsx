@@ -157,7 +157,7 @@ export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["c
                     <form className="flex h-full flex-col rounded-[1.7rem] bg-white/88 px-6 py-8 dark:bg-zinc-950/90 lg:px-8 lg:py-10"
                           onSubmit={handleSubmit}
                           onInput={(event) => updateWhatsAppUrl(event.currentTarget)}>
-                        <input type="hidden" name="site_name" value="The Adamant"/>
+                        <input type="hidden" name="site_name" value="Adamant"/>
                         <input type="hidden" name="submitted_at" defaultValue=""/>
                         <input type="hidden" name="reference_id" defaultValue=""/>
                         <input type="hidden" name="order_id" defaultValue=""/>

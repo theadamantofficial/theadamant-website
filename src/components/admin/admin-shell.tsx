@@ -89,7 +89,7 @@ function AdminShellInner({actor, children}: {actor: CrmActor; children: ReactNod
             <div className="flex w-full flex-col p-3">
                 <div className={`flex h-12 items-center ${collapsed ? "justify-center" : "justify-between px-1"}`}>
                     <Link href="/admin/dashboard" className="flex min-w-0 items-center gap-2.5">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white"><Image src="/vectors/logo-the-adamant.svg" alt="The Adamant" width={25} height={25}/></span>
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white"><Image src="/vectors/logo-the-adamant.svg" alt="Adamant" width={25} height={25}/></span>
                         {!collapsed ? <span className="min-w-0"><span className="block truncate text-sm font-semibold text-white">Adamant</span><span className="block text-[9px] uppercase tracking-[.16em] text-white/38">Internal CRM</span></span> : null}
                     </Link>
                     {!collapsed ? <button aria-label="Close navigation" onClick={() => setMobileOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-white/50 hover:bg-white/8 hover:text-white lg:hidden"><X className="h-4 w-4"/></button> : null}

@@ -35,7 +35,7 @@ export default function ServiceLandingPage({
     const pageSchema = {
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
-        name: `The Adamant - ${page.metaTitle}`,
+        name: `Adamant - ${page.metaTitle}`,
         url: pageUrl,
         description: page.metaDescription,
         image: `${siteUrl}${page.image}`,
@@ -43,7 +43,7 @@ export default function ServiceLandingPage({
         serviceType: page.title,
         provider: {
             "@type": "Organization",
-            name: "The Adamant",
+            name: "Adamant",
             url: siteUrl,
         },
     };

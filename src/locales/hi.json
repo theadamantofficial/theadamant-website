@@ -2,11 +2,11 @@
   "locale": "hi",
   "dir": "ltr",
   "metadata": {
-    "title": "The Adamant | वेबसाइट डिज़ाइन, डेवलपमेंट और SEO",
-    "description": "The Adamant प्रीमियम वेबसाइट, UX सिस्टम और मोबाइल अनुभव बनाता है जो मजबूत पहली छाप, बेहतर संदेश और SEO-ready संरचना देते हैं।"
+    "title": "Adamant | वेबसाइट डिज़ाइन, डेवलपमेंट और SEO",
+    "description": "Adamant प्रीमियम वेबसाइट, UX सिस्टम और मोबाइल अनुभव बनाता है जो मजबूत पहली छाप, बेहतर संदेश और SEO-ready संरचना देते हैं।"
   },
   "schema": {
-    "organizationDescription": "The Adamant वेबसाइट, प्रोडक्ट इंटरफेस और मोबाइल अनुभव बनाता है जिनमें साफ संदेश, तेज प्रदर्शन और SEO-ready foundations होती हैं।"
+    "organizationDescription": "Adamant वेबसाइट, प्रोडक्ट इंटरफेस और मोबाइल अनुभव बनाता है जिनमें साफ संदेश, तेज प्रदर्शन और SEO-ready foundations होती हैं।"
   },
   "navbar": {
     "navItems": [
@@ -23,7 +23,7 @@
   "hero": {
     "kicker": "डिज़ाइन, डेवलपमेंट और SEO-ready संरचना",
     "title": "पहली स्क्रीन को नज़रअंदाज़ करना मुश्किल बनाइए।",
-    "description": "The Adamant ऐसी वेबसाइट, UX सिस्टम और मोबाइल अनुभव बनाता है जो प्रीमियम दिखें, आपकी पेशकश को साफ़ तरीके से समझाएँ और search engines को पहले दिन से सही संरचना दें।",
+    "description": "Adamant ऐसी वेबसाइट, UX सिस्टम और मोबाइल अनुभव बनाता है जो प्रीमियम दिखें, आपकी पेशकश को साफ़ तरीके से समझाएँ और search engines को पहले दिन से सही संरचना दें।",
     "primaryCta": "अपना प्रोजेक्ट शुरू करें",
     "secondaryCta": "सेवाएँ देखें",
     "positioningPoints": [
@@ -127,8 +127,8 @@
     "description": "ये answers search engines को आपकी services और page intent के बारे में clearer context भी देते हैं।",
     "items": [
       {
-        "question": "The Adamant किस तरह के projects handle करता है?",
-        "answer": "The Adamant UI/UX design, website development और mobile app experiences पर काम करता है, खासकर उन brands के लिए जो sharper digital presence और stronger first impression चाहते हैं।"
+        "question": "Adamant किस तरह के projects handle करता है?",
+        "answer": "Adamant UI/UX design, website development और mobile app experiences पर काम करता है, खासकर उन brands के लिए जो sharper digital presence और stronger first impression चाहते हैं।"
       },
       {
         "question": "क्या वेबसाइट को शुरुआत से ही SEO-friendly बनाया जा सकता है?",
@@ -229,7 +229,7 @@
         ]
       }
     ],
-    "copyright": "The Adamant. सर्वाधिकार सुरक्षित।",
+    "copyright": "Adamant. सर्वाधिकार सुरक्षित।",
     "tagline": "Clarity, speed और stronger first impressions के लिए designed."
   }
 }

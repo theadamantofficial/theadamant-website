@@ -95,7 +95,7 @@ function renderBlogCoverSvg(
             <rect width="182" height="58" rx="29" fill="${escapeAttribute(design.accent)}"/>
             <text x="91" y="36" text-anchor="middle" font-size="20" font-family="Arial, sans-serif" font-weight="700" fill="#16191b">${escapeXml(design.accentLabel.toUpperCase())}</text>
         </g>`,
-        `<text x="84" y="490" font-size="18" font-family="Arial, sans-serif" fill="${escapeAttribute(design.ink)}" opacity="0.72">The Adamant</text>`,
+        `<text x="84" y="490" font-size="18" font-family="Arial, sans-serif" fill="${escapeAttribute(design.ink)}" opacity="0.72">Adamant</text>`,
         tagChips,
         '<path d="M862 458c82 20 152 57 210 114" stroke="rgba(255,255,255,0.16)" stroke-width="2" fill="none"/>',
         '<path d="M924 80c74 34 136 92 184 174" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none"/>',
@@ -147,7 +147,7 @@ function buildEyebrow(tags: string[]) {
         return tags[0];
     }
 
-    return "The Adamant";
+    return "Adamant";
 }
 
 function trimCopy(value: string, maxLength: number) {

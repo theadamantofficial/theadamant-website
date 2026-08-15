@@ -4,7 +4,7 @@ import LegalPage, {LegalSection} from "@/views/legal-page";
 import {buildOpenGraphMetadata, buildTwitterMetadata} from "@/lib/social-metadata";
 
 const title = "Privacy Policy";
-const description = "How The Adamant collects, uses, stores, and protects personal information across its website, CRM, and WhatsApp communications.";
+const description = "How Adamant collects, uses, stores, and protects personal information across its website, CRM, and WhatsApp communications.";
 
 export const metadata: Metadata = {
     title,
@@ -21,7 +21,7 @@ const sections: LegalSection[] = [
         content: (
             <p>
                 This Privacy Policy applies to JSSS Adamant Technologies Private Limited, operating as
-                The Adamant (“The Adamant”, “we”, “us”, or “our”). It covers the website at
+                Adamant (“Adamant”, “we”, “us”, or “our”). It covers the website at
                 theadamant.com, our enquiry and website-audit tools, our internal customer relationship
                 management system, and business communications conducted through email, telephone, and
                 WhatsApp.
@@ -79,7 +79,7 @@ const sections: LegalSection[] = [
         title: "WhatsApp and Meta",
         content: (
             <>
-                <p>When you contact The Adamant through WhatsApp, Meta Platforms and WhatsApp process information needed to deliver the communication. We receive the message and associated metadata through the WhatsApp Business Platform and may store it in our CRM so authorised team members can respond, assign the conversation, update a lead, and maintain a service record.</p>
+                <p>When you contact Adamant through WhatsApp, Meta Platforms and WhatsApp process information needed to deliver the communication. We receive the message and associated metadata through the WhatsApp Business Platform and may store it in our CRM so authorised team members can respond, assign the conversation, update a lead, and maintain a service record.</p>
                 <p>We may use approved WhatsApp message templates for permitted business-initiated communications. You can ask us to stop non-essential WhatsApp messages at any time by replying “STOP” or contacting us. Your use of WhatsApp is also governed by WhatsApp’s own terms and privacy policy.</p>
             </>
         ),

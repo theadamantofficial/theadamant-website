@@ -292,7 +292,7 @@ export function SeoChatFab() {
                                             Focused SEO help for real website questions.
                                         </h2>
                                         <p className="mt-2 text-sm leading-6 text-foreground/70">
-                                            Share your details, website, and issue first. This chat stays on SEO, UX, landing pages, metadata, local SEO, page speed, and conversion topics. Closing the chat sends the transcript to The Adamant team.
+                                            Share your details, website, and issue first. This chat stays on SEO, UX, landing pages, metadata, local SEO, page speed, and conversion topics. Closing the chat sends the transcript to Adamant team.
                                         </p>
                                     </div>
 
@@ -348,7 +348,7 @@ export function SeoChatFab() {
                                                 label="Company"
                                                 value={lead.company || ""}
                                                 onChange={(value) => setLead((current) => ({...current, company: value}))}
-                                                placeholder="The Adamant"
+                                                placeholder="Adamant"
                                                 required={false}
                                             />
                                             <LeadField
