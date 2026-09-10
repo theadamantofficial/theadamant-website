@@ -175,7 +175,7 @@ function parseTemplate(value: unknown): {name: string; language: string; paramet
     const rawParameters = Array.isArray(candidate.parameters) ? candidate.parameters : [];
     if (rawParameters.length > 20) throw new CrmApiError("This template has too many variables.");
     const parameters = rawParameters.map((parameter) => {
-        const item = parameter && typeof parameter === "object" && !Array.isArray(parameter)
+        const item: {name?: unknown; value?: unknown} = parameter && typeof parameter === "object" && !Array.isArray(parameter)
             ? parameter as {name?: unknown; value?: unknown}
             : {value: parameter};
         const parameterValue = typeof item.value === "string" ? item.value.trim() : "";
