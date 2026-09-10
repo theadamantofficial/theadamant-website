@@ -14,6 +14,7 @@ type WhatsAppStatus = {
     businessAccountId: boolean;
     appSecret: boolean;
     verifyToken: boolean;
+    translation: boolean;
     callbackUrl: string;
 };
 
@@ -55,7 +56,7 @@ export function SettingsScreen() {
                 <Connection icon={<Mail className="h-4 w-4"/>} name="Email and Discord" description="Existing EmailJS, automation and Discord notifications remain active" status="Unchanged" active/>
                 <Connection icon={<MessageCircle className="h-4 w-4"/>} name="WhatsApp Business" description={whatsApp?.configured ? "Meta Cloud API sending, signed webhooks and CRM inbox" : "Add all required Meta values in Vercel to activate the inbox"} status={whatsApp ? whatsApp.configured ? "Connected" : "Needs setup" : "Checking…"} active={Boolean(whatsApp?.configured)} loading={!whatsApp}/>
             </div>
-            {whatsApp ? <div className="border-t border-[var(--crm-border)] bg-[var(--crm-subtle)] p-4 sm:px-6"><div className="flex flex-col gap-2 sm:flex-row sm:items-center"><div className="min-w-0 flex-1"><p className="text-[10px] font-semibold uppercase tracking-[.1em] text-[var(--crm-muted)]">Meta callback URL</p><p className="mt-1 truncate font-mono text-[11px] text-[var(--crm-text)]">{whatsApp.callbackUrl}</p></div><button onClick={() => void copyCallback()} className="crm-button-secondary"><Copy className="h-3.5 w-3.5"/> Copy</button></div><div className="mt-3 flex flex-wrap gap-2"><Readiness label="Access token" ready={whatsApp.accessToken}/><Readiness label="Phone ID" ready={whatsApp.phoneNumberId}/><Readiness label="WABA ID" ready={whatsApp.businessAccountId}/><Readiness label="App secret" ready={whatsApp.appSecret}/><Readiness label="Verify token" ready={whatsApp.verifyToken}/></div></div> : null}
+            {whatsApp ? <div className="border-t border-[var(--crm-border)] bg-[var(--crm-subtle)] p-4 sm:px-6"><div className="flex flex-col gap-2 sm:flex-row sm:items-center"><div className="min-w-0 flex-1"><p className="text-[10px] font-semibold uppercase tracking-[.1em] text-[var(--crm-muted)]">Meta callback URL</p><p className="mt-1 truncate font-mono text-[11px] text-[var(--crm-text)]">{whatsApp.callbackUrl}</p></div><button onClick={() => void copyCallback()} className="crm-button-secondary"><Copy className="h-3.5 w-3.5"/> Copy</button></div><div className="mt-3 flex flex-wrap gap-2"><Readiness label="Access token" ready={whatsApp.accessToken}/><Readiness label="Phone ID" ready={whatsApp.phoneNumberId}/><Readiness label="WABA ID" ready={whatsApp.businessAccountId}/><Readiness label="App secret" ready={whatsApp.appSecret}/><Readiness label="Verify token" ready={whatsApp.verifyToken}/><Readiness label="AI translation" ready={whatsApp.translation}/></div></div> : null}
         </section>
     </div>;
 }

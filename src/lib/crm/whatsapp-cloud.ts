@@ -15,6 +15,7 @@ export type WhatsAppInboundEvent = {
     mediaId: string | null;
     timestamp: string;
     contextMessageId: string | null;
+    metadata: JsonRecord;
 };
 
 export type WhatsAppStatusEvent = {
@@ -123,6 +124,7 @@ export function parseWhatsAppWebhook(payload: unknown): WhatsAppWebhookEvent[] {
                         mediaId: content.mediaId,
                         timestamp: timestamp(text(item.timestamp)),
                         contextMessageId: isRecord(item.context) ? text(item.context.id) : null,
+                        metadata: content.metadata,
                     });
                 }
             }
@@ -200,6 +202,7 @@ export function getWhatsAppIntegrationStatus() {
     const businessAccountId = env("WHATSAPP_BUSINESS_ACCOUNT_ID");
     const appSecret = env("META_APP_SECRET");
     const verifyToken = env("WHATSAPP_WEBHOOK_VERIFY_TOKEN");
+    const translation = env("GROQ_API_KEY");
     return {
         configured: Boolean(accessToken && phoneNumberId && businessAccountId && appSecret && verifyToken),
         accessToken: Boolean(accessToken),
@@ -207,6 +210,7 @@ export function getWhatsAppIntegrationStatus() {
         businessAccountId: Boolean(businessAccountId),
         appSecret: Boolean(appSecret),
         verifyToken: Boolean(verifyToken),
+        translation: Boolean(translation),
     };
 }
 
@@ -219,6 +223,51 @@ export async function sendWhatsAppText(to: string, body: string) {
 
 export async function sendWhatsAppInteractive(to: string, interactive: JsonRecord) {
     return sendWhatsAppMessage(to, {type: "interactive", interactive});
+}
+
+export async function sendWhatsAppReaction(to: string, messageId: string, emoji: string) {
+    return sendWhatsAppMessage(to, {type: "reaction", reaction: {message_id: messageId, emoji}});
+}
+
+export type WhatsAppTemplateParameter = {name?: string; value: string};
+
+export async function sendWhatsAppTemplate(to: string, name: string, language: string, parameters: WhatsAppTemplateParameter[] = []) {
+    const bodyComponent = parameters.length ? [{
+        type: "body",
+        parameters: parameters.map((parameter) => ({
+            type: "text",
+            text: parameter.value,
+            ...(parameter.name ? {parameter_name: parameter.name} : {}),
+        })),
+    }] : [];
+    return sendWhatsAppMessage(to, {
+        type: "template",
+        template: {name, language: {code: language}, ...(bodyComponent.length ? {components: bodyComponent} : {})},
+    });
+}
+
+export async function getApprovedWhatsAppTemplates(fetcher: typeof fetch = fetch) {
+    const accessToken = env("WHATSAPP_ACCESS_TOKEN");
+    const businessAccountId = env("WHATSAPP_BUSINESS_ACCOUNT_ID");
+    const version = env("WHATSAPP_GRAPH_API_VERSION") || "v25.0";
+    if (!accessToken || !businessAccountId) throw new CrmApiError("WhatsApp templates are not configured.", 503);
+    const url = new URL(`https://graph.facebook.com/${version}/${encodeURIComponent(businessAccountId)}/message_templates`);
+    url.searchParams.set("fields", "name,status,language,category,parameter_format,components");
+    url.searchParams.set("limit", "100");
+    const response = await fetcher(url, {headers: {Authorization: `Bearer ${accessToken}`}, cache: "no-store"});
+    const payload = await response.json().catch(() => ({})) as JsonRecord;
+    if (!response.ok) {
+        const providerError = isRecord(payload.error) ? payload.error : {};
+        throw new CrmApiError(truncate(text(providerError.message), 400) || "Meta could not load approved WhatsApp templates.", 502);
+    }
+    const data = Array.isArray(payload.data) ? payload.data : [];
+    return data.filter((template) => isRecord(template) && text(template.status) === "APPROVED").map((template) => ({
+        name: text(template.name),
+        language: text(template.language),
+        category: text(template.category),
+        parameterFormat: text(template.parameter_format) || "POSITIONAL",
+        components: Array.isArray(template.components) ? template.components.filter(isRecord) : [],
+    })).filter((template) => template.name && template.language);
 }
 
 async function sendWhatsAppMessage(to: string, content: JsonRecord) {
@@ -313,8 +362,7 @@ async function ingestInboundMessage(client: SupabaseClient, event: WhatsAppInbou
     if (duplicate.error) throw new CrmApiError("WhatsApp message deduplication failed.", 502);
     if (duplicate.data) return false;
 
-    const lead = await findOrCreateWhatsAppLead(client, event);
-    const conversation = await findOrCreateConversation(client, event, lead.id, lead.assigned_to);
+    const conversation = await findOrCreateConversation(client, event);
     const {error: messageError} = await client.from("whatsapp_messages").insert({
         conversation_id: conversation.id,
         whatsapp_message_id: event.messageId,
@@ -325,7 +373,10 @@ async function ingestInboundMessage(client: SupabaseClient, event: WhatsAppInbou
         status: "received",
         sent_by: null,
         message_timestamp: event.timestamp,
-        metadata: event.contextMessageId ? {context_message_id: event.contextMessageId} : {},
+        metadata: {
+            ...event.metadata,
+            ...(event.contextMessageId ? {context_message_id: event.contextMessageId} : {}),
+        },
     });
     if (messageError?.code === "23505") return false;
     if (messageError) throw new CrmApiError("The inbound WhatsApp message could not be stored.", 502);
@@ -339,13 +390,11 @@ async function ingestInboundMessage(client: SupabaseClient, event: WhatsAppInbou
         && await claimAutoReplyWindow(client, conversation, serviceWindow);
     const {error: conversationError} = await client.from("whatsapp_conversations").update({
         contact_name: event.contactName || conversation.contact_name,
-        lead_id: lead.id,
-        assigned_to: lead.assigned_to,
         status: "open",
         unread_count: unreadCount,
         customer_service_window_expires_at: serviceWindow,
         last_message_at: event.timestamp,
-        last_message_preview: truncate(event.body, 180),
+        last_message_preview: truncate(event.body || messageTypeLabel(event.messageType), 180),
         last_message_direction: "inbound",
     }).eq("id", conversation.id);
     if (conversationError) throw new CrmApiError("The WhatsApp conversation could not be updated.", 502);
@@ -418,49 +467,7 @@ async function sendAndStoreWhatsAppAutoReply(client: SupabaseClient, conversatio
     }
 }
 
-async function findOrCreateWhatsAppLead(client: SupabaseClient, event: WhatsAppInboundEvent) {
-    const reference = `whatsapp:${event.waId}`;
-    const existing = await client.from("leads").select("id,assigned_to").eq("external_reference", reference).maybeSingle();
-    if (existing.error) throw new CrmApiError("The WhatsApp lead could not be matched.", 502);
-    if (existing.data) return existing.data as {id: string; assigned_to: string | null};
-
-    const phoneMatch = await client.from("leads").select("id,assigned_to,external_reference")
-        .in("phone", [event.waId, `+${event.waId}`]).order("created_at", {ascending: false}).limit(1).maybeSingle();
-    if (phoneMatch.error) throw new CrmApiError("The WhatsApp phone number could not be matched.", 502);
-    if (phoneMatch.data) {
-        if (!phoneMatch.data.external_reference) {
-            await client.from("leads").update({external_reference: reference}).eq("id", phoneMatch.data.id);
-        }
-        return {id: String(phoneMatch.data.id), assigned_to: phoneMatch.data.assigned_to as string | null};
-    }
-
-    const contactName = truncate(event.contactName.trim(), 300) || `WhatsApp contact ${event.waId.slice(-4)}`;
-    const inserted = await client.from("leads").insert({
-        customer_name: contactName,
-        phone: `+${event.waId}`,
-        email: null,
-        company_name: null,
-        service_required: "Other",
-        lead_source: "whatsapp",
-        status: "new",
-        estimated_value: 0,
-        assigned_to: null,
-        next_followup: null,
-        priority: "medium",
-        description: "Inbound WhatsApp conversation. Continue the conversation from the CRM WhatsApp inbox.",
-        external_reference: reference,
-        origin_metadata: {channel: "whatsapp"},
-        created_by: null,
-    }).select("id,assigned_to").single();
-    if (inserted.error?.code === "23505") {
-        const raced = await client.from("leads").select("id,assigned_to").eq("external_reference", reference).single();
-        if (!raced.error && raced.data) return raced.data as {id: string; assigned_to: string | null};
-    }
-    if (inserted.error || !inserted.data) throw new CrmApiError("The WhatsApp lead could not be created.", 502);
-    return inserted.data as {id: string; assigned_to: string | null};
-}
-
-async function findOrCreateConversation(client: SupabaseClient, event: WhatsAppInboundEvent, leadId: string, assignedTo: string | null) {
+async function findOrCreateConversation(client: SupabaseClient, event: WhatsAppInboundEvent) {
     const existing = await client.from("whatsapp_conversations").select("id,contact_name,unread_count,customer_service_window_expires_at")
         .eq("phone_number_id", event.phoneNumberId).eq("wa_id", event.waId).maybeSingle();
     if (existing.error) throw new CrmApiError("The WhatsApp conversation could not be matched.", 502);
@@ -471,8 +478,8 @@ async function findOrCreateConversation(client: SupabaseClient, event: WhatsAppI
         phone_number_id: event.phoneNumberId,
         wa_id: event.waId,
         contact_name: event.contactName,
-        lead_id: leadId,
-        assigned_to: assignedTo,
+        lead_id: null,
+        assigned_to: null,
         unread_count: 0,
     }).select("id,contact_name,unread_count,customer_service_window_expires_at").single();
     if (inserted.error?.code === "23505") {
@@ -485,7 +492,7 @@ async function findOrCreateConversation(client: SupabaseClient, event: WhatsAppI
 }
 
 async function updateMessageStatus(client: SupabaseClient, event: WhatsAppStatusEvent) {
-    const existing = await client.from("whatsapp_messages").select("id,status").eq("whatsapp_message_id", event.messageId).maybeSingle();
+    const existing = await client.from("whatsapp_messages").select("id,status,metadata").eq("whatsapp_message_id", event.messageId).maybeSingle();
     if (existing.error) throw new CrmApiError("WhatsApp delivery status could not be matched.", 502);
     if (!existing.data) return false;
     if (statusRank(event.status) < statusRank(String(existing.data.status))) return false;
@@ -493,33 +500,84 @@ async function updateMessageStatus(client: SupabaseClient, event: WhatsAppStatus
         status: event.status,
         error_code: event.errorCode,
         error_message: event.errorMessage,
-        metadata: event.recipientId ? {recipient_id: event.recipientId, status_timestamp: event.timestamp} : {status_timestamp: event.timestamp},
+        metadata: {
+            ...(isRecord(existing.data.metadata) ? existing.data.metadata : {}),
+            ...(event.recipientId ? {recipient_id: event.recipientId} : {}),
+            status_timestamp: event.timestamp,
+        },
     }).eq("id", existing.data.id);
     if (error) throw new CrmApiError("WhatsApp delivery status could not be saved.", 502);
     return true;
 }
 
-function extractMessageContent(message: JsonRecord) {
+export function extractWhatsAppMessageContent(message: JsonRecord) {
     const type = text(message.type) || "unknown";
     const value = isRecord(message[type]) ? message[type] : {};
-    if (type === "text") return {body: truncate(text(value.body), 4096), mediaId: null};
-    if (type === "button") return {body: truncate(text(value.text) || text(value.payload), 4096), mediaId: null};
+    const referral = isRecord(message.referral) ? message.referral : isRecord(value.referral) ? value.referral : {};
+    const referralMetadata = Object.keys(referral).length ? {
+        referral: {
+            source_url: text(referral.source_url),
+            source_type: text(referral.source_type),
+            source_id: text(referral.source_id),
+            headline: text(referral.headline),
+            body: text(referral.body),
+            media_type: text(referral.media_type),
+        },
+    } : {};
+    if (type === "text") return {body: truncate(text(value.body), 4096), mediaId: null, metadata: referralMetadata};
+    if (type === "button") return {body: truncate(text(value.text) || text(value.payload), 4096), mediaId: null, metadata: referralMetadata};
     if (type === "interactive") {
         const reply = isRecord(value.button_reply) ? value.button_reply : isRecord(value.list_reply) ? value.list_reply : {};
-        return {body: truncate(text(reply.title) || text(reply.id) || "[Interactive reply]", 4096), mediaId: null};
+        return {body: truncate(text(reply.title) || text(reply.id) || "Interactive reply", 4096), mediaId: null, metadata: referralMetadata};
     }
     if (type === "location") {
         const name = text(value.name) || "Shared location";
         const latitude = text(value.latitude);
         const longitude = text(value.longitude);
-        return {body: truncate(latitude && longitude ? `[Location] ${name} (${latitude}, ${longitude})` : `[Location] ${name}`, 4096), mediaId: null};
+        return {body: truncate(name, 4096), mediaId: null, metadata: {...referralMetadata, location: {latitude, longitude, address: text(value.address), url: text(value.url)}}};
+    }
+    if (type === "contacts") {
+        const contacts = Array.isArray(message.contacts) ? message.contacts : Array.isArray(value) ? value : [];
+        const names = contacts.filter(isRecord).map((contact) => {
+            const name = isRecord(contact.name) ? contact.name : {};
+            return text(name.formatted_name) || [text(name.first_name), text(name.last_name)].filter(Boolean).join(" ");
+        }).filter(Boolean);
+        return {body: truncate(names.length ? `Shared contact: ${names.join(", ")}` : "Shared a contact", 4096), mediaId: null, metadata: referralMetadata};
+    }
+    if (type === "reaction") {
+        return {body: truncate(text(value.emoji) ? `Reacted ${text(value.emoji)}` : "Removed a reaction", 4096), mediaId: null, metadata: {...referralMetadata, reacted_to_message_id: text(value.message_id), emoji: text(value.emoji)}};
+    }
+    if (type === "order") {
+        const items = Array.isArray(value.product_items) ? value.product_items : [];
+        return {body: truncate(items.length ? `Shared an order (${items.length} item${items.length === 1 ? "" : "s"})` : "Shared an order", 4096), mediaId: null, metadata: referralMetadata};
+    }
+    if (type === "system") {
+        return {body: truncate(text(value.body) || "WhatsApp system update", 4096), mediaId: null, metadata: referralMetadata};
+    }
+    if (type === "request_welcome") {
+        const label = text(referral.headline) || text(referral.body);
+        return {body: truncate(label ? `Started a conversation from ${label}` : "Started a WhatsApp conversation", 4096), mediaId: null, metadata: referralMetadata};
     }
     if (["image", "video", "audio", "document", "sticker"].includes(type)) {
         const caption = text(value.caption) || text(value.filename);
-        return {body: truncate(`[${type[0].toUpperCase()}${type.slice(1)}]${caption ? ` ${caption}` : ""}`, 4096), mediaId: text(value.id) || null};
+        return {body: truncate(caption, 4096), mediaId: text(value.id) || null, metadata: {...referralMetadata, filename: text(value.filename), mime_type: text(value.mime_type)}};
     }
-    return {body: `[${type[0]?.toUpperCase() || "U"}${type.slice(1)} message]`, mediaId: null};
+    const errors = Array.isArray(message.errors) ? message.errors.filter(isRecord) : [];
+    const firstError = errors[0] || {};
+    const errorData = isRecord(firstError.error_data) ? firstError.error_data : {};
+    const fallbackText = isRecord(message.text) ? text(message.text.body) : "";
+    const fallbackButton = isRecord(message.button) ? text(message.button.text) || text(message.button.payload) : "";
+    const recovered = text(value.body) || text(value.text) || text(value.title) || text(value.description)
+        || text(message.body) || fallbackText || fallbackButton || text(referral.headline) || text(referral.body);
+    const detail = text(errorData.details) || text(firstError.message) || text(firstError.title);
+    return {
+        body: truncate(recovered || detail || "This message type is not available through WhatsApp Cloud API.", 4096),
+        mediaId: text(value.id) || null,
+        metadata: {...referralMetadata, provider_message_type: type, ...(detail ? {provider_error: detail} : {})},
+    };
 }
+
+const extractMessageContent = extractWhatsAppMessageContent;
 
 function mapProviderStatus(value: string): WhatsAppStatusEvent["status"] | null {
     return value === "sent" || value === "delivered" || value === "read" || value === "failed" ? value : null;
@@ -527,6 +585,11 @@ function mapProviderStatus(value: string): WhatsAppStatusEvent["status"] | null 
 
 function statusRank(value: string) {
     return ({queued: 0, received: 1, sent: 1, delivered: 2, read: 3, failed: 4} as Record<string, number>)[value] ?? -1;
+}
+
+function messageTypeLabel(type: string) {
+    return ({audio: "Voice message", image: "Photo", video: "Video", document: "Document", sticker: "Sticker", contacts: "Contact", location: "Location", reaction: "Reaction"} as Record<string, string>)[type]
+        || `${type.charAt(0).toUpperCase()}${type.slice(1)} message`;
 }
 
 function timestamp(seconds: string) {

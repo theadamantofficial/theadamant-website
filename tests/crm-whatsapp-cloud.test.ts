@@ -3,6 +3,8 @@ import {afterEach, describe, expect, it, vi} from "vitest";
 import {
     DEFAULT_WHATSAPP_AUTO_REPLY,
     downloadWhatsAppMedia,
+    extractWhatsAppMessageContent,
+    getApprovedWhatsAppTemplates,
     getWhatsAppAutoReplyGapHours,
     getWhatsAppAutoReplyMessage,
     getWhatsAppAutomationReply,
@@ -15,6 +17,7 @@ import {
 
 afterEach(() => {
     delete process.env.WHATSAPP_ACCESS_TOKEN;
+    delete process.env.WHATSAPP_BUSINESS_ACCOUNT_ID;
     delete process.env.WHATSAPP_GRAPH_API_VERSION;
 });
 
@@ -62,7 +65,7 @@ describe("WhatsApp Cloud API webhook", () => {
             metadata: {phone_number_id: "phone"},
             messages: [{from: "919876543210", id: "wamid.image", type: "image", timestamp: "1786650000", image: {id: "media-1", caption: "Reference"}}],
         }}]}]});
-        expect(event).toMatchObject({kind: "message", messageType: "image", body: "[Image] Reference", mediaId: "media-1"});
+        expect(event).toMatchObject({kind: "message", messageType: "image", body: "Reference", mediaId: "media-1"});
     });
 
     it("keeps the media ID needed to play inbound audio", () => {
@@ -70,7 +73,33 @@ describe("WhatsApp Cloud API webhook", () => {
             metadata: {phone_number_id: "phone"},
             messages: [{from: "919876543210", id: "wamid.audio", type: "audio", timestamp: "1786650000", audio: {id: "voice-1", mime_type: "audio/ogg"}}],
         }}]}]});
-        expect(event).toMatchObject({kind: "message", messageType: "audio", body: "[Audio]", mediaId: "voice-1"});
+        expect(event).toMatchObject({kind: "message", messageType: "audio", body: "", mediaId: "voice-1"});
+    });
+
+    it("preserves reactions so the inbox can attach them to the original message", () => {
+        const content = extractWhatsAppMessageContent({type: "reaction", reaction: {message_id: "wamid.original", emoji: "❤️"}});
+        expect(content).toMatchObject({body: "Reacted ❤️", metadata: {reacted_to_message_id: "wamid.original", emoji: "❤️"}});
+    });
+
+    it("turns website and ad welcome events into useful conversation context", () => {
+        const content = extractWhatsAppMessageContent({type: "request_welcome", referral: {headline: "Website consultation", source_url: "https://theadamant.com"}});
+        expect(content).toMatchObject({body: "Started a conversation from Website consultation", metadata: {referral: {headline: "Website consultation"}}});
+    });
+
+    it("recovers provider content before falling back for an unknown message type", () => {
+        expect(extractWhatsAppMessageContent({type: "future_type", future_type: {body: "New provider content"}}).body).toBe("New provider content");
+    });
+
+    it("loads only approved message templates", async () => {
+        process.env.WHATSAPP_ACCESS_TOKEN = "template-token";
+        process.env.WHATSAPP_BUSINESS_ACCOUNT_ID = "waba-1";
+        const fetcher = vi.fn(async () => Response.json({data: [
+            {name: "welcome", status: "APPROVED", language: "en_US", category: "UTILITY", components: [{type: "BODY", text: "Hello"}]},
+            {name: "draft", status: "PENDING", language: "en_US", category: "UTILITY", components: []},
+        ]}));
+        const templates = await getApprovedWhatsAppTemplates(fetcher as typeof fetch);
+        expect(templates).toHaveLength(1);
+        expect(templates[0]).toMatchObject({name: "welcome", language: "en_US"});
     });
 
     it("resolves Meta's temporary media URL and downloads audio with authentication", async () => {

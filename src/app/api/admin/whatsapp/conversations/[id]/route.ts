@@ -11,9 +11,9 @@ export async function PATCH(request: NextRequest, context: Context) {
     try {
         const {client, actor} = await getCrmRequestContext(request);
         const {id} = await context.params;
-        const payload = await request.json() as {markRead?: unknown; assignedTo?: unknown};
+        const payload = await request.json() as {markRead?: unknown; assignedTo?: unknown; createLead?: unknown};
         const accessible = await client.from("whatsapp_conversations")
-            .select("id,lead_id,assigned_to").eq("id", id).maybeSingle();
+            .select("id,lead_id,assigned_to,wa_id,contact_name").eq("id", id).maybeSingle();
         if (accessible.error) throw new CrmApiError("WhatsApp conversation could not be loaded.", 502);
         if (!accessible.data) throw new CrmApiError("WhatsApp conversation not found or unavailable.", 404);
 
@@ -37,6 +37,40 @@ export async function PATCH(request: NextRequest, context: Context) {
             } else {
                 const {error} = await serviceClient.from("whatsapp_conversations").update({assigned_to: assignedTo}).eq("id", id);
                 if (error) throw new CrmApiError("The conversation could not be reassigned.", 502);
+            }
+        }
+
+        if (payload.createLead === true) {
+            requireCrmRoles(actor, ["super_admin", "admin"]);
+            if (!accessible.data.lead_id) {
+                const reference = `whatsapp:${accessible.data.wa_id}`;
+                const existing = await client.from("leads").select("id").eq("external_reference", reference).maybeSingle();
+                if (existing.error) throw new CrmApiError("An existing WhatsApp lead could not be checked.", 502);
+                let leadId = existing.data?.id ? String(existing.data.id) : "";
+                if (!leadId) {
+                    const contactName = String(accessible.data.contact_name || "").trim() || `WhatsApp contact ${String(accessible.data.wa_id).slice(-4)}`;
+                    const inserted = await client.from("leads").insert({
+                        customer_name: contactName,
+                        phone: `+${accessible.data.wa_id}`,
+                        email: null,
+                        company_name: null,
+                        service_required: "Other",
+                        lead_source: "whatsapp",
+                        status: "new",
+                        estimated_value: 0,
+                        assigned_to: accessible.data.assigned_to,
+                        next_followup: null,
+                        priority: "medium",
+                        description: "Created manually from a WhatsApp conversation.",
+                        external_reference: reference,
+                        origin_metadata: {channel: "whatsapp", promoted_manually: true},
+                        created_by: actor.id,
+                    }).select("id").single();
+                    if (inserted.error || !inserted.data) throw new CrmApiError(inserted.error?.message || "The WhatsApp contact could not be made into a lead.", 400);
+                    leadId = String(inserted.data.id);
+                }
+                const {error} = await serviceClient.from("whatsapp_conversations").update({lead_id: leadId}).eq("id", id);
+                if (error) throw new CrmApiError("The new lead could not be linked to this conversation.", 502);
             }
         }
 

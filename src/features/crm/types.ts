@@ -187,6 +187,7 @@ export type WhatsAppMessage = {
     message_timestamp: string;
     created_at: string;
     updated_at: string;
+    metadata?: Record<string, unknown>;
     sender?: Pick<Profile, "id" | "full_name" | "email" | "avatar_url"> | null;
 };
 
