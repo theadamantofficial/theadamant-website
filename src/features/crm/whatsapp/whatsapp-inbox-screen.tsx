@@ -342,7 +342,6 @@ function Composer({conversation, translation, sending, onSend}: {conversation: W
     const [templateKey, setTemplateKey] = useState("");
     const [parameters, setParameters] = useState<Record<string, string>>({});
     const [loadingTemplates, setLoadingTemplates] = useState(false);
-    const [draft, setDraft] = useState("");
 
     useEffect(() => {
         if (windowOpen) return;
@@ -367,12 +366,6 @@ function Composer({conversation, translation, sending, onSend}: {conversation: W
     const preview = renderTemplatePreview(templateText, variables, parameters);
     const complete = Boolean(selectedTemplate && variables.every((variable) => parameters[variable.key]?.trim()));
     return <div className="max-h-[50dvh] overflow-y-auto border-t border-[var(--crm-border)] bg-[var(--crm-surface)] p-3 sm:p-4">
-        <div className="mx-auto mb-4 max-w-3xl space-y-2">
-            <label className="block text-xs font-semibold">Write your own message<textarea aria-label="Custom WhatsApp message" value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={2000} rows={3} className="admin-input mt-2 h-auto resize-y py-3" placeholder="Type any message you want to send…"/></label>
-            <p className="text-xs text-[var(--crm-muted)]">WhatsApp requires an approved template for a first message or after 24 hours without a customer reply. Once they reply, you can send your own text here. To send this text now from your WhatsApp app, use the button below.</p>
-            {draft.trim() ? <a className="crm-button-secondary" href={`https://wa.me/${conversation.wa_id}?text=${encodeURIComponent(draft.trim())}`} target="_blank" rel="noopener noreferrer">Open custom message in WhatsApp</a> : <button type="button" disabled className="crm-button-secondary">Open custom message in WhatsApp</button>}
-            <p className="text-[10px] text-[var(--crm-muted)]">Opens your signed-in WhatsApp account. Review and press Send there. This text is not automatically translated; delivery and history are not tracked by this CRM.</p>
-        </div>
         <form onSubmit={(event) => {
         event.preventDefault();
         if (!selectedTemplate || !complete) return;
