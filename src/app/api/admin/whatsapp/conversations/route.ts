@@ -1,5 +1,6 @@
 import {NextRequest, NextResponse} from "next/server";
-import {crmErrorResponse, CrmApiError, getCrmRequestContext} from "@/lib/crm/auth";
+import {crmErrorResponse, CrmApiError, getCrmRequestContext, requireCrmRoles} from "@/lib/crm/auth";
+import {getCrmServiceClient} from "@/lib/crm/server-client";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,6 +24,38 @@ const CONVERSATION_SELECT = [
     "lead:leads!whatsapp_conversations_lead_id_fkey(id,customer_name,phone,email,company_name,status,assigned_to)",
     "assigned_profile:profiles!whatsapp_conversations_assigned_to_fkey(id,full_name,email,avatar_url)",
 ].join(",");
+
+export async function POST(request: NextRequest) {
+    try {
+        const {actor} = await getCrmRequestContext(request);
+        requireCrmRoles(actor, ["super_admin", "admin"]);
+        const payload = await request.json() as {phone?: unknown; name?: unknown};
+        const raw = typeof payload.phone === "string" ? payload.phone.trim() : "";
+        if (!/^\+[1-9][\d ()-]+$/.test(raw)) throw new CrmApiError("Enter an international phone number starting with + and its country code.");
+        const phone = raw.replace(/\D/g, "");
+        if (!/^[1-9]\d{7,14}$/.test(phone)) throw new CrmApiError("Enter a valid international phone number.");
+        const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID?.trim();
+        if (!phoneNumberId) throw new CrmApiError("WhatsApp sending is not configured.", 503);
+        const client = getCrmServiceClient();
+        // Ignore duplicates so an existing contact's assignment and reply window survive.
+        const inserted = await client.from("whatsapp_conversations").upsert({
+            phone_number_id: phoneNumberId,
+            whatsapp_business_account_id: process.env.WHATSAPP_BUSINESS_ACCOUNT_ID?.trim() || null,
+            wa_id: phone,
+            contact_name: typeof payload.name === "string" ? payload.name.trim().slice(0, 300) : "",
+            lead_id: null,
+            assigned_to: null,
+        }, {onConflict: "phone_number_id,wa_id", ignoreDuplicates: true});
+        if (inserted.error) throw new CrmApiError("The conversation could not be created.", 502);
+        const result = await client.from("whatsapp_conversations").select(CONVERSATION_SELECT)
+            .eq("phone_number_id", phoneNumberId).eq("wa_id", phone).single();
+        if (result.error) throw new CrmApiError("The conversation could not be loaded.", 502);
+        return NextResponse.json({conversation: result.data});
+    } catch (error) {
+        const {message, status} = crmErrorResponse(error);
+        return NextResponse.json({error: message}, {status});
+    }
+}
 
 export async function GET(request: NextRequest) {
     try {

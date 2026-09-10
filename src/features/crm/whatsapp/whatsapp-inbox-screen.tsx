@@ -41,6 +41,33 @@ export function WhatsAppInboxScreen({initialLeadId = ""}: {initialLeadId?: strin
     const [paymentOpen, setPaymentOpen] = useState(false);
     const [mobileThreadOpen, setMobileThreadOpen] = useState(false);
     const [error, setError] = useState("");
+    const [startPanel, setStartPanel] = useState<"chat" | "group" | null>(null);
+    const [creating, setCreating] = useState(false);
+    const [invite, setInvite] = useState("");
+    const groupUrl = validGroupInvite(invite);
+
+    useEffect(() => {
+        const invitation = new URLSearchParams(window.location.search).get("groupInvite");
+        if (invitation) {setInvite(invitation); setStartPanel("group");}
+    }, []);
+
+    async function startChat(form: HTMLFormElement) {
+        if (creating) return;
+        setCreating(true);
+        try {
+            const fields = new FormData(form);
+            const {conversation} = await crmFetch<{conversation: WhatsAppConversation}>("/api/admin/whatsapp/conversations", {
+                method: "POST", body: JSON.stringify({phone: fields.get("phone"), name: fields.get("name")}),
+            });
+            setMessages([]);
+            setConversations((current) => [conversation, ...current.filter((item) => item.id !== conversation.id)]);
+            setSelectedId(conversation.id);
+            setMobileThreadOpen(true);
+            setStartPanel(null);
+        } catch (createError) {
+            toast.error(createError instanceof Error ? createError.message : "Could not open the conversation.");
+        } finally {setCreating(false);}
+    }
 
     const loadConversations = useCallback(async (silent = false) => {
         if (!silent) setLoading(true);
@@ -172,8 +199,24 @@ export function WhatsAppInboxScreen({initialLeadId = ""}: {initialLeadId?: strin
         <PageHeader
             title="WhatsApp Inbox"
             description={canAssign ? "Receive customer messages, assign conversations and reply from one workspace." : "Reply to WhatsApp conversations assigned to you."}
-            actions={<button onClick={() => void loadConversations()} className="crm-button-secondary"><RefreshCw className="h-3.5 w-3.5"/> Refresh</button>}
+            actions={<div className="flex flex-wrap gap-2">{canAssign ? <button onClick={() => setStartPanel("chat")} className="crm-button-primary">New chat</button> : null}<button onClick={() => setStartPanel("group")} className="crm-button-secondary">Join group</button><button onClick={() => void loadConversations()} className="crm-button-secondary"><RefreshCw className="h-3.5 w-3.5"/> Refresh</button></div>}
         />
+        {startPanel ? <section className="crm-card space-y-3 p-4" aria-label={startPanel === "chat" ? "New WhatsApp chat" : "Join WhatsApp group"}>
+            <div className="flex items-center justify-between gap-3"><h2 className="text-sm font-semibold">{startPanel === "chat" ? "Start a WhatsApp conversation" : "Open a group invitation"}</h2><button type="button" onClick={() => setStartPanel(null)} className="crm-button-secondary">Close</button></div>
+            {startPanel === "chat" ? <form className="space-y-3" onSubmit={(event) => {event.preventDefault(); void startChat(event.currentTarget);}}>
+                <div className="grid gap-3 sm:grid-cols-2"><label className="text-xs">Phone with country code<input name="phone" type="tel" required autoComplete="tel" placeholder="+91 98765 43210" className="admin-input mt-1"/></label><label className="text-xs">Contact name (optional)<input name="name" maxLength={300} autoComplete="name" className="admin-input mt-1"/></label></div>
+                <p className="text-xs text-[var(--crm-muted)]">Choose an approved template in the chat to send the first message. Contact people who have agreed to receive your WhatsApp messages. Delivery depends on the number being registered with WhatsApp.</p>
+                <button disabled={creating} className="crm-button-primary">{creating ? "Opening…" : "Open conversation"}</button>
+            </form> : <div className="space-y-3">
+                <label className="block text-xs">WhatsApp group invitation URL<input type="url" value={invite} onChange={(event) => setInvite(event.target.value)} placeholder="https://chat.whatsapp.com/…" className="admin-input mt-1"/></label>
+                <p className="text-xs text-[var(--crm-muted)]">Continue in WhatsApp to review and join using the account signed in there. The group may require admin approval. Group chats are not synced to this inbox.</p>
+                {groupUrl ? <div className="flex flex-wrap gap-2"><a href={groupUrl} target="_blank" rel="noopener noreferrer" className="crm-button-primary">Continue to WhatsApp</a><button type="button" className="crm-button-secondary" onClick={() => {
+                    const link = new URL("/admin/whatsapp", window.location.origin);
+                    link.searchParams.set("groupInvite", groupUrl);
+                    void navigator.clipboard.writeText(link.toString()).then(() => toast.success("CRM invitation link copied")).catch(() => toast.error("Could not copy the link."));
+                }}>Copy CRM invitation link</button></div> : invite ? <p role="alert" className="text-xs text-red-600">Enter a valid https://chat.whatsapp.com/ invitation link.</p> : null}
+            </div>}
+        </section> : null}
         <section className="crm-card grid h-[calc(100dvh-10.5rem)] min-h-[32rem] overflow-hidden sm:h-[calc(100dvh-11.5rem)] lg:min-h-[38rem] lg:grid-cols-[21rem_minmax(0,1fr)]">
             <aside className={`${mobileThreadOpen ? "hidden" : "flex"} min-h-0 flex-col lg:flex lg:border-r lg:border-[var(--crm-border)]`}>
                 <div className="border-b border-[var(--crm-border)] p-3">
@@ -189,7 +232,7 @@ export function WhatsAppInboxScreen({initialLeadId = ""}: {initialLeadId?: strin
                     <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                         {messageLoading ? <div className="space-y-4">{Array.from({length: 5}).map((_, index) => <Skeleton key={index} className={`h-16 ${index % 2 ? "ml-auto w-2/3" : "w-3/5"}`}/>)}</div> : messages.length ? <div className="mx-auto flex max-w-3xl flex-col gap-3">{messages.filter((message) => message.message_type !== "reaction").map((message) => <MessageBubble key={message.id} message={message} reactions={getMessageReactions(messages, message)} reacting={reactingTo === message.id} onReact={(emoji) => void sendReaction(message.id, emoji)}/>)}</div> : <EmptyState title="No stored messages" description="Messages received after the webhook is connected will appear here."/>}
                     </div>
-                    <Composer conversation={selected} translation={translationDirection} sending={sending} onSend={sendMessage}/>
+                    <Composer key={selected.id} conversation={selected} translation={translationDirection} sending={sending} onSend={sendMessage}/>
                 </> : <div className="flex flex-1 items-center justify-center"><EmptyState title="Select a conversation" description="Choose a WhatsApp conversation to view its messages and reply."/></div>}
             </main>
         </section>
@@ -378,4 +421,12 @@ function shortTime(value: string | null) {
     return date.toDateString() === now.toDateString()
         ? new Intl.DateTimeFormat("en-IN", {hour: "2-digit", minute: "2-digit"}).format(date)
         : new Intl.DateTimeFormat("en-IN", {day: "2-digit", month: "short"}).format(date);
+}
+
+function validGroupInvite(value: string) {
+    try {
+        const url = new URL(value.trim());
+        if (url.protocol !== "https:" || url.hostname !== "chat.whatsapp.com" || url.port || url.username || url.password || !/^\/[a-zA-Z0-9_-]{10,100}\/?$/.test(url.pathname)) return "";
+        return `https://chat.whatsapp.com/${url.pathname.split("/")[1]}`;
+    } catch {return "";}
 }
