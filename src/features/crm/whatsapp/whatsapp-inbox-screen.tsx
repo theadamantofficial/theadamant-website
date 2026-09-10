@@ -43,6 +43,7 @@ export function WhatsAppInboxScreen({initialLeadId = ""}: {initialLeadId?: strin
     const [error, setError] = useState("");
     const [startPanel, setStartPanel] = useState<"chat" | "group" | null>(null);
     const [creating, setCreating] = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const [invite, setInvite] = useState("");
     const groupUrl = validGroupInvite(invite);
 
@@ -136,17 +137,41 @@ export function WhatsAppInboxScreen({initialLeadId = ""}: {initialLeadId?: strin
     }, [conversations, search]);
 
     async function sendMessage(payload: OutgoingMessage) {
-        if (!selected) return;
+        if (!selected) return false;
         setSending(true);
         try {
             const outgoing = !payload.template && translationDirection ? {...payload, translation: translationDirection} : payload;
             await crmFetch(`/api/admin/whatsapp/conversations/${selected.id}/messages`, {method: "POST", body: JSON.stringify(outgoing)});
             await Promise.all([loadMessages(selected.id), loadConversations(true)]);
+            return true;
         } catch (sendError) {
             toast.error(sendError instanceof Error ? sendError.message : "Message could not be sent.");
+            return false;
         } finally {
             setSending(false);
         }
+    }
+
+    async function deleteChat() {
+        if (!selected || deleting) return;
+        const target = selected;
+        const leadWarning = target.lead_id
+            ? `\n\nThis also permanently deletes the linked lead ${target.lead?.customer_name || target.lead_id}, its notes, tasks and activity history. Other chats linked to that lead will lose their lead link.`
+            : "\n\nThere is no linked lead to delete.";
+        if (!window.confirm(`Delete the CRM chat with ${target.contact_name || `+${target.wa_id}`}?\n\nAll stored messages and payment records for this chat will be permanently deleted.${leadWarning}\n\nThis cannot be undone and does not delete messages from the recipient's WhatsApp.`)) return;
+        setDeleting(true);
+        try {
+            await crmFetch(`/api/admin/whatsapp/conversations/${target.id}`, {method: "DELETE", body: JSON.stringify({confirmed: true, expectedLeadId: target.lead_id})});
+            setConversations((current) => current.filter((item) => item.id !== target.id));
+            setSelectedId("");
+            setMessages([]);
+            setMobileThreadOpen(false);
+            setPaymentOpen(false);
+            toast.success(target.lead_id ? "Chat and linked lead deleted" : "Chat deleted");
+            await loadConversations(true);
+        } catch (deleteError) {
+            toast.error(deleteError instanceof Error ? deleteError.message : "Chat could not be deleted.");
+        } finally {setDeleting(false);}
     }
 
     async function sendReaction(messageId: string, emoji: string) {
@@ -228,6 +253,7 @@ export function WhatsAppInboxScreen({initialLeadId = ""}: {initialLeadId?: strin
 
             <main className={`${mobileThreadOpen ? "flex" : "hidden"} min-h-0 min-w-0 flex-col bg-[var(--crm-subtle)]/70 lg:flex`}>
                 {selected ? <>
+                    {canAssign ? <div className="flex justify-end border-b border-[var(--crm-border)] px-3 py-1"><button type="button" disabled={deleting} onClick={() => void deleteChat()} className="crm-button-secondary text-red-600">{deleting ? "Deleting…" : "Delete chat"}</button></div> : null}
                     <ConversationHeader conversation={selected} translation={translationDirection} canAssign={canAssign} members={members} assigning={assigning} promoting={promoting} onAssign={(id) => void assignConversation(id)} onPayment={() => setPaymentOpen(true)} onCreateLead={() => void createLead()} onBack={() => setMobileThreadOpen(false)}/>
                     <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                         {messageLoading ? <div className="space-y-4">{Array.from({length: 5}).map((_, index) => <Skeleton key={index} className={`h-16 ${index % 2 ? "ml-auto w-2/3" : "w-3/5"}`}/>)}</div> : messages.length ? <div className="mx-auto flex max-w-3xl flex-col gap-3">{messages.filter((message) => message.message_type !== "reaction").map((message) => <MessageBubble key={message.id} message={message} reactions={getMessageReactions(messages, message)} reacting={reactingTo === message.id} onReact={(emoji) => void sendReaction(message.id, emoji)}/>)}</div> : <EmptyState title="No stored messages" description="Messages received after the webhook is connected will appear here."/>}
@@ -310,12 +336,13 @@ function MessageStatus({status}: {status: WhatsAppMessage["status"]}) {
     return <Check aria-label="Sent" className="h-3 w-3"/>;
 }
 
-function Composer({conversation, translation, sending, onSend}: {conversation: WhatsAppConversation; translation: TranslationDirection | null; sending: boolean; onSend: (payload: OutgoingMessage) => Promise<void>}) {
+function Composer({conversation, translation, sending, onSend}: {conversation: WhatsAppConversation; translation: TranslationDirection | null; sending: boolean; onSend: (payload: OutgoingMessage) => Promise<boolean>}) {
     const windowOpen = Boolean(conversation.customer_service_window_expires_at && new Date(conversation.customer_service_window_expires_at).getTime() > Date.now());
     const [templates, setTemplates] = useState<WhatsAppTemplate[]>([]);
     const [templateKey, setTemplateKey] = useState("");
     const [parameters, setParameters] = useState<Record<string, string>>({});
     const [loadingTemplates, setLoadingTemplates] = useState(false);
+    const [draft, setDraft] = useState("");
 
     useEffect(() => {
         if (windowOpen) return;
@@ -331,7 +358,7 @@ function Composer({conversation, translation, sending, onSend}: {conversation: W
         const form = event.currentTarget;
         const body = String(new FormData(form).get("body") || "").trim();
         if (!body) return;
-        void onSend({body}).then(() => form.reset());
+        void onSend({body}).then((sent) => {if (sent) form.reset();});
     }} className="mx-auto max-w-3xl"><div className="flex items-end gap-2"><textarea name="body" required maxLength={4096} rows={2} className="admin-input h-auto min-h-12 flex-1 resize-none py-3 sm:resize-y" placeholder={translation ? `Type in English — sends in ${translation.targetLanguage}…` : "Write a WhatsApp reply…"}/><button disabled={sending} className="crm-button-primary h-12 px-4">{sending ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>}<span className="hidden sm:inline">Send</span></button></div>{translation ? <p className="mt-1.5 flex items-center gap-1 text-[9px] text-[var(--crm-muted)]"><Languages className="h-3 w-3"/>Only your team sees English; the customer receives {translation.targetLanguage}.</p> : null}</form></div>;
 
     const selectedTemplate = templates.find((template) => `${template.name}:${template.language}` === templateKey) || null;
@@ -339,7 +366,14 @@ function Composer({conversation, translation, sending, onSend}: {conversation: W
     const variables = getTemplateVariables(selectedTemplate, templateText);
     const preview = renderTemplatePreview(templateText, variables, parameters);
     const complete = Boolean(selectedTemplate && variables.every((variable) => parameters[variable.key]?.trim()));
-    return <div className="border-t border-[var(--crm-border)] bg-[var(--crm-surface)] p-3 sm:p-4"><form onSubmit={(event) => {
+    return <div className="max-h-[50dvh] overflow-y-auto border-t border-[var(--crm-border)] bg-[var(--crm-surface)] p-3 sm:p-4">
+        <div className="mx-auto mb-4 max-w-3xl space-y-2">
+            <label className="block text-xs font-semibold">Write your own message<textarea aria-label="Custom WhatsApp message" value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={2000} rows={3} className="admin-input mt-2 h-auto resize-y py-3" placeholder="Type any message you want to send…"/></label>
+            <p className="text-xs text-[var(--crm-muted)]">WhatsApp requires an approved template for a first message or after 24 hours without a customer reply. Once they reply, you can send your own text here. To send this text now from your WhatsApp app, use the button below.</p>
+            {draft.trim() ? <a className="crm-button-secondary" href={`https://wa.me/${conversation.wa_id}?text=${encodeURIComponent(draft.trim())}`} target="_blank" rel="noopener noreferrer">Open custom message in WhatsApp</a> : <button type="button" disabled className="crm-button-secondary">Open custom message in WhatsApp</button>}
+            <p className="text-[10px] text-[var(--crm-muted)]">Opens your signed-in WhatsApp account. Review and press Send there. This text is not automatically translated; delivery and history are not tracked by this CRM.</p>
+        </div>
+        <form onSubmit={(event) => {
         event.preventDefault();
         if (!selectedTemplate || !complete) return;
         const templateParameters = variables.map((variable) => ({...(variable.name ? {name: variable.name} : {}), value: parameters[variable.key].trim()}));

@@ -7,6 +7,26 @@ export const dynamic = "force-dynamic";
 
 type Context = {params: Promise<{id: string}>};
 
+export async function DELETE(request: NextRequest, context: Context) {
+    try {
+        const {client, actor} = await getCrmRequestContext(request);
+        requireCrmRoles(actor, ["super_admin", "admin"]);
+        const {id} = await context.params;
+        const payload = await request.json() as {confirmed?: unknown; expectedLeadId?: unknown};
+        if (payload.confirmed !== true) throw new CrmApiError("Confirm deletion of the chat and linked lead.");
+        const result = await client.from("whatsapp_conversations").select("id,lead_id").eq("id", id).maybeSingle();
+        if (result.error) throw new CrmApiError("Conversation could not be checked.", 502);
+        if (!result.data) throw new CrmApiError("Conversation not found.", 404);
+        if (payload.expectedLeadId !== result.data.lead_id) throw new CrmApiError("Linked lead changed. Refresh and confirm deletion again.", 409);
+        const deleted = await getCrmServiceClient().rpc("delete_whatsapp_chat", {p_id: id, p_expected_lead_id: result.data.lead_id});
+        if (deleted.error) throw new CrmApiError("Chat deletion failed. Ensure the latest database migration is applied, then refresh and retry.", 502);
+        return NextResponse.json({deleted: true});
+    } catch (error) {
+        const {message, status} = crmErrorResponse(error);
+        return NextResponse.json({error: message}, {status});
+    }
+}
+
 export async function PATCH(request: NextRequest, context: Context) {
     try {
         const {client, actor} = await getCrmRequestContext(request);
