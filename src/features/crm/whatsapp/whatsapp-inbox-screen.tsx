@@ -22,7 +22,7 @@ type WhatsAppTemplate = {
     components: Array<{type?: unknown; text?: unknown; format?: unknown; buttons?: unknown}>;
 };
 type TranslationDirection = {targetLanguage: string; targetLanguageCode: string};
-type OutgoingMessage = {body: string; template?: {name: string; language: string; parameters: Array<{name?: string; value: string}>}; translation?: TranslationDirection};
+type OutgoingMessage = {body: string; template?: {name: string; language: string; parameters: Array<{name?: string; value: string}>; document?: {mediaId: string; filename: string}}; translation?: TranslationDirection};
 
 export function WhatsAppInboxScreen({initialLeadId = ""}: {initialLeadId?: string}) {
     const actor = useAdminActor();
@@ -341,6 +341,8 @@ function Composer({conversation, translation, sending, onSend}: {conversation: W
     const [templates, setTemplates] = useState<WhatsAppTemplate[]>([]);
     const [templateKey, setTemplateKey] = useState("");
     const [parameters, setParameters] = useState<Record<string, string>>({});
+    const [document, setDocument] = useState<{mediaId: string; filename: string} | null>(null);
+    const [uploadingDocument, setUploadingDocument] = useState(false);
     const [loadingTemplates, setLoadingTemplates] = useState(false);
 
     useEffect(() => {
@@ -363,17 +365,19 @@ function Composer({conversation, translation, sending, onSend}: {conversation: W
     const selectedTemplate = templates.find((template) => `${template.name}:${template.language}` === templateKey) || null;
     const templateText = getTemplateBody(selectedTemplate);
     const variables = getTemplateVariables(selectedTemplate, templateText);
+    const requiresPdf = selectedTemplate?.components.some((component) => component.type === "HEADER" && component.format === "DOCUMENT") || false;
     const preview = renderTemplatePreview(templateText, variables, parameters);
-    const complete = Boolean(selectedTemplate && variables.every((variable) => parameters[variable.key]?.trim()));
+    const complete = Boolean(selectedTemplate && variables.every((variable) => parameters[variable.key]?.trim()) && (!requiresPdf || document));
     return <div className="max-h-[50dvh] overflow-y-auto border-t border-[var(--crm-border)] bg-[var(--crm-surface)] p-3 sm:p-4">
         <form onSubmit={(event) => {
         event.preventDefault();
         if (!selectedTemplate || !complete) return;
         const templateParameters = variables.map((variable) => ({...(variable.name ? {name: variable.name} : {}), value: parameters[variable.key].trim()}));
-        void onSend({body: preview || `Template: ${selectedTemplate.name}`, template: {name: selectedTemplate.name, language: selectedTemplate.language, parameters: templateParameters}});
+        void onSend({body: preview || `Template: ${selectedTemplate.name}`, template: {name: selectedTemplate.name, language: selectedTemplate.language, parameters: templateParameters, ...(document ? {document} : {})}});
     }} className="mx-auto max-w-3xl space-y-2">
         <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[10px] leading-4 text-amber-800"><Clock3 className="mt-0.5 h-3.5 w-3.5 shrink-0"/><span>The free-form reply window is closed. You can still start a message with an approved Meta template.</span></div>
-        <div className="flex items-end gap-2"><label className="min-w-0 flex-1"><span className="sr-only">Approved WhatsApp template</span><select value={templateKey} onChange={(event) => {setTemplateKey(event.target.value); setParameters({});}} disabled={loadingTemplates || sending} className="crm-control w-full"><option value="">{loadingTemplates ? "Loading approved templates…" : templates.length ? "Choose an approved template…" : "No usable approved templates"}</option>{templates.map((template) => <option key={`${template.name}:${template.language}`} value={`${template.name}:${template.language}`}>{template.name.replaceAll("_", " ")} · {template.language}</option>)}</select></label><button disabled={sending || !complete} className="crm-button-primary"><Send className="h-4 w-4"/><span className="hidden sm:inline">Send template</span></button></div>
+        <div className="flex items-end gap-2"><label className="min-w-0 flex-1"><span className="sr-only">Approved WhatsApp template</span><select value={templateKey} onChange={(event) => {setTemplateKey(event.target.value); setParameters({}); setDocument(null);}} disabled={loadingTemplates || sending} className="crm-control w-full"><option value="">{loadingTemplates ? "Loading approved templates…" : templates.length ? "Choose an approved template…" : "No usable approved templates"}</option>{templates.map((template) => <option key={`${template.name}:${template.language}`} value={`${template.name}:${template.language}`}>{template.name.replaceAll("_", " ")} · {template.language}</option>)}</select></label><button disabled={sending || uploadingDocument || !complete} className="crm-button-primary"><Send className="h-4 w-4"/><span className="hidden sm:inline">Send template</span></button></div>
+        {requiresPdf ? <PdfAttachment value={document} busy={uploadingDocument} onChange={setDocument} onBusy={setUploadingDocument}/> : null}
         {selectedTemplate ? <div className="rounded-lg border border-[var(--crm-border)] bg-[var(--crm-subtle)] p-2.5"><p className="whitespace-pre-wrap text-[11px] leading-4">{preview}</p>{variables.length ? <div className="mt-2 grid gap-2 sm:grid-cols-2">{variables.map((variable) => {
             const inputType = templateVariableInputType(variable);
             return <label key={variable.key} className="text-[9px] font-semibold capitalize text-[var(--crm-muted)]">{variable.label}
@@ -397,6 +401,23 @@ function record(value: unknown): Record<string, unknown> | null {
     return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
 }
 
+function PdfAttachment({value, busy, onChange, onBusy}: {value: {mediaId: string; filename: string} | null; busy: boolean; onChange: (value: {mediaId: string; filename: string} | null) => void; onBusy: (value: boolean) => void}) {
+    return <div className="rounded-lg border border-dashed border-[var(--crm-border)] p-3">
+        <div className="flex items-center justify-between gap-3"><div><p className="text-xs font-semibold">Proposal PDF</p><p className="mt-1 text-[10px] text-[var(--crm-muted)]">This approved template requires a PDF document header.</p></div>{value ? <button type="button" className="crm-button-secondary" onClick={() => onChange(null)}>Remove</button> : null}</div>
+        {value ? <p className="mt-2 truncate text-xs text-[#0d5c63]">{value.filename}</p> : <label className="crm-button-secondary mt-3 cursor-pointer"><FileText className="h-3.5 w-3.5"/>{busy ? "Uploading…" : "Choose PDF"}<input type="file" accept="application/pdf,.pdf" className="sr-only" disabled={busy} onChange={async (event) => {
+            const file = event.target.files?.[0]; event.target.value = ""; if (!file) return;
+            if (file.type !== "application/pdf" || file.size > 10 * 1024 * 1024) {toast.error("Choose a PDF up to 10 MB."); return;}
+            onBusy(true);
+            try {
+                const form = new FormData(); form.set("file", file);
+                const uploaded = await crmFetch<{mediaId: string; filename: string}>("/api/admin/whatsapp/templates/media", {method: "POST", body: form});
+                onChange(uploaded);
+            } catch (error) {toast.error(error instanceof Error ? error.message : "PDF upload failed.");}
+            finally {onBusy(false);}
+        }}/></label>}
+    </div>;
+}
+
 function safeExternalUrl(value: unknown) {
     if (typeof value !== "string") return "";
     try {
@@ -416,7 +437,11 @@ function getTemplateVariables(template: WhatsAppTemplate | null, body: string) {
     if (!template) return [];
     const named = template.parameterFormat.toUpperCase() === "NAMED";
     const matches = Array.from(body.matchAll(named ? /{{\s*([a-z][a-z0-9_]*)\s*}}/gi : /{{\s*(\d+)\s*}}/g));
-    return Array.from(new Set(matches.map((match) => match[1]))).map((key) => ({key, name: named ? key : undefined, label: named ? key.replaceAll("_", " ") : `Variable ${key}`}));
+    return Array.from(new Set(matches.map((match) => match[1]))).map((key) => {
+        const labelMatch = body.match(new RegExp(`([A-Za-z][A-Za-z ]{1,32})\\s*[:：-]\\s*{{\\s*${key}\\s*}}`, "i"));
+        const label = labelMatch?.[1]?.trim() || (named ? key.replaceAll("_", " ") : `Variable ${key}`);
+        return {key, name: named ? key : undefined, label};
+    });
 }
 
 function templateVariableInputType(variable: {key: string; label: string}) {

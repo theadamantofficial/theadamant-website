@@ -106,7 +106,7 @@ export async function POST(request: NextRequest, context: Context) {
         let sent: {messageId: string};
         try {
             sent = template
-                ? await sendWhatsAppTemplate(conversation.wa_id, template.name, template.language, template.parameters)
+                ? await sendWhatsAppTemplate(conversation.wa_id, template.name, template.language, template.parameters, template.document)
                 : await sendWhatsAppText(conversation.wa_id, sentBody);
         } catch (sendError) {
             const message = sendError instanceof Error ? sendError.message.slice(0, 500) : "Meta could not send this message.";
@@ -164,9 +164,9 @@ function asRecord(value: unknown): Record<string, unknown> {
     return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
 }
 
-function parseTemplate(value: unknown): {name: string; language: string; parameters: WhatsAppTemplateParameter[]} | null {
+function parseTemplate(value: unknown): {name: string; language: string; parameters: WhatsAppTemplateParameter[]; document?: {mediaId: string; filename: string}} | null {
     if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-    const candidate = value as {name?: unknown; language?: unknown; parameters?: unknown};
+    const candidate = value as {name?: unknown; language?: unknown; parameters?: unknown; document?: unknown};
     const name = typeof candidate.name === "string" ? candidate.name.trim() : "";
     const language = typeof candidate.language === "string" ? candidate.language.trim() : "";
     if (!name || !/^[a-z0-9_]+$/.test(name) || !language || language.length > 35 || !/^[a-z]{2,3}(?:_[A-Z]{2})?$/.test(language)) {
@@ -184,7 +184,11 @@ function parseTemplate(value: unknown): {name: string; language: string; paramet
         if (parameterName && !/^[a-z0-9_]+$/.test(parameterName)) throw new CrmApiError("A WhatsApp template variable name is invalid.");
         return {value: parameterValue, ...(parameterName ? {name: parameterName} : {})};
     });
-    return {name, language, parameters};
+    const documentCandidate = candidate.document && typeof candidate.document === "object" && !Array.isArray(candidate.document) ? candidate.document as {mediaId?: unknown; filename?: unknown} : null;
+    const mediaId = typeof documentCandidate?.mediaId === "string" ? documentCandidate.mediaId.trim() : "";
+    const filename = typeof documentCandidate?.filename === "string" ? documentCandidate.filename.trim() : "";
+    if (documentCandidate && (!/^\d+$/.test(mediaId) || !/^[^/\\]{1,180}\.pdf$/i.test(filename))) throw new CrmApiError("Choose a valid PDF attachment.");
+    return {name, language, parameters, ...(mediaId ? {document: {mediaId, filename}} : {})};
 }
 
 async function requireAccessibleConversation(client: Awaited<ReturnType<typeof getCrmRequestContext>>["client"], id: string) {

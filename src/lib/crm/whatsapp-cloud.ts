@@ -230,8 +230,36 @@ export async function sendWhatsAppReaction(to: string, messageId: string, emoji:
 }
 
 export type WhatsAppTemplateParameter = {name?: string; value: string};
+export type WhatsAppTemplateDocument = {mediaId: string; filename: string};
 
-export async function sendWhatsAppTemplate(to: string, name: string, language: string, parameters: WhatsAppTemplateParameter[] = []) {
+export async function uploadWhatsAppDocument(file: File) {
+    const accessToken = env("WHATSAPP_ACCESS_TOKEN");
+    const phoneNumberId = env("WHATSAPP_PHONE_NUMBER_ID");
+    const version = env("WHATSAPP_GRAPH_API_VERSION") || "v25.0";
+    if (!accessToken || !phoneNumberId) throw new CrmApiError("WhatsApp media upload is not configured.", 503);
+    const form = new FormData();
+    form.set("messaging_product", "whatsapp");
+    form.set("type", "application/pdf");
+    form.set("file", file, file.name);
+    const response = await fetch(`https://graph.facebook.com/${version}/${encodeURIComponent(phoneNumberId)}/media`, {
+        method: "POST",
+        headers: {Authorization: `Bearer ${accessToken}`},
+        body: form,
+        cache: "no-store",
+    });
+    const payload = await response.json().catch(() => ({})) as JsonRecord;
+    if (!response.ok || typeof payload.id !== "string") {
+        const providerError = isRecord(payload.error) ? payload.error : {};
+        throw new CrmApiError(truncate(text(providerError.message), 400) || "Meta could not upload this PDF.", 502);
+    }
+    return payload.id;
+}
+
+export async function sendWhatsAppTemplate(to: string, name: string, language: string, parameters: WhatsAppTemplateParameter[] = [], document?: WhatsAppTemplateDocument) {
+    const headerComponent = document ? [{
+        type: "header",
+        parameters: [{type: "document", document: {id: document.mediaId, filename: document.filename}}],
+    }] : [];
     const bodyComponent = parameters.length ? [{
         type: "body",
         parameters: parameters.map((parameter) => ({
@@ -242,7 +270,7 @@ export async function sendWhatsAppTemplate(to: string, name: string, language: s
     }] : [];
     return sendWhatsAppMessage(to, {
         type: "template",
-        template: {name, language: {code: language}, ...(bodyComponent.length ? {components: bodyComponent} : {})},
+        template: {name, language: {code: language}, ...(headerComponent.length || bodyComponent.length ? {components: [...headerComponent, ...bodyComponent]} : {})},
     });
 }
 
