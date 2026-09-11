@@ -67,7 +67,7 @@ export function TeamScreen() {
     return <div className="space-y-5">
         <PageHeader
             title="Team"
-            description="Company members, roles and current CRM workload."
+            description="Manage company access. Developer + QA combines both roles; CTO includes both and manages development decisions."
             actions={<span className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] px-3 py-2 text-[11px] text-[var(--crm-muted)]"><ShieldCheck className="h-3.5 w-3.5"/> {canManage ? "Manage roles and access" : "View only · Super admin manages access"}</span>}
         />
         {error ? <DataError message={error} onRetry={() => void load()}/> : null}
@@ -116,11 +116,11 @@ export function TeamScreen() {
                                 <button
                                     disabled={!canGrantDatabase || member.role !== "employee" || !member.active || isSaving}
                                     onClick={() => void update(member.id, {canAccessProspectDatabase: !member.can_access_prospect_database})}
-                                    title={member.role !== "employee" ? "Admins already have access" : "Allow this user to view leads and initiate WhatsApp outreach"}
-                                    className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[10px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${member.role !== "employee" || member.can_access_prospect_database ? "bg-sky-50 text-sky-700" : "bg-[var(--crm-subtle)] text-[var(--crm-muted)]"}`}
+                                    title={["super_admin", "admin"].includes(member.role) ? "Admins already have access" : "Allow this user to view leads and initiate WhatsApp outreach"}
+                                    className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[10px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${["super_admin", "admin"].includes(member.role) || (member.role === "employee" && member.can_access_prospect_database) ? "bg-sky-50 text-sky-700" : "bg-[var(--crm-subtle)] text-[var(--crm-muted)]"}`}
                                 >
                                     <Database className="h-3 w-3"/>
-                                    {member.role !== "employee" ? "Included" : member.can_access_prospect_database ? "Allowed" : "No access"}
+                                    {["super_admin", "admin"].includes(member.role) ? "Included" : member.role === "employee" && member.can_access_prospect_database ? "Allowed" : "No access"}
                                 </button>
                             </td>
                             <td className="px-3 py-3 text-[var(--crm-muted)]">{formatCrmDate(member.created_at)}</td>

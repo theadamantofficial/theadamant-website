@@ -14,7 +14,7 @@ export const LEAD_STATUSES: LeadStatus[] = [
 export const LEAD_SOURCES: LeadSource[] = ["website", "whatsapp", "instagram", "linkedin", "referral", "email", "phone", "other"];
 export const PRIORITIES: Priority[] = ["low", "medium", "high", "urgent"];
 export const TASK_STATUSES: TaskStatus[] = ["open", "in_progress", "completed", "cancelled"];
-export const CRM_ROLES: CrmRole[] = ["super_admin", "admin", "employee"];
+export const CRM_ROLES: CrmRole[] = ["super_admin", "admin", "employee", "cto", "developer", "qa", "developer_qa"];
 
 export const ADAMANT_SERVICES = [
     "Web Development",
@@ -54,4 +54,8 @@ export const ROLE_LABELS: Record<CrmRole, string> = {
     super_admin: "Super admin",
     admin: "Admin",
     employee: "Employee",
+    cto: "CTO",
+    developer: "Developer",
+    qa: "QA",
+    developer_qa: "Developer + QA",
 };
