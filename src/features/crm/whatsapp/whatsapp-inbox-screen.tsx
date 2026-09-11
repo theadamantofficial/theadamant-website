@@ -347,7 +347,7 @@ function Composer({conversation, translation, sending, onSend}: {conversation: W
         if (windowOpen) return;
         setLoadingTemplates(true);
         void crmFetch<{templates: WhatsAppTemplate[]}>("/api/admin/whatsapp/templates")
-            .then((data) => setTemplates(data.templates.filter(isUsableTemplate)))
+            .then((data) => setTemplates(data.templates))
             .catch((loadError) => toast.error(loadError instanceof Error ? loadError.message : "Approved templates could not be loaded."))
             .finally(() => setLoadingTemplates(false));
     }, [windowOpen]);
@@ -454,14 +454,6 @@ function calendarDate(value: string) {
 
 function renderTemplatePreview(body: string, variables: Array<{key: string}>, parameters: Record<string, string>) {
     return variables.reduce((preview, variable) => preview.replace(new RegExp(`{{\\s*${variable.key}\\s*}}`, "gi"), parameters[variable.key]?.trim() || `{{${variable.key}}}`), body);
-}
-
-function isUsableTemplate(template: WhatsAppTemplate) {
-    return template.components.every((component) => {
-        if (component.type === "HEADER") return component.format === "TEXT" && !(typeof component.text === "string" && component.text.includes("{{"));
-        if (component.type === "BUTTONS") return !JSON.stringify(component.buttons || []).includes("{{");
-        return true;
-    });
 }
 
 function getConversationTranslation(messages: WhatsAppMessage[]): TranslationDirection | null {
