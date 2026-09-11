@@ -421,8 +421,17 @@ function PdfAttachment({value, documents, busy, onChange, onBusy}: {value: Whats
             if (file.type !== "application/pdf" || file.size > 10 * 1024 * 1024) {toast.error("Choose a PDF up to 10 MB."); return;}
             onBusy(true);
             try {
-                const form = new FormData(); form.set("file", file);
-                const uploaded = await crmFetch<{mediaId: string; filename: string}>("/api/admin/whatsapp/templates/media", {method: "POST", body: form});
+                const prepared = await crmFetch<{path: string; signedUrl: string}>("/api/admin/whatsapp/templates/media", {
+                    method: "POST", body: JSON.stringify({action: "prepare", filename: file.name}),
+                });
+                const uploadBody = new FormData();
+                uploadBody.set("cacheControl", "3600");
+                uploadBody.set("", file);
+                const storageResponse = await fetch(prepared.signedUrl, {method: "POST", body: uploadBody});
+                if (!storageResponse.ok) throw new Error("The PDF could not be uploaded to storage.");
+                const uploaded = await crmFetch<{mediaId: string; filename: string}>("/api/admin/whatsapp/templates/media", {
+                    method: "POST", body: JSON.stringify({action: "complete", path: prepared.path, filename: file.name}),
+                });
                 onChange(uploaded);
             } catch (error) {toast.error(error instanceof Error ? error.message : "PDF upload failed.");}
             finally {onBusy(false);}
