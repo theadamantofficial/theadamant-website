@@ -4,7 +4,7 @@ import {useCallback, useEffect, useMemo, useState} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import {AlertCircle, ArrowLeft, AudioLines, BadgeIndianRupee, Check, CheckCheck, ChevronDown, Clock3, Download, FileText, Languages, Loader2, MapPin, Phone, PhoneIncoming, RefreshCw, Search, Send, SmilePlus, UserRound} from "lucide-react";
+import {AlertCircle, ArrowLeft, AudioLines, BadgeIndianRupee, CalendarPlus, Check, CheckCheck, ChevronDown, Clock3, Download, FileText, Languages, Loader2, MapPin, Phone, PhoneIncoming, RefreshCw, Search, Send, SmilePlus, UserRound} from "lucide-react";
 import {useAdminActor} from "@/components/admin/admin-shell";
 import {DataError, EmptyState, PageHeader, Skeleton, UserAvatar} from "@/components/admin/admin-ui";
 import {crmFetch} from "@/features/crm/api";
@@ -374,7 +374,22 @@ function Composer({conversation, translation, sending, onSend}: {conversation: W
     }} className="mx-auto max-w-3xl space-y-2">
         <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[10px] leading-4 text-amber-800"><Clock3 className="mt-0.5 h-3.5 w-3.5 shrink-0"/><span>The free-form reply window is closed. You can still start a message with an approved Meta template.</span></div>
         <div className="flex items-end gap-2"><label className="min-w-0 flex-1"><span className="sr-only">Approved WhatsApp template</span><select value={templateKey} onChange={(event) => {setTemplateKey(event.target.value); setParameters({});}} disabled={loadingTemplates || sending} className="crm-control w-full"><option value="">{loadingTemplates ? "Loading approved templates…" : templates.length ? "Choose an approved template…" : "No usable approved templates"}</option>{templates.map((template) => <option key={`${template.name}:${template.language}`} value={`${template.name}:${template.language}`}>{template.name.replaceAll("_", " ")} · {template.language}</option>)}</select></label><button disabled={sending || !complete} className="crm-button-primary"><Send className="h-4 w-4"/><span className="hidden sm:inline">Send template</span></button></div>
-        {selectedTemplate ? <div className="rounded-lg border border-[var(--crm-border)] bg-[var(--crm-subtle)] p-2.5"><p className="whitespace-pre-wrap text-[11px] leading-4">{preview}</p>{variables.length ? <div className="mt-2 grid gap-2 sm:grid-cols-2">{variables.map((variable) => <label key={variable.key} className="text-[9px] font-semibold text-[var(--crm-muted)]">{variable.label}<input value={parameters[variable.key] || ""} onChange={(event) => setParameters((current) => ({...current, [variable.key]: event.target.value}))} maxLength={1024} required className="crm-control mt-1 w-full" placeholder={`Value for ${variable.label}`}/></label>)}</div> : null}</div> : null}
+        {selectedTemplate ? <div className="rounded-lg border border-[var(--crm-border)] bg-[var(--crm-subtle)] p-2.5"><p className="whitespace-pre-wrap text-[11px] leading-4">{preview}</p>{variables.length ? <div className="mt-2 grid gap-2 sm:grid-cols-2">{variables.map((variable) => {
+            const inputType = templateVariableInputType(variable);
+            return <label key={variable.key} className="text-[9px] font-semibold capitalize text-[var(--crm-muted)]">{variable.label}
+                <div className="relative mt-1">
+                    <input type={inputType} value={parameters[variable.key] || ""} onChange={(event) => setParameters((current) => ({...current, [variable.key]: event.target.value}))} maxLength={1024} required className="crm-control w-full" placeholder={inputType === "date" ? "Choose a date" : inputType === "datetime-local" ? "Choose date and time" : `Value for ${variable.label}`}/>
+                    {inputType === "url" && <button type="button" className="mt-1 text-[10px] font-semibold text-[#0d5c63] hover:underline" onClick={() => window.open("https://meet.google.com/new", "_blank", "noopener,noreferrer")}>Create Google Meet link</button>}
+                </div>
+            </label>;
+        })}</div> : null}
+        {isMeetingTemplate(templateText, variables) && complete ? <a
+            href={googleCalendarUrl(conversation, selectedTemplate?.name || "Meeting", variables, parameters, templateText)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="crm-button-secondary mt-2"
+        ><CalendarPlus className="h-3.5 w-3.5"/> Add meeting to Google Calendar</a> : null}
+        </div> : null}
     </form></div>;
 }
 
@@ -402,6 +417,39 @@ function getTemplateVariables(template: WhatsAppTemplate | null, body: string) {
     const named = template.parameterFormat.toUpperCase() === "NAMED";
     const matches = Array.from(body.matchAll(named ? /{{\s*([a-z][a-z0-9_]*)\s*}}/gi : /{{\s*(\d+)\s*}}/g));
     return Array.from(new Set(matches.map((match) => match[1]))).map((key) => ({key, name: named ? key : undefined, label: named ? key.replaceAll("_", " ") : `Variable ${key}`}));
+}
+
+function templateVariableInputType(variable: {key: string; label: string}) {
+    const name = `${variable.key} ${variable.label}`.toLowerCase();
+    if (/(^|[\s_])(date|day)([\s_]|$)/.test(name) && !/(time|at)/.test(name)) return "date";
+    if (/(date.?time|time|schedule|slot|when)/.test(name)) return "datetime-local";
+    if (/(meet|meeting|google)/.test(name)) return "url";
+    return "text";
+}
+
+function isMeetingTemplate(body: string, variables: Array<{key: string; label: string}>) {
+    return /(meet|meeting|calendar|schedule|appointment)/i.test(`${body} ${variables.map((variable) => `${variable.key} ${variable.label}`).join(" ")}`);
+}
+
+function googleCalendarUrl(conversation: WhatsAppConversation, templateName: string, variables: Array<{key: string; label: string}>, parameters: Record<string, string>, body: string) {
+    const title = `${templateName.replaceAll("_", " ")} · ${conversation.contact_name || conversation.lead?.customer_name || `+${conversation.wa_id}`}`;
+    const dateKey = variables.find((variable) => /(date|day|when|schedule)/i.test(`${variable.key} ${variable.label}`))?.key;
+    const dateValue = dateKey ? parameters[dateKey] : "";
+    const start = dateValue ? calendarDate(dateValue) : "";
+    const end = start ? calendarDate(new Date(new Date(dateValue).getTime() + 60 * 60 * 1000).toISOString()) : "";
+    const meetingKey = variables.find((variable) => /(meet|meeting|google|link)/i.test(`${variable.key} ${variable.label}`))?.key;
+    const meetingLink = meetingKey ? parameters[meetingKey] : "";
+    const details = `${body}\n\nClient: ${conversation.contact_name || conversation.lead?.customer_name || `+${conversation.wa_id}`}${meetingLink ? `\nGoogle Meet: ${meetingLink}` : ""}`;
+    const params = new URLSearchParams({action: "TEMPLATE", text: title, details});
+    if (start && end) params.set("dates", `${start}/${end}`);
+    if (conversation.lead?.email) params.set("add", conversation.lead.email);
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+function calendarDate(value: string) {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return "";
+    return date.toISOString().replaceAll(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
 }
 
 function renderTemplatePreview(body: string, variables: Array<{key: string}>, parameters: Record<string, string>) {

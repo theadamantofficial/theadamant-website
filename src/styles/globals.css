@@ -201,7 +201,7 @@
 
 @layer components {
     .admin-input {
-        @apply h-10 w-full rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] px-3 text-sm text-[var(--crm-text)] outline-none transition duration-150 placeholder:text-[var(--crm-muted)] focus:border-[#0d5c63] focus:ring-3 focus:ring-[#0d5c63]/8 disabled:cursor-not-allowed disabled:opacity-60;
+        @apply h-10 w-full rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] px-3 text-sm leading-normal text-[var(--crm-text)] outline-none transition duration-150 placeholder:text-[var(--crm-muted)] focus:border-[#0d5c63] focus:ring-3 focus:ring-[#0d5c63]/8 disabled:cursor-not-allowed disabled:opacity-60;
     }
 
     .crm-card {
@@ -209,7 +209,15 @@
     }
 
     .crm-control {
-        @apply h-9 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] px-3 text-xs text-[var(--crm-text)] outline-none transition duration-150 placeholder:text-[var(--crm-muted)] focus:border-[#0d5c63] focus:ring-3 focus:ring-[#0d5c63]/8;
+        @apply h-9 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] px-3 text-xs leading-normal text-[var(--crm-text)] outline-none transition duration-150 placeholder:text-[var(--crm-muted)] focus:border-[#0d5c63] focus:ring-3 focus:ring-[#0d5c63]/8;
+    }
+
+    .admin-input:is(select),
+    .crm-control:is(select) {
+        @apply appearance-none bg-no-repeat pr-10;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7c78' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-position: right 0.75rem center;
+        background-size: 0.875rem;
     }
 
     .crm-button-primary {
@@ -236,7 +244,7 @@
     .crm-status-new { @apply border-slate-200 bg-slate-50 text-slate-600; }
     .crm-status-contacted { @apply border-cyan-200/70 bg-cyan-50 text-cyan-700; }
     .crm-status-meeting_scheduled { @apply border-blue-200/70 bg-blue-50 text-blue-700; }
-    .crm-status-requirement_discussion { @apply border-violet-200/70 bg-violet-50 text-violet-700; }
+    .crm-status-requirement_discussion { @apply border-teal-200/70 bg-teal-50 text-teal-700; }
     .crm-status-proposal_sent { @apply border-amber-200/70 bg-amber-50 text-amber-700; }
     .crm-status-negotiation { @apply border-orange-200/70 bg-orange-50 text-orange-700; }
     .crm-status-won { @apply border-emerald-200/70 bg-emerald-50 text-emerald-700; }
@@ -254,7 +262,7 @@
     .pipeline-dot-new { @apply bg-slate-400; }
     .pipeline-dot-contacted { @apply bg-cyan-500; }
     .pipeline-dot-meeting_scheduled { @apply bg-blue-500; }
-    .pipeline-dot-requirement_discussion { @apply bg-violet-500; }
+    .pipeline-dot-requirement_discussion { @apply bg-teal-500; }
     .pipeline-dot-proposal_sent { @apply bg-amber-500; }
     .pipeline-dot-negotiation { @apply bg-orange-500; }
     .pipeline-dot-won { @apply bg-emerald-500; }
