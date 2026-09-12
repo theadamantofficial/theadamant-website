@@ -137,7 +137,7 @@ export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["c
                         </StaggerGroup>
                     </div>
 
-                    <div className="overflow-hidden rounded-[1.75rem] border border-black/8 bg-[#edf4f1] pt-6 dark:border-white/10 dark:bg-[#122326]">
+                    <div className="contact-visual-3d overflow-hidden rounded-[1.75rem] border border-black/8 bg-[#edf4f1] pt-6 dark:border-white/10 dark:bg-[#122326]">
                         <Image
                             src="/images/img-contact-us-light.png"
                             alt=""
