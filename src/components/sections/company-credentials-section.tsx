@@ -12,6 +12,7 @@ import {
 import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 import {SiteCopy} from "@/lib/site-copy";
 import {SectionDepth} from "@/components/visuals/section-depth";
+import {MascotHeading} from "@/components/visuals/section-character";
 
 type CredentialsCopy = NonNullable<SiteCopy["credentials"]>;
 
@@ -60,7 +61,7 @@ export default function CompanyCredentialsSection({
 
                 <div className="relative">
                     <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-                        <div className="max-w-3xl">
+                        <MascotHeading mood="thumbs-up" side="left">
                             <p className="section-kicker">
                                 <BadgeCheck className="h-4 w-4 text-primary" aria-hidden="true"/>
                                 {copy.kicker}
@@ -71,7 +72,7 @@ export default function CompanyCredentialsSection({
                             <p className="section-copy max-w-3xl">
                                 {copy.description}
                             </p>
-                        </div>
+                        </MascotHeading>
 
                         <div className="inline-flex w-fit items-center gap-3 rounded-full border border-primary/20 bg-primary/8 px-4 py-3 text-sm font-semibold text-primary dark:border-primary/25 dark:bg-primary/10">
                             <Landmark className="h-5 w-5" aria-hidden="true"/>

@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 import {loadEmailJs} from "@/lib/load-emailjs";
 import {SiteCopy} from "@/lib/site-copy";
 import {SectionDepth} from "@/components/visuals/section-depth";
-import {SectionCharacter} from "@/components/visuals/section-character";
+import {MascotHeading} from "@/components/visuals/section-character";
 import {buildWhatsAppContactUrl} from "@/lib/whatsapp-contact";
 
 const SUCCESS_RESET_MS = 4000;
@@ -105,11 +105,10 @@ export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["c
 
     return (
         <section id="contact" className="section-shell contact-chapter pb-24 pt-10" aria-labelledby="contact-heading">
-            <SectionCharacter mood="builder" side="right"/>
             <SectionDepth variant="contact"/>
             <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
                 <Reveal className="glass-panel flex h-full flex-col justify-between gap-8 overflow-hidden p-8 sm:p-10">
-                    <div>
+                    <MascotHeading mood="phone-wave" side="right">
                         <p className="section-kicker">{copy.kicker}</p>
                         <h2 id="contact-heading" className="section-title">
                             {copy.title}
@@ -118,7 +117,9 @@ export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["c
                         <p className="section-copy">
                             {copy.description}
                         </p>
+                    </MascotHeading>
 
+                    <div>
                         <StaggerGroup className="mt-8 grid gap-4 md:grid-cols-2">
                             {copy.highlights.map(({title, description}, index) => {
                                 const Icon = highlightIcons[index];

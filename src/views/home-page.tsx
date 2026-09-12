@@ -3,6 +3,7 @@ import Footer from "@/components/layouts/footer";
 import dynamic from "next/dynamic";
 import {SiteCopy} from "@/lib/site-copy";
 import {SiteLocale} from "@/lib/site-locale";
+import AdamantSystemSection from "@/components/experience/adamant-system-section";
 
 const HeroSection = dynamic(() => import("@/components/sections/hero-section"));
 const CompanyCredentialsSection = dynamic(() => import("@/components/sections/company-credentials-section"));
@@ -14,7 +15,6 @@ const FaqSection = dynamic(() => import("@/components/sections/faq-section"));
 const ContactUsSection = dynamic(() => import("@/components/sections/contact-us-section"));
 const CursorHalo = dynamic(() => import("@/components/visuals/cursor-halo"));
 const PeelReveal = dynamic(() => import("@/components/visuals/peel-reveal"));
-const DeferredAdamantSystem = dynamic(() => import("@/components/experience/deferred-experiences").then((module) => module.DeferredAdamantSystem));
 const DeferredPathToSuccess = dynamic(() => import("@/components/experience/deferred-experiences").then((module) => module.DeferredPathToSuccess));
 const NonCriticalTools = dynamic(() => import("@/components/ui/non-critical-tools").then((module) => module.NonCriticalTools));
 
@@ -85,7 +85,7 @@ export default function HomePage({
 
         <HeroSection copy={copy.hero} locale={locale}/>
 
-        <DeferredAdamantSystem services={copy.services}/>
+        <AdamantSystemSection services={copy.services}/>
 
         <PartnerProofStrip copy={copy.services.proofStrip} items={proofItems}/>
 

@@ -1,5 +1,6 @@
 import type {Metadata} from "next";
 import "../styles/globals.css";
+import "../styles/experience.css";
 import {ReactNode} from "react";
 import {Toaster} from "react-hot-toast";
 import {headers} from "next/headers";

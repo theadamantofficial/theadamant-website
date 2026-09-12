@@ -18,6 +18,7 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
     const progressRef = useRef(0);
     const [introComplete, setIntroComplete] = useState(false);
     const [isHeroVisible, setIsHeroVisible] = useState(true);
+    const [sceneReady, setSceneReady] = useState(false);
     const enhanced = isReady && capability === "full";
     useEffect(() => {
         const complete = () => setIntroComplete(true);
@@ -32,6 +33,7 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
         observer.observe(section);
         return () => observer.disconnect();
     }, []);
+    useEffect(() => {if (!isHeroVisible) setSceneReady(false);}, [isHeroVisible]);
     const zoomIn = () => {
         const section = sectionRef.current;
         if (section) window.scrollTo({top: section.offsetTop + section.offsetHeight - innerHeight, behavior: capability === "reduced" ? "instant" : "smooth"});
@@ -39,7 +41,7 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
     useEffect(() => {
         const section = sectionRef.current;
         const hero = heroRef.current;
-        if (!section || !hero) return;
+        if (!section || !hero || !isHeroVisible || !introComplete || capability === "reduced") return;
         let frame = 0;
         const update = () => {
             const distance = section.offsetHeight - innerHeight;
@@ -53,10 +55,10 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
         window.addEventListener("resize", schedule);
         update();
         return () => {cancelAnimationFrame(frame);window.removeEventListener("scroll",schedule);window.removeEventListener("resize",schedule);};
-    }, []);
+    }, [isHeroVisible, introComplete, capability]);
 
     return (
-        <section ref={sectionRef} className="workspace-scroll-track" data-motion={capability} aria-labelledby="hero-heading">
+        <section ref={sectionRef} className="workspace-scroll-track" data-motion={capability} data-motion-active={isHeroVisible && introComplete && capability !== "reduced"} aria-labelledby="hero-heading">
             <div ref={heroRef} className={`workspace-hero ${introComplete ? "workspace-intro-complete" : ""}`}>
                 <div className="workspace-heading">
                     <p className="workspace-label"><span/> INDEPENDENT DIGITAL STUDIO</p>
@@ -64,11 +66,11 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
                     <p className="workspace-intro">We design. We build. We make a little noise.<br/>Scroll through a world of bold digital ideas.</p>
                 </div>
                 <div className="workspace-scene">
-                    <div className="workspace-fallback" aria-hidden="true">
-                        <div className="fallback-monitor"><span>ADAMANT</span><div className="fallback-film"/><p>Firm in vision. Bold in action.</p></div>
-                        <div className="fallback-neck"/><div className="fallback-base"/><div className="fallback-desk"/>
-                    </div>
-                    {enhanced && introComplete && isHeroVisible && <StudioRoom onEnter={zoomIn} progressRef={progressRef} paused={false} resetKey={0} palette={0}/>}
+                    {!sceneReady && <div className="workspace-mascot-loader" role={enhanced && introComplete ? "status" : undefined}>
+                        <Image src="/images/adamant-mascot/thinking.webp" alt="" width={420} height={525} sizes="(max-width: 600px) 156px, 210px"/>
+                        {enhanced && introComplete ? <><span className="mascot-loading-dots" aria-hidden="true"><i/><i/><i/></span><span className="sr-only">Preparing the studio</span></> : <p>Big ideas. Thoughtfully made.</p>}
+                    </div>}
+                    {enhanced && introComplete && isHeroVisible && <StudioRoom onReady={() => setSceneReady(true)} onEnter={zoomIn} progressRef={progressRef} paused={false} resetKey={0} palette={0}/>}
                 </div>
                 <div className="workspace-bottom">
                     <span />
@@ -77,7 +79,7 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
                     </div>
                 </div>
                 <div className="workspace-audio-avatar" aria-hidden="true">
-                    <Image src="/images/adamant-avatar/listening.webp" alt="" fill sizes="220px"/>
+                    <Image src="/images/adamant-avatar/listening.webp" alt="" fill sizes="(max-width: 600px) 110px, (max-width: 1100px) 160px, 220px"/>
                 </div>
                 <div className="workspace-footer"><span>FIRM IN VISION. BOLD IN ACTION.</span><span>BUILT IN INDIA. CONNECTED TO THE WORLD.</span></div>
             </div>

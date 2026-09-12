@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {motion, useScroll, useTransform} from "motion/react";
+import {motion} from "motion/react";
 import {Reveal} from "@/components/ui/reveal";
 import {SiteCopy} from "@/lib/site-copy";
 import {useRef} from "react";
 import {useMotionCapability} from "@/hooks/use-motion-capability";
 import {SectionDepth} from "@/components/visuals/section-depth";
+import {MascotHeading} from "@/components/visuals/section-character";
 import SystemInterfaces from "@/components/visuals/system-interfaces";
 
 type ProofStripCopy = NonNullable<SiteCopy["services"]["proofStrip"]>;
@@ -29,8 +30,6 @@ export default function PartnerProofStrip({
     const {capability, isReady} = useMotionCapability();
     const hasRichMotion = isReady && capability === "full";
     const sectionRef = useRef<HTMLElement>(null);
-    const {scrollYProgress} = useScroll({target: sectionRef, offset: ["start end", "end start"]});
-    const depthShift = useTransform(scrollYProgress, [0, 1], [34, -34]);
 
     if (!copy || items.length === 0) {
         return null;
@@ -64,7 +63,7 @@ export default function PartnerProofStrip({
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(13,92,99,0.14),transparent_34%),radial-gradient(circle_at_86%_14%,rgba(214,106,69,0.12),transparent_28%)]"/>
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/30 to-transparent"/>
                 <div className="relative space-y-8">
-                    <div className="max-w-4xl">
+                    <MascotHeading mood="walking-tablet" side="right">
                         <p className="section-kicker">{copy.kicker}</p>
                         <h2 id="partner-proof-heading" className="section-title">
                             {copy.title}
@@ -72,17 +71,17 @@ export default function PartnerProofStrip({
                         <p className="section-copy max-w-xl">
                             {copy.description}
                         </p>
-                    </div>
+                    </MascotHeading>
 
                     {shouldScroll
                         ? (
                             <div className="space-y-4">
                                 <div className="overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-                                    <motion.div style={hasRichMotion ? {x: depthShift} : undefined} className="proof-marquee flex w-max gap-4 py-1">
+                                    <div className="proof-marquee flex w-max gap-4 py-1">
                                         {[...highlightTiles, ...highlightTiles].map((tile, index) => (
                                             <BeltTileCard key={`proof-primary-${tile.item.title}-${tile.kind}-${index}`} tile={tile}/>
                                         ))}
-                                    </motion.div>
+                                    </div>
                                 </div>
 
                                 <div className="overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">

@@ -97,10 +97,6 @@ export const NavBody = ({children, className, visible, hidden}: NavBodyProps) =>
     return (
         <motion.div
             animate={{
-                backdropFilter: visible ? "blur(16px)" : "none",
-                boxShadow: visible
-                    ? "0 28px 70px -42px rgba(15, 23, 42, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08) inset"
-                    : "none",
                 scale: visible ? 0.96 : 1,
                 y: visible ? 2 : 0,
                 opacity: hidden ? 0.94 : 1,
@@ -111,7 +107,7 @@ export const NavBody = ({children, className, visible, hidden}: NavBodyProps) =>
             }}
             className={cn(
                 "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center gap-4 rounded-full border border-transparent bg-transparent px-5 py-3 xl:flex",
-                visible && "border-black/8 bg-white/75 dark:border-[#5fcabd]/20 dark:bg-[#071820]/88",
+                visible && "border-black/8 bg-white/95 dark:border-[#5fcabd]/20 dark:bg-[#071820]/95",
                 className,
             )}
             style={{

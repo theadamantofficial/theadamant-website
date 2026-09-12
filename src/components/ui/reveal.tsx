@@ -1,79 +1,33 @@
 "use client";
-
-import {motion, type HTMLMotionProps} from "motion/react";
-import {ReactNode} from "react";
+import {type HTMLAttributes, type ReactNode, type CSSProperties, useEffect, useRef} from "react";
 import {cn} from "@/lib/utils";
-
-const smoothEase = [0.22, 1, 0.36, 1] as const;
-
-type RevealProps = HTMLMotionProps<"div"> & {
-    children: ReactNode;
-    delay?: number;
-};
-
-export function Reveal({children, className, delay = 0, ...props}: RevealProps) {
-    return (
-        <motion.div
-            className={cn("motion-reveal", className)}
-            initial={false}
-            whileInView={{opacity: 1, y: 0}}
-            viewport={{once: true, amount: 0.22}}
-            transition={{duration: 0.65, ease: smoothEase, delay}}
-            {...props}
-        >
-            {children}
-        </motion.div>
-    );
+type Props = HTMLAttributes<HTMLDivElement> & {children: ReactNode; delay?: number};
+/** One-shot native transforms; no scroll subscriptions per card. */
+export function Reveal({children, className, delay = 0, style, ...props}: Props) {
+    const ref = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const node = ref.current;
+        if (!node || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        let observer: IntersectionObserver | undefined;
+        const observe = () => {
+            observer?.disconnect();
+            observer = new IntersectionObserver(([entry]) => {
+                if (!entry.isIntersecting) return;
+                node.dataset.arrived = "true";
+                observer?.disconnect();
+            }, {threshold: .08});
+            observer.observe(node);
+        };
+        if (!document.querySelector(".peel-reveal")) observe();
+        window.addEventListener("adamant:intro-complete", observe, {once: true});
+        return () => {observer?.disconnect(); window.removeEventListener("adamant:intro-complete", observe);};
+    }, []);
+    return <div ref={ref} className={cn("native-reveal", className)} style={{"--reveal-delay": String(delay) + "s", ...style} as CSSProperties} {...props}>{children}</div>;
 }
-
-type StaggerGroupProps = HTMLMotionProps<"div"> & {
-    children: ReactNode;
-};
-
-export function StaggerGroup({children, className, ...props}: StaggerGroupProps) {
-    return (
-        <motion.div
-            className={cn("motion-reveal", className)}
-            initial={false}
-            whileInView="show"
-            viewport={{once: true, amount: 0.18}}
-            variants={{
-                hidden: {},
-                show: {
-                    transition: {
-                        staggerChildren: 0.12,
-                    },
-                },
-            }}
-            {...props}
-        >
-            {children}
-        </motion.div>
-    );
+export function StaggerGroup({children, className, ...props}: Props) {
+    return <Reveal className={cn("native-stagger", className)} {...props}>{children}</Reveal>;
 }
-
-type StaggerItemProps = HTMLMotionProps<"div"> & {
-    children: ReactNode;
-};
-
-export function StaggerItem({children, className, ...props}: StaggerItemProps) {
-    return (
-        <motion.div
-            className={cn("motion-reveal", className)}
-            variants={{
-                hidden: {opacity: 0, y: 24},
-                show: {
-                    opacity: 1,
-                    y: 0,
-                    transition: {
-                        duration: 0.6,
-                        ease: smoothEase,
-                    },
-                },
-            }}
-            {...props}
-        >
-            {children}
-        </motion.div>
-    );
+export function StaggerItem({children, className, delay: _delay, ...props}: Props) {
+    void _delay;
+    return <div className={cn("native-stagger-item", className)} {...props}>{children}</div>;
 }

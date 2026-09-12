@@ -1,25 +1,41 @@
 "use client";
-
-import {motion, useScroll, useTransform} from "motion/react";
-import {useRef} from "react";
-
+import {useEffect, useRef} from "react";
+import {useMotionCapability} from "@/hooks/use-motion-capability";
+import {registerViewportMotion} from "@/lib/viewport-motion";
 type DepthVariant = "credentials" | "proof" | "values" | "services" | "process" | "faq" | "contact" | "footer";
-
-/** Shared low-cost 3D layer for the homepage chapters. It gives each section a distinct object language. */
 export function SectionDepth({variant}: {variant: DepthVariant}) {
-    const sectionRef = useRef<HTMLDivElement>(null);
-    const {scrollYProgress} = useScroll({target: sectionRef, offset: ["start end", "end start"]});
-    const y = useTransform(scrollYProgress, [0, 1], [70, -70]);
-    const rotate = useTransform(scrollYProgress, [0, 1], [-14, 16]);
-    const drift = useTransform(scrollYProgress, [0, 1], [-35, 35]);
-
-    return (
-        <div ref={sectionRef} className={`section-depth section-depth-${variant}`} aria-hidden="true">
-            <motion.div className="depth-object depth-object-main" style={{y, rotate}} />
-            <motion.div className="depth-object depth-object-orbit" style={{y: drift, rotate: rotate}} />
-            <motion.div className="depth-object depth-object-dot" style={{y: drift}} />
-            <motion.div className="depth-core" style={{y: drift, rotate}}><span/></motion.div>
-            <div className="depth-connector" />
-        </div>
-    );
+    const ref = useRef<HTMLDivElement>(null);
+    const {capability} = useMotionCapability();
+    useEffect(() => {
+        const node = ref.current, section = node?.closest("section, footer") as HTMLElement | null;
+        if (!node || !section) return;
+        section.dataset.motion = capability;
+        let remove: (() => void) | undefined;
+        let inView = false;
+        const sync = () => {
+            const active = inView && !document.hidden && !section.inert;
+            section.dataset.motionActive = String(active && capability !== "reduced");
+            remove?.(); remove = undefined;
+            if (active && capability === "full") {
+                remove = registerViewportMotion({element: section, write: progress => {
+                    section.style.setProperty("--chapter-progress", progress.toFixed(4));
+                    node.style.setProperty("--depth-y", String(70 - progress * 140) + "px");
+                    node.style.setProperty("--depth-drift", String(progress * 70 - 35) + "px");
+                }});
+            }
+        };
+        const observer = new IntersectionObserver(([entry]) => {inView = entry.isIntersecting; sync();});
+        observer.observe(section);
+        document.addEventListener("visibilitychange", sync);
+        window.addEventListener("adamant:intro-complete", sync);
+        sync();
+        return () => {observer.disconnect(); remove?.(); document.removeEventListener("visibilitychange", sync); window.removeEventListener("adamant:intro-complete", sync);};
+    }, [capability]);
+    return <div ref={ref} className={"section-depth section-depth-" + variant} aria-hidden="true">
+        <div className="depth-object depth-object-main"/>
+        <div className="depth-object depth-object-orbit"/>
+        <div className="depth-object depth-object-dot"/>
+        <div className="depth-core"><span/></div>
+        <div className="depth-connector"/>
+    </div>;
 }

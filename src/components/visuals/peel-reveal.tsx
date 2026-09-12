@@ -3,9 +3,11 @@
 import {useCallback, useEffect, useRef, useState} from "react";
 import * as THREE from "three";
 import {TearableCloth} from "./tearable-cloth";
+import {useWebGLSlot} from "@/hooks/use-webgl-slot";
 
 /** Transparent holes are missing cloth faces, not a progress-based wipe. */
 export default function PeelReveal() {
+    const {available, claim} = useWebGLSlot();
     const hostRef = useRef<HTMLDivElement>(null);
     const disposeRef = useRef<(() => void) | null>(null);
     const [visible, setVisible] = useState(true);
@@ -41,10 +43,14 @@ export default function PeelReveal() {
             const timer = window.setTimeout(finish, 300);
             return () => { window.clearTimeout(timer); releasePage(); };
         }
+        if (!available) return releasePage;
+        const releaseSlot = claim();
+        if (!releaseSlot) return releasePage;
         let renderer: THREE.WebGLRenderer;
         try {
             renderer = new THREE.WebGLRenderer({alpha: true, antialias: false, powerPreference: "low-power"});
         } catch {
+            releaseSlot();
             // WebGL failure keeps the branded cover and an accessible skip control.
             return releasePage;
         }
@@ -261,12 +267,13 @@ export default function PeelReveal() {
             renderer.forceContextLoss();
             renderer.domElement.remove();
             paper.width = paper.height = 1;
+            releaseSlot();
             releasePage();
             delete host.dataset.ready;
         };
         disposeRef.current = dispose;
         return dispose;
-    }, [visible, finish]);
+    }, [visible, finish, available, claim]);
 
     if (!visible) return null;
     return <div ref={hostRef} className="peel-reveal" role="dialog" aria-modal="true" aria-label="Tear to reveal Adamant">

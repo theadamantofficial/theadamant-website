@@ -5,8 +5,12 @@ import * as THREE from "three";
 import {RoundedBoxGeometry} from "three/addons/geometries/RoundedBoxGeometry.js";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {getDeviceQuality, getMaxDpr} from "@/lib/device-quality";
+import {useWebGLSlot} from "@/hooks/use-webgl-slot";
 
-export default function StudioRoom({onEnter, paused, resetKey, palette, progressRef}: {progressRef: RefObject<number>; onEnter: () => void; paused: boolean; resetKey: number; palette: number}) {
+export default function StudioRoom({onEnter, onReady, paused, resetKey, palette, progressRef}: {progressRef: RefObject<number>; onEnter: () => void; onReady?: () => void; paused: boolean; resetKey: number; palette: number}) {
+    const {available, claim} = useWebGLSlot();
+    const readyRef = useRef(onReady);
+    useEffect(() => {readyRef.current = onReady;}, [onReady]);
     const hostRef = useRef<HTMLDivElement>(null);
     const enterRef = useRef(onEnter);
     const pausedRef = useRef(paused);
@@ -19,13 +23,15 @@ export default function StudioRoom({onEnter, paused, resetKey, palette, progress
 
     useEffect(() => {
         const host = hostRef.current;
-        if (!host) return;
+        if (!host || !available) return;
+        const release = claim();
+        if (!release) return;
         let renderer: THREE.WebGLRenderer;
         try {renderer = new THREE.WebGLRenderer({alpha: true, antialias: true, powerPreference: "low-power"});}
-        catch {return;}
+        catch {release();return;}
         const quality = getDeviceQuality();
         renderer.setPixelRatio(Math.min(devicePixelRatio, getMaxDpr(quality)));
-        renderer.shadowMap.enabled = quality !== "low";
+        renderer.shadowMap.enabled = quality === "high";
         renderer.shadowMap.type = THREE.PCFShadowMap;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.2;
@@ -236,11 +242,14 @@ export default function StudioRoom({onEnter, paused, resetKey, palette, progress
         const restored=()=>{lost=false;host.dataset.ready='true';wake();};
         host.addEventListener('pointerdown',down);host.addEventListener('pointerup',up);host.addEventListener('pointermove',move);
         renderer.domElement.addEventListener('webglcontextlost',contextLost);renderer.domElement.addEventListener('webglcontextrestored',restored);
-        const wake=()=>{if(!frame&&visible&&!document.hidden&&!lost){previous=performance.now();frame=requestAnimationFrame(render);}};
+        const wake=()=>{if(!frame&&visible&&!document.hidden&&!lost){frame=requestAnimationFrame(render);}};
         const visibilityChanged=()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;}else wake();};
         const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)wake();else{cancelAnimationFrame(frame);frame=0;}});observer.observe(host);
         document.addEventListener('visibilitychange',visibilityChanged);
-        const render=(time:number)=>{frame=0;const delta=Math.min((time-previous)/1000,.05);previous=time;if(!visible||document.hidden||lost)return;
+        let ready = false, lastRender = 0;
+        const render=(time:number)=>{frame=0;if(!visible||document.hidden||lost)return;
+            if(time-lastRender<1000/30){wake();return;}lastRender=time;
+            const delta=Math.min((time-previous)/1000,.05);previous=time;
             assembly=Math.min(1,assembly+delta/.9);
             if (assembly < 1) assemblyParts.forEach((part,index)=>{part.position.lerpVectors(assemblyOffsets[index],assemblyTargets[index],assembly);});
             if(!pausedRef.current&&!reduced.matches){elapsed+=delta;leaves.forEach((leaf,i)=>{leaf.rotation.z=Math.cos(i*2.4)*.8+Math.sin(elapsed*.7+i)*.035;});
@@ -261,12 +270,12 @@ export default function StudioRoom({onEnter, paused, resetKey, palette, progress
                 overview.copy(camera.position);
             }
             lastProgress = progress;
-            renderer.render(scene,camera);host.dataset.ready='true';wake();};wake();
+            renderer.render(scene,camera);if(!ready){ready=true;host.dataset.ready='true';readyRef.current?.();}wake();};wake();
         return()=>{themeObserver.disconnect();cancelAnimationFrame(frame);observer.disconnect();resizeObserver.disconnect();controls.dispose();resetRef.current=null;paletteRef.current=null;
             document.removeEventListener('visibilitychange',visibilityChanged);
             host.removeEventListener('pointerdown',down);host.removeEventListener('pointerup',up);host.removeEventListener('pointermove',move);
             renderer.domElement.removeEventListener('webglcontextlost',contextLost);renderer.domElement.removeEventListener('webglcontextrestored',restored);
-            geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());renderer.setAnimationLoop(null);renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();delete host.dataset.ready;};
-    },[progressRef]);
+            geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());renderer.setAnimationLoop(null);renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();delete host.dataset.ready;release();};
+    },[progressRef, available, claim]);
     return <div ref={hostRef} className="workspace-canvas" aria-hidden="true"/>;
 }
