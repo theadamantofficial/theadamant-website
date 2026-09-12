@@ -9,6 +9,7 @@ import Link from "next/link";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPagePath, getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 import {BLOG_LABELS, MEDIUM_URL} from "@/lib/blog-config";
+import {SectionDepth} from "@/components/visuals/section-depth";
 const MEDIUM_COPY: Record<SiteLocale, {
     kicker: string;
     title: string;
@@ -112,8 +113,9 @@ export default function Footer({
             : section
     ));
 
-    return <footer className="section-shell pb-12 pt-6">
-        <div className="glass-panel overflow-hidden px-6 py-10 sm:px-8">
+    return <footer className="section-shell site-footer-3d pb-12 pt-6">
+        <SectionDepth variant="footer"/>
+        <div className="footer-content-world glass-panel overflow-hidden px-6 py-10 sm:px-8">
             <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr_0.9fr]">
                 <div>
                     <div className="flex flex-col gap-4">

@@ -12,6 +12,11 @@ const ServicesSection = dynamic(() => import("@/components/sections/services-sec
 const ProcessSection = dynamic(() => import("@/components/sections/process-section"));
 const FaqSection = dynamic(() => import("@/components/sections/faq-section"));
 const ContactUsSection = dynamic(() => import("@/components/sections/contact-us-section"));
+const CreativeWorld = dynamic(() => import("@/components/visuals/creative-world"));
+const CursorHalo = dynamic(() => import("@/components/visuals/cursor-halo"));
+const ChapterRail = dynamic(() => import("@/components/visuals/chapter-rail"));
+const AdamantSystemSection = dynamic(() => import("@/components/experience/adamant-system-section"));
+const PathToSuccess = dynamic(() => import("@/components/experience/path-to-success"));
 const WebsiteAuditFab = dynamic(
     () => import("@/components/ui/website-audit-fab").then((module) => module.WebsiteAuditFab),
 );
@@ -82,11 +87,17 @@ export default function HomePage({
         {locale === "en" && <WebsiteAuditFab locale={locale}/>}
         {locale === "en" && <SeoChatFab/>}
 
+        <CreativeWorld/>
+        <CursorHalo/>
+        <ChapterRail/>
+
         <HeroSection copy={copy.hero} locale={locale}/>
 
-        <CompanyCredentialsSection copy={copy.credentials}/>
+        <AdamantSystemSection services={copy.services}/>
 
         <PartnerProofStrip copy={copy.services.proofStrip} items={proofItems}/>
+
+        <CompanyCredentialsSection copy={copy.credentials}/>
 
         <ValuePropsSection copy={copy.valueProps}/>
 
@@ -97,6 +108,8 @@ export default function HomePage({
         <FaqSection copy={copy.faq}/>
 
         <ContactUsSection copy={copy.contact}/>
+
+        <PathToSuccess locale={locale}/>
 
         <Footer copy={copy.footer} locale={locale}/>
     </main>;

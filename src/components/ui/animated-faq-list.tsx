@@ -50,7 +50,7 @@ export function AnimatedFaqList({
                             className="group flex w-full items-center justify-between gap-4 p-6 text-left text-lg font-semibold tracking-tight text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                             aria-expanded={isOpen}
                             aria-controls={panelId}
-                            onClick={() => setOpenIndex(isOpen ? null : index)}
+                            onClick={() => {setOpenIndex(isOpen ? null : index);window.dispatchEvent(new CustomEvent("adamant:faq", {detail: {open: !isOpen}}));}}
                         >
                             <span>{item.question}</span>
                             <motion.span

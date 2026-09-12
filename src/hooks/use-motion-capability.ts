@@ -46,8 +46,10 @@ export function useMotionCapability(): {
 
     const capability = useMemo(() => getMotionCapability({
         ...signals,
-        prefersReducedMotion: prefersReducedMotion === true,
-    }), [prefersReducedMotion, signals]);
+        // Keep the server render and the browser's first render identical.
+        // The media preference is applied immediately after capability signals mount.
+        prefersReducedMotion: isReady && prefersReducedMotion === true,
+    }), [isReady, prefersReducedMotion, signals]);
 
     return {capability, isReady};
 }

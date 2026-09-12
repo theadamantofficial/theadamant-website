@@ -5,6 +5,7 @@ import {motion} from "motion/react";
 import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 import {SiteCopy} from "@/lib/site-copy";
 import {useMotionCapability} from "@/hooks/use-motion-capability";
+import {SectionDepth} from "@/components/visuals/section-depth";
 
 const cardVariants = {
     rest: {y: 0, scale: 1},
@@ -28,6 +29,7 @@ export default function ValuePropsSection({copy}: { copy: SiteCopy["valueProps"]
 
     return (
         <section className="section-shell py-8 sm:py-12" aria-labelledby="value-props-heading">
+            <SectionDepth variant="values"/>
             <Reveal className="glass-panel p-6 sm:p-8">
                 <div className="max-w-3xl">
                     <p className="section-kicker">{copy.kicker}</p>

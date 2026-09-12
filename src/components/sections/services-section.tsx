@@ -5,6 +5,7 @@ import {SiteCopy} from "@/lib/site-copy";
 import Link from "next/link";
 import {SiteLocale} from "@/lib/site-locale";
 import {ServiceScrollStory} from "@/components/sections/service-scroll-story";
+import {SectionDepth} from "@/components/visuals/section-depth";
 
 const LANDING_LINKS = [
     {href: "/website-development", label: "Global SEO-friendly website development"},
@@ -23,6 +24,7 @@ export default function ServicesSection({
 }) {
     return (
         <section id="services" className="section-shell py-16 sm:py-20" aria-labelledby="services-heading">
+            <SectionDepth variant="services"/>
             <Reveal className="max-w-3xl">
                 <p className="section-kicker">{copy.kicker}</p>
                 <h2 id="services-heading" className="section-title">

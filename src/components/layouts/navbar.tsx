@@ -94,8 +94,7 @@ export function Navbar({
     };
 
     return (
-        <NavbarComponent
-        >
+            <NavbarComponent className="site-navbar">
             <NavBody>
                 <AppLogo className="shrink-0 px-2" href={homeHref}/>
                 <NavItems items={navItems}/>
@@ -113,7 +112,7 @@ export function Navbar({
                             : <IconMoon className="theme-toggle-icon" stroke={1.8}/>}
                     </button>
 
-                    <Link href={getLocalizedPath(locale, "contact")} className="button-primary px-4 py-2.5 text-sm">
+                    <Link href={getLocalizedPath(locale, "contact")} data-magnetic className="button-primary px-4 py-2.5 text-sm">
                         {copy.startProject}
                     </Link>
                 </div>

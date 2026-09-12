@@ -111,7 +111,7 @@ export const NavBody = ({children, className, visible, hidden}: NavBodyProps) =>
             }}
             className={cn(
                 "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center gap-4 rounded-full border border-transparent bg-transparent px-5 py-3 xl:flex",
-                visible && "border-black/8 bg-white/75 dark:border-white/10 dark:bg-neutral-950/72",
+                visible && "border-black/8 bg-white/75 dark:border-[#5fcabd]/20 dark:bg-[#071820]/88",
                 className,
             )}
             style={{
@@ -194,7 +194,7 @@ export const MobileNav = ({children, className, visible, hidden}: MobileNavProps
             }}
             className={cn(
                 "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between border border-transparent bg-transparent px-3 py-3 xl:hidden",
-                visible && "border-black/8 bg-white/75 dark:border-white/10 dark:bg-neutral-950/72",
+                visible && "border-black/8 bg-white/75 dark:border-[#5fcabd]/20 dark:bg-[#071820]/88",
                 className,
             )}
             style={{
@@ -236,7 +236,7 @@ export const MobileNavMenu = ({
                     exit={{opacity: 0, y: -10}}
                     transition={{duration: 0.22, ease: [0.22, 1, 0.36, 1]}}
                     className={cn(
-                        "absolute inset-x-0 top-[calc(100%+0.75rem)] z-50 flex w-full flex-col items-start justify-start gap-4 rounded-[1.75rem] border border-black/8 bg-white px-4 py-6 shadow-[0_28px_70px_-42px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-neutral-950",
+                        "absolute inset-x-0 top-[calc(100%+0.75rem)] z-[100] flex w-full flex-col items-start justify-start gap-4 rounded-[1.75rem] border border-black/8 bg-white px-4 py-6 shadow-[0_28px_70px_-42px_rgba(15,23,42,0.55)] dark:border-[#5fcabd]/20 dark:bg-[#071820]",
                         className,
                     )}
                 >

@@ -12,6 +12,7 @@ import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 import toast from "react-hot-toast";
 import {loadEmailJs} from "@/lib/load-emailjs";
 import {SiteCopy} from "@/lib/site-copy";
+import {SectionDepth} from "@/components/visuals/section-depth";
 import {buildWhatsAppContactUrl} from "@/lib/whatsapp-contact";
 
 const SUCCESS_RESET_MS = 4000;
@@ -102,7 +103,8 @@ export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["c
     }
 
     return (
-        <section id="contact" className="section-shell pb-24 pt-10" aria-labelledby="contact-heading">
+        <section id="contact" className="section-shell contact-chapter pb-24 pt-10" aria-labelledby="contact-heading">
+            <SectionDepth variant="contact"/>
             <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
                 <Reveal className="glass-panel flex h-full flex-col justify-between gap-8 overflow-hidden p-8 sm:p-10">
                     <div>

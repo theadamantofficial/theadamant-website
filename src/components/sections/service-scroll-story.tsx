@@ -26,7 +26,7 @@ export function ServiceScrollStory({
     const {capability} = useMotionCapability();
     const {scrollYProgress} = useScroll({
         target: storyRef,
-        offset: ["start 70%", "end 40%"],
+        offset: ["start 25%", "end 80%"],
     });
 
     useMotionValueEvent(scrollYProgress, "change", (latest) => {
@@ -74,39 +74,10 @@ export function ServiceScrollStory({
                         />
                     </div>
 
-                    <div className="absolute inset-x-5 bottom-24 top-20 overflow-hidden rounded-[1.5rem] border border-black/8 bg-white/55 dark:border-white/10 dark:bg-black/20 sm:inset-x-6 sm:bottom-28 sm:top-24">
-                        {items.map((service, index) => {
-                            const isActive = index === displayedIndex;
-
-                            return (
-                                <motion.div
-                                    key={service.title}
-                                    className="absolute inset-0"
-                                    initial={false}
-                                    animate={{
-                                        opacity: isActive ? 1 : 0,
-                                        scale: isFullMotion && isActive ? 1 : 0.965,
-                                        clipPath: isFullMotion && isActive
-                                            ? "inset(0% 0% 0% 0% round 1.5rem)"
-                                            : "inset(3% 3% 3% 3% round 1.5rem)",
-                                    }}
-                                    transition={{
-                                        duration: isFullMotion ? 0.55 : 0.12,
-                                        ease: smoothEase,
-                                    }}
-                                    aria-hidden={!isActive}
-                                >
-                                    <Image
-                                        src={service.image}
-                                        alt=""
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 1024px) 100vw, 44vw"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/42 via-transparent to-transparent"/>
-                                </motion.div>
-                            );
-                        })}
+                    <div className="service-sculpture-frame">
+                        <div className="service-sculpture-fallback">
+                            <Image src={items[displayedIndex].image} alt="" fill className="object-contain" sizes="(max-width: 1024px) 85vw, 44vw"/>
+                        </div>
                     </div>
 
                     <div className="absolute inset-x-5 bottom-5 z-20 sm:inset-x-6 sm:bottom-6">
@@ -129,7 +100,7 @@ export function ServiceScrollStory({
                                 : "flex min-h-[58svh] items-center py-8 lg:min-h-[72svh] lg:py-12"}
                         >
                             <motion.article
-                                className={`relative w-full overflow-hidden rounded-[1.8rem] border bg-white/76 p-6 shadow-[0_28px_65px_-48px_rgba(15,23,42,0.56)] backdrop-blur-xl transition-colors dark:bg-white/[0.05] sm:p-8 ${
+                                className={`service-spatial-card relative w-full border border-transparent p-6 transition-colors sm:p-8 ${
                                     !isReduced && isActive
                                         ? "border-primary/35"
                                         : "border-black/10 dark:border-white/10"
@@ -167,7 +138,7 @@ export function ServiceScrollStory({
                                 <p className="mt-4 text-base leading-7 text-foreground/72">
                                     {service.description}
                                 </p>
-                                <div className="mt-6 rounded-[1.35rem] border border-black/8 bg-black/[0.035] p-5 dark:border-white/10 dark:bg-white/[0.035]">
+                                <div className="service-detail-plane mt-6 border-l border-primary/35 p-5">
                                     <p className="text-sm leading-7 text-foreground/66">
                                         {service.detail}
                                     </p>

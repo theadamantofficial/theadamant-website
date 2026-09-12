@@ -2,10 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {motion} from "motion/react";
+import {motion, useScroll, useTransform} from "motion/react";
 import {Reveal} from "@/components/ui/reveal";
 import {SiteCopy} from "@/lib/site-copy";
+import {useRef} from "react";
 import {useMotionCapability} from "@/hooks/use-motion-capability";
+import {SectionDepth} from "@/components/visuals/section-depth";
+import SystemInterfaces from "@/components/visuals/system-interfaces";
 
 type ProofStripCopy = NonNullable<SiteCopy["services"]["proofStrip"]>;
 type ProofItem = SiteCopy["services"]["items"][number];
@@ -25,6 +28,9 @@ export default function PartnerProofStrip({
 }) {
     const {capability, isReady} = useMotionCapability();
     const hasRichMotion = isReady && capability === "full";
+    const sectionRef = useRef<HTMLElement>(null);
+    const {scrollYProgress} = useScroll({target: sectionRef, offset: ["start end", "end start"]});
+    const depthShift = useTransform(scrollYProgress, [0, 1], [34, -34]);
 
     if (!copy || items.length === 0) {
         return null;
@@ -48,9 +54,12 @@ export default function PartnerProofStrip({
 
     return (
         <section
+            ref={sectionRef}
             className={`section-shell py-6 sm:py-10 ${hasRichMotion ? "" : "motion-effects-paused"}`}
             aria-labelledby="partner-proof-heading"
         >
+            <SectionDepth variant="proof"/>
+            <SystemInterfaces/>
             <Reveal className="relative overflow-hidden rounded-[2.25rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(242,234,223,0.74))] p-6 shadow-[0_40px_100px_-60px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(18,21,23,0.96),rgba(12,16,18,0.9))] sm:p-8">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(13,92,99,0.14),transparent_34%),radial-gradient(circle_at_86%_14%,rgba(214,106,69,0.12),transparent_28%)]"/>
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/30 to-transparent"/>
@@ -69,11 +78,11 @@ export default function PartnerProofStrip({
                         ? (
                             <div className="space-y-4">
                                 <div className="overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-                                    <div className="proof-marquee flex w-max gap-4 py-1">
+                                    <motion.div style={hasRichMotion ? {x: depthShift} : undefined} className="proof-marquee flex w-max gap-4 py-1">
                                         {[...highlightTiles, ...highlightTiles].map((tile, index) => (
                                             <BeltTileCard key={`proof-primary-${tile.item.title}-${tile.kind}-${index}`} tile={tile}/>
                                         ))}
-                                    </div>
+                                    </motion.div>
                                 </div>
 
                                 <div className="overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">

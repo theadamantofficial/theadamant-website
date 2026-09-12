@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 import {SiteCopy} from "@/lib/site-copy";
+import {SectionDepth} from "@/components/visuals/section-depth";
 
 type CredentialsCopy = NonNullable<SiteCopy["credentials"]>;
 
@@ -52,6 +53,7 @@ export default function CompanyCredentialsSection({
             className="section-shell scroll-mt-28 py-8 sm:py-12"
             aria-labelledby="credentials-heading"
         >
+            <SectionDepth variant="credentials"/>
             <Reveal className="relative overflow-hidden rounded-[2.25rem] border border-black/10 bg-[linear-gradient(145deg,rgba(255,255,255,0.9),rgba(239,231,217,0.76))] p-6 shadow-[0_40px_100px_-58px_rgba(15,23,42,0.58)] dark:border-white/10 dark:bg-[linear-gradient(145deg,rgba(20,24,26,0.96),rgba(11,16,18,0.92))] sm:p-8 lg:p-10">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_4%,rgba(13,92,99,0.18),transparent_30%),radial-gradient(circle_at_92%_12%,rgba(214,106,69,0.14),transparent_26%)]"/>
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/30 to-transparent"/>

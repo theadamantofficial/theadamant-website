@@ -22,20 +22,24 @@
     "languageAriaLabel": "Change website language"
   },
   "hero": {
-    "kicker": "Global SEO-friendly web and digital marketing partner for India, USA, UK, and Japan",
+    "kicker": "Independent digital studio · Built for a global stage",
     "tagline": "Firm in Vision. Bold in Action",
-    "title": "Innovative Web, Mobile, SaaS & Digital Marketing Solutions",
-    "description": "We create SEO-friendly websites, scalable SaaS products, mobile apps, and digital marketing systems including social media management, brand growth, and paid ad campaigns for ambitious brands worldwide.",
-    "primaryCta": "Book a consultation",
+    "title": "Bold ideas.\nBeautifully built.",
+    "description": "We turn ambitious ideas into websites, apps, and digital experiences. Thoughtfully designed, engineered to perform, and built to help your business grow.",
+    "primaryCta": "Let’s build something",
     "secondaryCta": "Explore services",
     "positioningPoints": [
-      "Structured for search visibility with clearer hierarchy and user-first navigation",
-      "UI/UX design that explains your offer fast and improves conversion intent",
-      "Digital marketing support for social media, brand visibility, and paid ad campaigns"
+      "Design with purpose",
+      "Development built to last",
+      "Marketing that moves you forward"
     ],
-    "previewEyebrowLeft": "SEO-ready brand presence",
-    "previewEyebrowRight": "Design, build, market",
-    "floatingBadges": ["Landing pages", "Search-ready", "Paid ads"],
+    "previewEyebrowLeft": "Ideas, brought into dimension",
+    "previewEyebrowRight": "From first spark to what’s next",
+    "floatingBadges": [
+      "Landing pages",
+      "Search-ready",
+      "Paid ads"
+    ],
     "featureCards": [
       {
         "title": "Conversion-focused design",
