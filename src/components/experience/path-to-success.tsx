@@ -191,7 +191,7 @@ return <section ref={shellRef} id="path-to-success" className={`journey-shell jo
             <div className="journey-next-check"><span>NEXT SYSTEM CHECK</span><b>{challenge.kind === "connected" ? "CONNECTED ARCHITECTURE" : `${challenge.kind.toUpperCase()} EXPERIENCE`}</b></div>
             <ChallengeVisual kind={challenge.kind}/>
             <div ref={characterRef} className="journey-character" style={playerStyle}>
-                <Image src={mode === "success" ? "/images/adamant-mascot/champion.webp" : "/images/adamant-mascot/walking-tablet.webp"} alt="" fill sizes="(max-width: 800px) 90px, 130px" className="journey-character-image"/>
+                <Image src="/images/adamant-character/creative-guide.webp" alt="" fill sizes="(max-width: 800px) 110px, 150px" className="journey-character-image"/>
                 <span className="character-head"/><span className="character-body"/><span className="character-arm arm-left"/><span className="character-arm arm-right"/><span className="character-leg leg-left"/><span className="character-leg leg-right"/>
             </div>
             <div className="journey-success-car"><Image src="/images/adamant-avatar/roadster.webp" alt="" fill sizes="(max-width: 800px) 320px, 600px"/></div>

@@ -6,8 +6,14 @@ main > .section-shell:target {content-visibility:visible}
 .mascot-heading-left {grid-template-columns:156px minmax(0,1fr)}
 .mascot-heading-left > .section-character {order:-1}
 .mascot-heading-copy {min-width:0}
+.contact-form-mascot {position:relative!important;inset:auto!important;width:220px;height:235px;align-self:center;display:block!important;opacity:1;animation:mascotFloat 5s ease-in-out infinite;filter:none!important;transform:none!important;isolation:isolate;pointer-events:auto!important;cursor:grab;touch-action:none}
+.contact-form-mascot[data-dragging="true"] {cursor:grabbing}
+.contact-form-mascot .mascot-image {position:relative;z-index:2;width:100%;height:100%;object-fit:contain;transform-style:preserve-3d;backface-visibility:visible;transform:rotateY(var(--mascot-rotate-y,0deg))}
+.contact-form-mascot::before {content:"";position:absolute;z-index:0;left:50%;top:50%;width:205px;height:78px;border:1px solid color-mix(in srgb,var(--primary) 42%,transparent);border-radius:50%;transform:translate(-50%,-50%) rotate(-18deg) perspective(500px) rotateX(58deg);box-shadow:0 0 25px color-mix(in srgb,var(--primary) 18%,transparent),inset 0 0 16px color-mix(in srgb,var(--primary) 10%,transparent);animation:mascotOrbit 7s linear infinite}
+.contact-form-mascot::after {content:"◆   ·   ◆";position:absolute;z-index:1;left:50%;top:50%;width:270px;height:270px;display:grid;place-items:center;color:var(--accent);font:11px monospace;letter-spacing:2.6rem;white-space:nowrap;transform:translate(-50%,-50%) rotate(22deg);text-shadow:0 0 12px color-mix(in srgb,var(--accent) 60%,transparent);animation:mascotOrbitReverse 12s linear infinite}
+.contact-form-mascot-hint {display:block;align-self:center;margin-top:-.75rem;color:color-mix(in srgb,var(--foreground) 52%,transparent);font:9px monospace;letter-spacing:.14em;text-transform:uppercase}
 .mascot-heading > .section-character {position:relative!important;inset:auto!important;display:block!important;width:100%;height:auto;aspect-ratio:4/5;opacity:1;pointer-events:none;animation:mascotFloat 5s ease-in-out infinite;filter:none!important;z-index:1;transform:none}
-.mascot-heading .mascot-image {width:100%;height:auto;object-fit:contain;transform:none}
+.mascot-heading .mascot-image {width:100%;height:100%;object-fit:contain;transform:none}
 .workspace-mascot-loader {position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;pointer-events:none}
 .workspace-mascot-loader > img {width:210px;height:auto;max-height:75%;object-fit:contain}
 .workspace-mascot-loader > p {font-size:.8rem;color:var(--foreground)}
@@ -61,6 +67,8 @@ main > .section-shell:target {content-visibility:visible}
 [data-motion=lite] .depth-object,[data-motion=lite] .ambient-orb,[data-motion=lite] .journey-city,[data-motion=lite] .journey-flow-markers {animation:none!important}
 @keyframes mascotFloat {50%{transform:translateY(-4px)}}
 @keyframes mascotDot {50%{transform:translateY(-4px);opacity:.4}}
+@keyframes mascotOrbit {to{transform:translate(-50%,-50%) rotate(342deg) perspective(500px) rotateX(58deg)}}
+@keyframes mascotOrbitReverse {to{transform:translate(-50%,-50%) rotate(-338deg)}}
 @keyframes sectionArrival {from{opacity:.3;translate:0 20px}to{opacity:1;translate:0 0}}
 @media(hover:hover) and (pointer:fine){.capability-module:hover{transform:translateY(-5px)}}
 @media(max-width:1000px){
@@ -84,9 +92,13 @@ main > .section-shell:target {content-visibility:visible}
     .workspace-scroll-track[data-motion=lite] {height:100svh;min-height:780px}
     .workspace-scroll-track[data-motion=lite] .workspace-hero {min-height:780px;height:100svh}
     .workspace-scroll-track[data-motion=lite] .workspace-scene {inset:280px 0 130px}
+    .contact-form-mascot {width:175px;height:195px}
+    .contact-form-mascot::before {width:165px;height:64px}
+    .contact-form-mascot::after {width:215px;height:215px;font-size:9px;letter-spacing:1.7rem}
 }
 @media(prefers-reduced-motion:reduce){
     .native-reveal.native-reveal,.native-stagger.native-stagger > .native-stagger-item {animation:none}
     .mascot-heading > .section-character,.workspace-audio-avatar.workspace-audio-avatar,.mascot-loading-dots i {animation:none}
     .section-depth {display:none}.process-progress {transform:scaleX(1)}
+    .contact-form-mascot,.contact-form-mascot::before,.contact-form-mascot::after {animation:none}
 }
