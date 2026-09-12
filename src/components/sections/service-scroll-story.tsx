@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import {motion, useMotionValueEvent, useScroll} from "motion/react";
 import {useRef, useState} from "react";
 import {SiteCopy} from "@/lib/site-copy";
@@ -15,6 +16,13 @@ const visualAccents = [
     "from-[#c69f62]/28 via-[#c69f62]/8 to-transparent",
     "from-[#6c8f7b]/28 via-[#6c8f7b]/8 to-transparent",
 ];
+
+const SERVICE_OFFERS: Record<string, {startingAt: string; timeline: string; proof: string[]; cta: string; href: string}> = {
+    "UI/UX Design": {startingAt: "Starting at ₹45k", timeline: "2–4 weeks", proof: ["Clickable prototype before build", "Journey map and conversion review"], cta: "Plan the experience", href: "/#contact"},
+    "Website Development": {startingAt: "Starting at ₹75k", timeline: "4–8 weeks", proof: ["Performance and technical SEO checklist", "Reusable content blocks for your team"], cta: "Scope a website", href: "/website-development"},
+    "Mobile App Development": {startingAt: "Starting at ₹1.5L", timeline: "8–14 weeks", proof: ["Shared iOS and Android codebase", "Testable onboarding and release plan"], cta: "Discuss an app", href: "/app-development-noida"},
+    "Digital Marketing": {startingAt: "Starting at ₹30k / month", timeline: "First plan in 10 days", proof: ["Channel plan tied to landing pages", "Weekly creative and performance review"], cta: "Build a growth plan", href: "/digital-marketing-services"},
+};
 
 export function ServiceScrollStory({
     items,
@@ -98,6 +106,7 @@ export function ServiceScrollStory({
             <div className={isReduced ? "grid gap-4" : "grid"}>
                 {items.map((service, index) => {
                     const isActive = index === activeIndex;
+                    const offer = SERVICE_OFFERS[service.title];
 
                     return (
                         <div
@@ -150,6 +159,17 @@ export function ServiceScrollStory({
                                         {service.detail}
                                     </p>
                                 </div>
+                                {offer && <div className="mt-6 border-t border-black/8 pt-5 dark:border-white/10">
+                                    <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-tertiary)]">
+                                        <span>{offer.startingAt}</span><span aria-hidden="true">·</span><span>{offer.timeline}</span>
+                                    </div>
+                                    <ul className="mt-4 grid gap-2 text-sm leading-6 text-[var(--text-secondary)]">
+                                        {offer.proof.map((point) => <li key={point}>✓ {point}</li>)}
+                                    </ul>
+                                    <Link href={offer.href} className="mt-5 inline-flex text-sm font-semibold text-primary underline decoration-primary/35 underline-offset-4">
+                                        {offer.cta} →
+                                    </Link>
+                                </div>}
                             </motion.article>
                         </div>
                     );

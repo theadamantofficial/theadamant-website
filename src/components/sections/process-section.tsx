@@ -7,6 +7,7 @@ import {motion, useScroll, useTransform, MotionValue} from "motion/react";
 import {useRef, ReactNode} from "react";
 import {useMotionCapability} from "@/hooks/use-motion-capability";
 import {SectionDepth} from "@/components/visuals/section-depth";
+import {SectionCharacter} from "@/components/visuals/section-character";
 
 export default function ProcessSection({copy}: { copy: SiteCopy["process"] }) {
     const sectionRef = useRef<HTMLElement>(null);
@@ -20,6 +21,7 @@ export default function ProcessSection({copy}: { copy: SiteCopy["process"] }) {
     return (
         <section ref={sectionRef} id="process" className="section-shell py-24" aria-labelledby="process-heading">
             <SectionDepth variant="process"/>
+            <SectionCharacter mood="builder" side="left"/>
             <Reveal className="max-w-3xl">
                 <p className="section-kicker">{copy.kicker}</p>
                 <h2 id="process-heading" className="section-title">

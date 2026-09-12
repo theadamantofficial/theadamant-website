@@ -12,17 +12,11 @@ const ServicesSection = dynamic(() => import("@/components/sections/services-sec
 const ProcessSection = dynamic(() => import("@/components/sections/process-section"));
 const FaqSection = dynamic(() => import("@/components/sections/faq-section"));
 const ContactUsSection = dynamic(() => import("@/components/sections/contact-us-section"));
-const CreativeWorld = dynamic(() => import("@/components/visuals/creative-world"));
 const CursorHalo = dynamic(() => import("@/components/visuals/cursor-halo"));
-const ChapterRail = dynamic(() => import("@/components/visuals/chapter-rail"));
-const AdamantSystemSection = dynamic(() => import("@/components/experience/adamant-system-section"));
-const PathToSuccess = dynamic(() => import("@/components/experience/path-to-success"));
-const WebsiteAuditFab = dynamic(
-    () => import("@/components/ui/website-audit-fab").then((module) => module.WebsiteAuditFab),
-);
-const SeoChatFab = dynamic(
-    () => import("@/components/ui/seo-chat-fab").then((module) => module.SeoChatFab),
-);
+const PeelReveal = dynamic(() => import("@/components/visuals/peel-reveal"));
+const DeferredAdamantSystem = dynamic(() => import("@/components/experience/deferred-experiences").then((module) => module.DeferredAdamantSystem));
+const DeferredPathToSuccess = dynamic(() => import("@/components/experience/deferred-experiences").then((module) => module.DeferredPathToSuccess));
+const NonCriticalTools = dynamic(() => import("@/components/ui/non-critical-tools").then((module) => module.NonCriticalTools));
 
 export default function HomePage({
     copy,
@@ -84,16 +78,14 @@ export default function HomePage({
 
         <Navbar copy={copy.navbar} locale={locale}/>
 
-        {locale === "en" && <WebsiteAuditFab locale={locale}/>}
-        {locale === "en" && <SeoChatFab/>}
+        <NonCriticalTools locale={locale}/>
 
-        <CreativeWorld/>
+        <PeelReveal/>
         <CursorHalo/>
-        <ChapterRail/>
 
         <HeroSection copy={copy.hero} locale={locale}/>
 
-        <AdamantSystemSection services={copy.services}/>
+        <DeferredAdamantSystem services={copy.services}/>
 
         <PartnerProofStrip copy={copy.services.proofStrip} items={proofItems}/>
 
@@ -109,7 +101,7 @@ export default function HomePage({
 
         <ContactUsSection copy={copy.contact}/>
 
-        <PathToSuccess locale={locale}/>
+        <DeferredPathToSuccess locale={locale}/>
 
         <Footer copy={copy.footer} locale={locale}/>
     </main>;

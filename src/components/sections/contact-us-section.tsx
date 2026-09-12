@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import {loadEmailJs} from "@/lib/load-emailjs";
 import {SiteCopy} from "@/lib/site-copy";
 import {SectionDepth} from "@/components/visuals/section-depth";
+import {SectionCharacter} from "@/components/visuals/section-character";
 import {buildWhatsAppContactUrl} from "@/lib/whatsapp-contact";
 
 const SUCCESS_RESET_MS = 4000;
@@ -104,6 +105,7 @@ export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["c
 
     return (
         <section id="contact" className="section-shell contact-chapter pb-24 pt-10" aria-labelledby="contact-heading">
+            <SectionCharacter mood="builder" side="right"/>
             <SectionDepth variant="contact"/>
             <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
                 <Reveal className="glass-panel flex h-full flex-col justify-between gap-8 overflow-hidden p-8 sm:p-10">
@@ -139,18 +141,20 @@ export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["c
 
                     <div className="contact-visual-3d overflow-hidden rounded-[1.75rem] border border-black/8 bg-[#edf4f1] pt-6 dark:border-white/10 dark:bg-[#122326]">
                         <Image
-                            src="/images/img-contact-us-light.png"
+                            src="/images/img-contact-us-light.webp"
                             alt=""
                             className="max-h-[250px] w-full object-cover object-center dark:hidden"
-                            width={700}
-                            height={520}
+                            width={480}
+                            height={250}
+                            sizes="(max-width: 1024px) 100vw, 46vw"
                         />
                         <Image
-                            src="/images/img-contact-us-dark.png"
+                            src="/images/img-contact-us-dark.webp"
                             alt=""
                             className="hidden max-h-[250px] w-full object-cover object-center dark:block"
-                            width={700}
-                            height={520}
+                            width={480}
+                            height={250}
+                            sizes="(max-width: 1024px) 100vw, 46vw"
                         />
                     </div>
                 </Reveal>

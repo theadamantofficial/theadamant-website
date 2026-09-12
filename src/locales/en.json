@@ -111,29 +111,29 @@
     "items": [
       {
         "title": "UI/UX Design",
-        "description": "UI/UX design for landing pages, websites, and product flows that feel modern and easy to use.",
-        "detail": "Landing page design, website redesign, responsive interface design, wireframes, user journeys, and conversion-focused layouts built to improve clarity, trust, engagement, and lead generation.",
+        "description": "Turn a complex offer into an interface people understand on the first visit.",
+        "detail": "We map the decision path, test the message in a clickable prototype, then hand engineering a responsive system with fewer ambiguities and stronger calls to action.",
         "imageAlt": "Visual representation of a software design workflow",
-        "image": "/images/img-ui-ux-design.png"
+        "image": "/images/img-ui-ux-design.webp"
       },
       {
         "title": "Website Development",
-        "description": "Custom website development with fast performance, technical SEO, and scalable front-end architecture.",
-        "detail": "Business websites, startup websites, service websites, and marketing pages built with responsive layouts, clean code, technical SEO foundations, and content structure designed to rank better and convert more visitors.",
+        "description": "Build a fast, editable website that carries its SEO and conversion foundations into launch.",
+        "detail": "From content model to deployment, we build durable pages your team can extend without a template’s excess JavaScript or a developer queue for every change.",
         "imageAlt": "Infographic-style preview of an SEO-focused website structure",
-        "image": "/images/img-web-dev.png"
+        "image": "/images/img-web-dev.webp"
       },
       {
         "title": "Mobile App Development",
-        "description": "Cross-platform app development with polished UI, smooth onboarding, and reliable performance.",
-        "detail": "Mobile app design and development for Android and iOS, including product flows, scalable front-end systems, onboarding journeys, and user-friendly experiences that support product growth.",
+        "description": "Take a product from a focused first release to a dependable iOS and Android experience.",
+        "detail": "We define the smallest useful release, design the states that make it feel complete, and ship a maintainable cross-platform app with a measured release path.",
         "imageAlt": "Showcase of a mobile app user interface design",
-        "image": "/images/img-app-dev.png"
+        "image": "/images/img-app-dev.webp"
       },
       {
         "title": "Digital Marketing",
-        "description": "Digital marketing services for social media management, brand visibility, and paid ad campaigns.",
-        "detail": "Social media handling, content planning, brand boosting, paid ads setup, campaign management, audience targeting, and performance-focused marketing support that connects search visibility, traffic, and conversions.",
+        "description": "Create demand with campaigns that give visitors a clear, credible place to land.",
+        "detail": "We connect creative, paid media, search intent, and landing-page iteration so each channel has a defined job and performance can guide the next decision.",
         "imageAlt": "Digital marketing dashboard showing social media, paid ads, and brand growth signals",
         "image": "/images/img-digital-marketing.svg"
       },

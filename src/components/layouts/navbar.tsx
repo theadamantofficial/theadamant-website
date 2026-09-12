@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import {useEffect, useState} from "react";
 import {
     MobileNav,
@@ -10,10 +11,14 @@ import {
 } from "@/components/ui/resizable-navbar";
 import {IconMoon, IconSun} from "@tabler/icons-react";
 import Link from "next/link";
-import {LanguageSwitcher} from "@/components/ui/language-switcher";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPagePath, getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 import {BLOG_LABELS} from "@/lib/blog-config";
+
+const LanguageSwitcher = dynamic(
+    () => import("@/components/ui/language-switcher").then((module) => module.LanguageSwitcher),
+    {ssr: false},
+);
 
 export function Navbar({
     copy,

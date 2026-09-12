@@ -3,7 +3,6 @@
 import {useEffect, useState} from "react";
 
 const chapters = [
-    {id:"hero", label:"The spark", target:"#hero-heading"},
     {id:"systems", label:"Systems", target:"#adamant-system"},
     {id:"services", label:"Services", target:"#services-heading"},
     {id:"process", label:"Process", target:"#process-heading"},

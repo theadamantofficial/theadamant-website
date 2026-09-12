@@ -16,11 +16,22 @@ export default function AdamantSystemSection({services}: {services: SiteCopy["se
     const sectionRef = useRef<HTMLElement>(null);
     const worldRef = useRef<HTMLDivElement>(null);
     const [active, setActive] = useState(0);
+    const [isInViewport, setIsInViewport] = useState(false);
+
+    useEffect(() => {
+        const section = sectionRef.current;
+        if (!section) return;
+        const observer = new IntersectionObserver(([entry]) => setIsInViewport(entry.isIntersecting), {
+            rootMargin: "160px 0px",
+        });
+        observer.observe(section);
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         const section = sectionRef.current;
         const world = worldRef.current;
-        if (!section || !world) return;
+        if (!section || !world || !isInViewport) return;
         let frame = 0;
         const update = () => {
             const distance = section.offsetHeight - innerHeight;
@@ -32,7 +43,7 @@ export default function AdamantSystemSection({services}: {services: SiteCopy["se
         const schedule = () => {cancelAnimationFrame(frame); frame = requestAnimationFrame(update);};
         update(); window.addEventListener("scroll", schedule, {passive: true}); window.addEventListener("resize", schedule);
         return () => {cancelAnimationFrame(frame); window.removeEventListener("scroll", schedule); window.removeEventListener("resize", schedule);};
-    }, []);
+    }, [isInViewport]);
 
     return <section ref={sectionRef} id="adamant-system" className="adamant-system-track" aria-labelledby="adamant-system-title">
         <div ref={worldRef} className="adamant-system-world">
@@ -58,7 +69,7 @@ export default function AdamantSystemSection({services}: {services: SiteCopy["se
                 {services.items.map(item => <span key={item.title}>{item.title}</span>)}
             </div>
             <div className="system-guide" aria-hidden="true">
-                <Image src="/images/adamant-avatar/builder.png" alt="" fill sizes="260px"/>
+                <Image src="/images/adamant-avatar/builder.webp" alt="" fill sizes="260px"/>
                 <span>ADAMANT GUIDE <b>ONLINE</b></span>
             </div>
             <p className="system-forward-copy">Technology is only useful<br/>when it moves your business forward.</p>

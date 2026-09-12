@@ -3,7 +3,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import {ArrowDown, Volume2, VolumeX} from "lucide-react";
+import {ArrowDown} from "lucide-react";
 import {useEffect, useRef, useState} from "react";
 import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
@@ -16,9 +16,22 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
     const sectionRef = useRef<HTMLElement>(null);
     const heroRef = useRef<HTMLDivElement>(null);
     const progressRef = useRef(0);
-    const audioRef = useRef<{context: AudioContext; oscillators: OscillatorNode[]} | null>(null);
-    const [audioOn, setAudioOn] = useState(false);
+    const [introComplete, setIntroComplete] = useState(false);
+    const [isHeroVisible, setIsHeroVisible] = useState(true);
     const enhanced = isReady && capability === "full";
+    useEffect(() => {
+        const complete = () => setIntroComplete(true);
+        if (document.documentElement.dataset.introComplete === "true") complete();
+        window.addEventListener("adamant:intro-complete", complete);
+        return () => window.removeEventListener("adamant:intro-complete", complete);
+    }, []);
+    useEffect(() => {
+        const section = sectionRef.current;
+        if (!section) return;
+        const observer = new IntersectionObserver(([entry]) => setIsHeroVisible(entry.isIntersecting), {rootMargin: "160px 0px"});
+        observer.observe(section);
+        return () => observer.disconnect();
+    }, []);
     const zoomIn = () => {
         const section = sectionRef.current;
         if (section) window.scrollTo({top: section.offsetTop + section.offsetHeight - innerHeight, behavior: capability === "reduced" ? "instant" : "smooth"});
@@ -41,51 +54,21 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
         update();
         return () => {cancelAnimationFrame(frame);window.removeEventListener("scroll",schedule);window.removeEventListener("resize",schedule);};
     }, []);
-    useEffect(() => () => {
-        audioRef.current?.oscillators.forEach((oscillator) => oscillator.stop());
-        void audioRef.current?.context.close();
-    }, []);
-    const toggleAudio = () => {
-        if (audioRef.current) {
-            audioRef.current.oscillators.forEach((oscillator) => oscillator.stop());
-            void audioRef.current.context.close();
-            audioRef.current = null;
-            setAudioOn(false);
-            return;
-        }
-        const context = new AudioContext();
-        const master = context.createGain();
-        master.gain.value = .018;
-        master.connect(context.destination);
-        const oscillators = [82.41, 123.47].map((frequency, index) => {
-            const oscillator = context.createOscillator();
-            const gain = context.createGain();
-            oscillator.type = index ? "sine" : "triangle";
-            oscillator.frequency.value = frequency;
-            gain.gain.value = index ? .28 : .42;
-            oscillator.connect(gain).connect(master);
-            oscillator.start();
-            return oscillator;
-        });
-        audioRef.current = {context, oscillators};
-        setAudioOn(true);
-    };
 
     return (
         <section ref={sectionRef} className="workspace-scroll-track" data-motion={capability} aria-labelledby="hero-heading">
-            <div ref={heroRef} className="workspace-hero">
+            <div ref={heroRef} className={`workspace-hero ${introComplete ? "workspace-intro-complete" : ""}`}>
                 <div className="workspace-heading">
                     <p className="workspace-label"><span/> INDEPENDENT DIGITAL STUDIO</p>
                     <h1 id="hero-heading">{locale === "en" ? <>Serious about<br/><em>the unexpected.</em></> : copy.title}</h1>
                     <p className="workspace-intro">We design. We build. We make a little noise.<br/>Scroll through a world of bold digital ideas.</p>
                 </div>
-                <div className="workspace-edition" aria-hidden="true"><span>ADAMANT®</span><span>INTERACTIVE STUDIO — VOL. 01</span></div>
                 <div className="workspace-scene">
                     <div className="workspace-fallback" aria-hidden="true">
                         <div className="fallback-monitor"><span>ADAMANT</span><div className="fallback-film"/><p>Firm in vision. Bold in action.</p></div>
                         <div className="fallback-neck"/><div className="fallback-base"/><div className="fallback-desk"/>
                     </div>
-                    {enhanced && <StudioRoom onEnter={zoomIn} progressRef={progressRef} paused={false} resetKey={0} palette={0}/>}
+                    {enhanced && introComplete && isHeroVisible && <StudioRoom onEnter={zoomIn} progressRef={progressRef} paused={false} resetKey={0} palette={0}/>}
                 </div>
                 <div className="workspace-bottom">
                     <span />
@@ -93,14 +76,9 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
                         <Link href={getLocalizedPath(locale,"services")} className="workspace-scroll">Explore services <ArrowDown size={14}/></Link>
                     </div>
                 </div>
-                <div className="workspace-film-caption"><span>01 / THE SPARK</span><p>Firm in vision.<br/><em>Bold in action.</em></p><small>Keep scrolling. There’s more to the story. ↓</small></div>
-                <div className={`workspace-audio-avatar ${audioOn ? "is-listening" : ""}`} aria-hidden="true">
-                    <Image src="/images/adamant-avatar/listening.png" alt="" fill sizes="220px"/>
-                    <span>STUDIO FREQUENCY</span>
+                <div className="workspace-audio-avatar" aria-hidden="true">
+                    <Image src="/images/adamant-avatar/listening.webp" alt="" fill sizes="220px"/>
                 </div>
-                <button className="workspace-film-sound" type="button" onClick={toggleAudio} aria-label={audioOn ? "Mute studio ambience" : "Play studio ambience"} aria-pressed={audioOn}>
-                    {audioOn ? <Volume2 size={17}/> : <VolumeX size={17}/>}
-                </button>
                 <div className="workspace-footer"><span>FIRM IN VISION. BOLD IN ACTION.</span><span>BUILT IN INDIA. CONNECTED TO THE WORLD.</span></div>
             </div>
         </section>

@@ -22,7 +22,18 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
     const [challengeIndex, setChallengeIndex] = useState(0);
     const [businessProgress, setBusinessProgress] = useState(10);
     const [soundOn, setSoundOn] = useState(false);
+    const [isInViewport, setIsInViewport] = useState(false);
     const challenge = JOURNEY_CHALLENGES[challengeIndex];
+
+    useEffect(() => {
+        const shell = shellRef.current;
+        if (!shell) return;
+        const observer = new IntersectionObserver(([entry]) => setIsInViewport(entry.isIntersecting), {
+            rootMargin: "160px 0px",
+        });
+        observer.observe(shell);
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         if (mode !== "success" || !soundOn) return;
@@ -98,6 +109,7 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
     }, [businessProgress, challengeIndex, dispatchWorld, mode, updatePosition]);
 
     useEffect(() => {
+        if (!isInViewport) return;
         const isActive = () => {
             const rect = shellRef.current?.getBoundingClientRect();
             return Boolean(rect && rect.top < innerHeight * .8 && rect.bottom > innerHeight * .2);
@@ -113,10 +125,10 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
         const blur = () => {keysRef.current.clear(); shellRef.current?.classList.remove("is-moving");};
         window.addEventListener("keydown", down); window.addEventListener("keyup", up); window.addEventListener("blur", blur);
         return () => {window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); window.removeEventListener("blur", blur);};
-    }, [activate, mode]);
+    }, [activate, isInViewport, mode]);
 
     useEffect(() => {
-        if (mode !== "playing") return;
+        if (mode !== "playing" || !isInViewport) return;
         const shell = shellRef.current;
         let frame = 0; let last = performance.now();
         const update = (time: number) => {
@@ -137,7 +149,7 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
         };
         frame = requestAnimationFrame(update);
         return () => {cancelAnimationFrame(frame); shell?.classList.remove("is-moving");};
-    }, [businessProgress, challengeIndex, dispatchWorld, mode, updatePosition]);
+    }, [businessProgress, challengeIndex, dispatchWorld, isInViewport, mode, updatePosition]);
 
     useEffect(() => () => {
         if (timerRef.current) window.clearTimeout(timerRef.current);
@@ -164,10 +176,10 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
             <div className="journey-next-check"><span>NEXT SYSTEM CHECK</span><b>{challenge.kind === "connected" ? "CONNECTED ARCHITECTURE" : `${challenge.kind.toUpperCase()} EXPERIENCE`}</b></div>
             <ChallengeVisual kind={challenge.kind}/>
             <div ref={characterRef} className="journey-character" style={playerStyle}>
-                <Image src="/images/adamant-avatar/walking.png" alt="" fill priority sizes="(max-width: 800px) 90px, 130px" className="journey-character-image"/>
+                <Image src="/images/adamant-avatar/walking.webp" alt="" fill sizes="(max-width: 800px) 90px, 130px" className="journey-character-image"/>
                 <span className="character-head"/><span className="character-body"/><span className="character-arm arm-left"/><span className="character-arm arm-right"/><span className="character-leg leg-left"/><span className="character-leg leg-right"/>
             </div>
-            <div className="journey-success-car"><Image src="/images/adamant-avatar/roadster.png" alt="" fill sizes="(max-width: 800px) 320px, 600px"/></div>
+            <div className="journey-success-car"><Image src="/images/adamant-avatar/roadster.webp" alt="" fill sizes="(max-width: 800px) 320px, 600px"/></div>
         </div>
         <div className="journey-hud"><span>ADAMANT SYSTEM <i/> ONLINE</span><strong>BUSINESS PROGRESS <b>{businessProgress}%</b></strong><div><i style={{width: `${businessProgress}%`}}/></div></div>
         {mode === "intro" && <div className="journey-panel journey-intro"><p>THE PATH TO SUCCESS</p><h3>Your path to <em>growth.</em></h3><span>Every business starts with an idea. What happens next depends on the systems behind it.</span><button data-magnetic className="button-primary" onClick={start}>Start journey →</button><small>Use arrow keys or W A S D to move.</small></div>}

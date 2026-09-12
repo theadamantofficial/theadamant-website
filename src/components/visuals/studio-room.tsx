@@ -36,7 +36,8 @@ export default function StudioRoom({onEnter, paused, resetKey, palette, progress
         controls.enablePan = false;
         controls.enableZoom = false;
         controls.enableDamping = false;
-        controls.enableRotate = false;
+        controls.enableRotate = true;
+        controls.rotateSpeed = .45;
         controls.minPolarAngle = 0.22;
         controls.maxPolarAngle = Math.PI - 0.22;
         controls.target.set(0, 2, 0);
@@ -222,22 +223,24 @@ export default function StudioRoom({onEnter, paused, resetKey, palette, progress
         // a true portal into the next chapter, without exposing empty bands around it.
         const entryPosition = new THREE.Vector3(0,3.63,0.86);
         const entryTarget = new THREE.Vector3(0,3.63,-.05);
-        let rotationTime = 0;
         let lastProgress = 0;
-        const reset=()=>{rotationTime=0;camera.position.copy(overview);controls.target.copy(overviewTarget);controls.update();};resetRef.current=reset;reset();
+        const reset=()=>{camera.position.copy(overview);controls.target.copy(overviewTarget);controls.update();};resetRef.current=reset;reset();
         const resize=()=>{const {width,height}=host.getBoundingClientRect();if(!width||!height)return;renderer.setSize(width,height);camera.aspect=width/height;camera.fov=width<650?48:35;camera.updateProjectionMatrix();};
         const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(host);resize();
         const raycaster=new THREE.Raycaster();const pointer=new THREE.Vector2();let startX=0;let startY=0;let assembly=0;
         const intersects=(event:PointerEvent)=>{const r=host.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);raycaster.setFromCamera(pointer,camera);return raycaster.intersectObject(computer,true).length>0;};
         const down=(e:PointerEvent)=>{startX=e.clientX;startY=e.clientY;};
         const up=(e:PointerEvent)=>{if(Math.hypot(e.clientX-startX,e.clientY-startY)<6&&intersects(e))enterRef.current();};
-        const move=(e:PointerEvent)=>{renderer.domElement.style.cursor=intersects(e)?'pointer':'default';};
-        const contextLost=(e:Event)=>{e.preventDefault();lost=true;delete host.dataset.ready;};
-        const restored=()=>{lost=false;host.dataset.ready='true';};
+        const move=(e:PointerEvent)=>{renderer.domElement.style.cursor=intersects(e)?'pointer':'grab';};
+        const contextLost=(e:Event)=>{e.preventDefault();lost=true;cancelAnimationFrame(frame);frame=0;delete host.dataset.ready;};
+        const restored=()=>{lost=false;host.dataset.ready='true';wake();};
         host.addEventListener('pointerdown',down);host.addEventListener('pointerup',up);host.addEventListener('pointermove',move);
         renderer.domElement.addEventListener('webglcontextlost',contextLost);renderer.domElement.addEventListener('webglcontextrestored',restored);
-        const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;});observer.observe(host);
-        const render=(time:number)=>{frame=requestAnimationFrame(render);const delta=Math.min((time-previous)/1000,.05);previous=time;if(!visible||document.hidden||lost)return;
+        const wake=()=>{if(!frame&&visible&&!document.hidden&&!lost){previous=performance.now();frame=requestAnimationFrame(render);}};
+        const visibilityChanged=()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;}else wake();};
+        const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)wake();else{cancelAnimationFrame(frame);frame=0;}});observer.observe(host);
+        document.addEventListener('visibilitychange',visibilityChanged);
+        const render=(time:number)=>{frame=0;const delta=Math.min((time-previous)/1000,.05);previous=time;if(!visible||document.hidden||lost)return;
             assembly=Math.min(1,assembly+delta/.9);
             if (assembly < 1) assemblyParts.forEach((part,index)=>{part.position.lerpVectors(assemblyOffsets[index],assemblyTargets[index],assembly);});
             if(!pausedRef.current&&!reduced.matches){elapsed+=delta;leaves.forEach((leaf,i)=>{leaf.rotation.z=Math.cos(i*2.4)*.8+Math.sin(elapsed*.7+i)*.035;});
@@ -246,29 +249,24 @@ export default function StudioRoom({onEnter, paused, resetKey, palette, progress
             }
             const progress = reduced.matches ? 0 : progressRef.current;
             if(time-lastScreenPaint>65){drawMonitor(progress,elapsed);screenTexture.needsUpdate=true;lastScreenPaint=time;}
-            controls.enabled = progress < .015;
+            controls.enabled = progress === 0;
             if (progress > 0) {
                 const eased = progress * progress * (3 - 2 * progress);
                 camera.position.lerpVectors(overview, entryPosition, eased);
                 camera.lookAt(new THREE.Vector3().lerpVectors(overviewTarget, entryTarget, eased));
             } else {
                 if (lastProgress > 0) reset();
-                if (!pausedRef.current && !reduced.matches) {
-                    rotationTime += delta;
-                    // A gentle back-and-forth orbit keeps the monitor facing visitors.
-                    const angle = .42 + Math.sin(rotationTime * .22) * .22;
-                    camera.position.lerp(new THREE.Vector3(Math.sin(angle) * 16.8, 7.4, Math.cos(angle) * 16.8), 1-Math.exp(-delta*2));
-                    controls.target.copy(overviewTarget);
-                }
+                // Preserve a visitor's drag angle instead of overwriting it every frame.
                 controls.update();
                 overview.copy(camera.position);
             }
             lastProgress = progress;
-            renderer.render(scene,camera);host.dataset.ready='true';};frame=requestAnimationFrame(render);
+            renderer.render(scene,camera);host.dataset.ready='true';wake();};wake();
         return()=>{themeObserver.disconnect();cancelAnimationFrame(frame);observer.disconnect();resizeObserver.disconnect();controls.dispose();resetRef.current=null;paletteRef.current=null;
+            document.removeEventListener('visibilitychange',visibilityChanged);
             host.removeEventListener('pointerdown',down);host.removeEventListener('pointerup',up);host.removeEventListener('pointermove',move);
             renderer.domElement.removeEventListener('webglcontextlost',contextLost);renderer.domElement.removeEventListener('webglcontextrestored',restored);
-            geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());renderer.dispose();renderer.domElement.remove();delete host.dataset.ready;};
+            geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());renderer.setAnimationLoop(null);renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();delete host.dataset.ready;};
     },[progressRef]);
     return <div ref={hostRef} className="workspace-canvas" aria-hidden="true"/>;
 }
