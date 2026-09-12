@@ -9,7 +9,9 @@ export default function CreativeWorld() {
     const hostRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
         const host = hostRef.current;
-        if (!host || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const mobileLayout = window.matchMedia("(max-width: 900px)").matches || window.matchMedia("(pointer: coarse)").matches;
+        if (!host || reducedMotion || mobileLayout) return;
         let renderer: THREE.WebGLRenderer;
         try { renderer = new THREE.WebGLRenderer({alpha: true, antialias: true, powerPreference: "low-power"}); } catch { return; }
         const quality = getDeviceQuality();
@@ -55,6 +57,15 @@ export default function CreativeWorld() {
         function pathPoint(index: number) {return new THREE.Vector3(-1.65 + index * 1.08, -1.2 + Math.sin(index * 1.6) * .9, .35 + index * .04);}
         const chapterDots = [-.78,-.36,.02,.4,.78].map((value,index) => {const dot=makeMesh(new THREE.SphereGeometry(index===0?.09:.12,14,10),index%2?copper:teal);dot.userData.progress=value;return dot;});
         let progress=0,target=0,frame=0,last=0,visible=true,faqPulse=0,pointerX=0,pointerY=0,journeyEnergy=0;
+        let lastUiSync = 0;
+        const main = document.querySelector("main");
+        const syncWorldState = (nextProgress: number, nextChapter: string) => {
+            const now = performance.now();
+            if (now - lastUiSync < 120) return;
+            document.documentElement.style.setProperty("--world-progress", String(nextProgress));
+            main?.setAttribute("data-world-chapter", nextChapter);
+            lastUiSync = now;
+        };
         const onFaq=()=>{faqPulse=1;};window.addEventListener("adamant:faq",onFaq);
         const onJourney=(event:Event)=>{const detail=(event as CustomEvent<{mode:string;progress:number}>).detail;journeyEnergy=detail.mode==="transforming"?1:detail.progress/100;};window.addEventListener("adamant:journey",onJourney);
         const onPointer=(event:PointerEvent)=>{pointerX=(event.clientX/innerWidth-.5)*2;pointerY=(event.clientY/innerHeight-.5)*2;};window.addEventListener("pointermove",onPointer,{passive:true});
@@ -63,7 +74,7 @@ export default function CreativeWorld() {
         const resize=()=>{const {width,height}=host.getBoundingClientRect();if(!width||!height)return;renderer.setSize(width,height);camera.aspect=width/height;camera.updateProjectionMatrix();};
         const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(host);resize();
         const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;});observer.observe(host);
-        const render=(time:number)=>{frame=requestAnimationFrame(render);const delta=Math.min((time-last)/1000,.05);last=time;if(!visible||document.hidden)return;progress+=(target-progress)*(1-Math.exp(-delta*5));const chapter=progress*4;document.documentElement.style.setProperty("--world-progress",String(progress));const tint=new THREE.Color().setHSL(.52-progress*.03,.32,.09+progress*.025);document.documentElement.style.setProperty("--world-tint",tint.getStyle());document.querySelector("main")?.setAttribute("data-world-chapter",progress<.14?"hero":progress<.3?"systems":progress<.48?"services":progress<.66?"process":progress<.84?"faq":"journey");
+        const render=(time:number)=>{frame=requestAnimationFrame(render);const delta=Math.min((time-last)/1000,.05);last=time;if(!visible||document.hidden)return;progress+=(target-progress)*(1-Math.exp(-delta*5));const chapter=progress*4;const chapterLabel=progress<.14?"hero":progress<.3?"systems":progress<.48?"services":progress<.66?"process":progress<.84?"faq":"journey";const tint=new THREE.Color().setHSL(.52-progress*.03,.32,.09+progress*.025);document.documentElement.style.setProperty("--world-tint",tint.getStyle());syncWorldState(progress, chapterLabel);
             faqPulse=Math.max(0,faqPulse-delta*2.4);root.rotation.y+=delta*.12+faqPulse*.035+journeyEnergy*.002;root.rotation.x+=(pointerY*.035-root.rotation.x)*.035;root.position.x+=(pointerX*.12-root.position.x)*.035;orb.position.set(Math.sin(chapter*.9)*.65,Math.cos(chapter*.55)*.25,0);orb.rotation.x=chapter*.35+faqPulse*.5;orb.rotation.z=Math.sin(chapter*Math.PI*2)*.12;orb.scale.setScalar(1+journeyEnergy*.45);copper.emissive.setHex(0x5b1806);copper.emissiveIntensity=journeyEnergy*.55;
             knot.position.set(Math.sin(chapter*1.2+1)*.8,Math.cos(chapter*.75+1)*.65,.15);knot.rotation.x+=delta*.25;knot.rotation.y+=delta*.42;seed.position.set(Math.cos(chapter*1.5)*1.35,Math.sin(chapter*.8)*1.2,.1);loop.rotation.z+=delta*.3;
             chapterDots.forEach(dot=>{const p=dot.userData.progress as number;dot.position.copy(path.getPoint((p+1)/2));dot.scale.setScalar(.75+Math.max(0,1-Math.abs(progress-(p+1)/2)*8)*.55);});

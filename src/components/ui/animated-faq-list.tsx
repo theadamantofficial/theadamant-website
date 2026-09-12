@@ -47,7 +47,7 @@ export function AnimatedFaqList({
                         <button
                             id={triggerId}
                             type="button"
-                            className="group flex w-full items-center justify-between gap-4 p-6 text-left text-lg font-semibold tracking-tight text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+                            className="group flex w-full items-center justify-between gap-4 p-6 text-left text-lg font-semibold tracking-tight text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                             aria-expanded={isOpen}
                             aria-controls={panelId}
                             onClick={() => {setOpenIndex(isOpen ? null : index);window.dispatchEvent(new CustomEvent("adamant:faq", {detail: {open: !isOpen}}));}}
@@ -55,8 +55,8 @@ export function AnimatedFaqList({
                             <span>{item.question}</span>
                             <motion.span
                                 className={cn(
-                                    "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/10 transition-colors dark:border-white/10",
-                                    isOpen ? "bg-foreground text-background" : "bg-white/70 text-foreground dark:bg-white/5",
+                                    "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors",
+                                    isOpen ? "border-transparent bg-[var(--text-primary)] text-[var(--bg-primary)]" : "border-[var(--border-visible)] bg-[var(--surface-elevated)] text-[var(--text-primary)]",
                                 )}
                                 animate={isOpen ? {rotate: 180} : {rotate: 0}}
                                 transition={transition}
@@ -76,7 +76,7 @@ export function AnimatedFaqList({
                             transition={transition}
                             className="animated-faq-panel overflow-hidden"
                         >
-                            <p className="max-w-3xl px-6 pb-6 text-sm leading-7 text-foreground/68">
+                            <p className="max-w-3xl px-6 pb-6 text-sm leading-7 text-[var(--text-secondary)]">
                                 {item.answer}
                             </p>
                         </motion.div>

@@ -51,17 +51,17 @@ export function ServiceScrollStory({
         >
             <div className={isReduced ? "relative" : "sticky top-24 z-10 lg:top-28"}>
                 <div
-                    className="services-story-stage relative h-[42svh] min-h-[19rem] max-h-[30rem] overflow-hidden rounded-[2rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(237,229,218,0.82))] shadow-[0_38px_90px_-52px_rgba(15,23,42,0.58)] dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(18,21,23,0.98),rgba(10,14,16,0.95))] lg:h-[calc(100svh-9rem)] lg:max-h-[46rem]"
+                    className="services-story-stage relative h-[42svh] min-h-[19rem] max-h-[30rem] overflow-hidden rounded-[2rem] border border-[var(--border-visible)] bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(237,229,218,0.82))] shadow-[0_38px_90px_-52px_rgba(15,23,42,0.58)] dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(18,21,23,0.98),rgba(10,14,16,0.95))] lg:h-[calc(100svh-9rem)] lg:max-h-[46rem]"
                     aria-hidden="true"
                 >
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(13,92,99,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(13,92,99,0.06)_1px,transparent_1px)] bg-[size:42px_42px] [mask-image:radial-gradient(circle_at_center,black,transparent_82%)] dark:opacity-60"/>
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(13,92,99,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(13,92,99,0.06)_1px,transparent_1px)] bg-[size:42px_42px] opacity-80 [mask-image:radial-gradient(circle_at_center,black,transparent_82%)] dark:opacity-60"/>
                     <div className={`absolute inset-0 bg-gradient-to-br ${visualAccents[displayedIndex % visualAccents.length]}`}/>
 
                     <div className="absolute inset-x-5 top-5 z-20 flex items-center justify-between gap-4 sm:inset-x-6 sm:top-6">
-                        <p className="max-w-[70%] truncate text-xs font-semibold uppercase tracking-[0.2em] text-foreground/62">
+                        <p className="max-w-[70%] truncate text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-primary)]">
                             {items[displayedIndex]?.title}
                         </p>
-                        <p className="text-xs font-semibold tabular-nums tracking-[0.18em] text-foreground/48">
+                        <p className="text-xs font-semibold tabular-nums tracking-[0.18em] text-[var(--text-secondary)]">
                             {String(displayedIndex + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
                         </p>
                     </div>
@@ -81,7 +81,7 @@ export function ServiceScrollStory({
                     </div>
 
                     <div className="absolute inset-x-5 bottom-5 z-20 sm:inset-x-6 sm:bottom-6">
-                        <p className="line-clamp-2 text-sm leading-6 text-foreground/70 sm:text-base">
+                        <p className="line-clamp-2 text-sm leading-6 text-[var(--text-secondary)] sm:text-base">
                             {items[displayedIndex]?.description}
                         </p>
                     </div>
@@ -111,9 +111,9 @@ export function ServiceScrollStory({
                                     y: 0,
                                     scale: 1,
                                 } : {
-                                    opacity: isActive ? 1 : 0.58,
-                                    y: isActive ? 0 : 18,
-                                    scale: isFullMotion && isActive ? 1 : 0.985,
+                                    opacity: isActive ? 1 : 0.82,
+                                    y: isActive ? 0 : 8,
+                                    scale: isFullMotion && isActive ? 1 : 0.99,
                                 }}
                                 transition={{duration: isFullMotion ? 0.4 : 0.12, ease: smoothEase}}
                                 aria-current={!isReduced && isActive ? "step" : undefined}
@@ -127,19 +127,19 @@ export function ServiceScrollStory({
                                 </div>
 
                                 <div className="flex items-center justify-between gap-4">
-                                    <span className="text-xs font-semibold uppercase tracking-[0.24em] text-foreground/45">
+                                    <span className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--text-tertiary)]">
                                         {String(index + 1).padStart(2, "0")}
                                     </span>
-                                    <span className={`h-2.5 w-2.5 rounded-full transition-colors ${isActive && !isReduced ? "bg-primary" : "bg-foreground/16"}`}/>
+                                    <span className={`h-2.5 w-2.5 rounded-full transition-colors ${isActive && !isReduced ? "bg-primary" : "bg-[var(--text-tertiary)]"}`}/>
                                 </div>
-                                <h3 className="mt-7 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                                <h3 className="mt-7 text-2xl font-semibold tracking-tight text-[var(--text-primary)] sm:text-3xl">
                                     {service.title}
                                 </h3>
-                                <p className="mt-4 text-base leading-7 text-foreground/72">
+                                <p className="mt-4 text-base leading-7 text-[var(--text-secondary)]">
                                     {service.description}
                                 </p>
                                 <div className="service-detail-plane mt-6 border-l border-primary/35 p-5">
-                                    <p className="text-sm leading-7 text-foreground/66">
+                                    <p className="text-sm leading-7 text-[var(--text-secondary)]">
                                         {service.detail}
                                     </p>
                                 </div>
