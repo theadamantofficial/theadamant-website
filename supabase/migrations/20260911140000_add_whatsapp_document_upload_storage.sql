@@ -5,4 +5,5 @@ on conflict (id) do update set file_size_limit = excluded.file_size_limit, allow
 drop policy if exists whatsapp_template_documents_storage_read on storage.objects;
 create policy whatsapp_template_documents_storage_read
 on storage.objects for select to authenticated
-using (bucket_id = 'whatsapp-template-documents' and public.current_crm_role() is not null);
+using (bucket_id = 'whatsapp-template-documents' and public.current_crm_role() is not null
+);
