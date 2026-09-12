@@ -11,13 +11,20 @@ export default function CreativeWorld() {
         const host = hostRef.current;
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const mobileLayout = window.matchMedia("(max-width: 900px)").matches || window.matchMedia("(pointer: coarse)").matches;
-        if (!host || reducedMotion || mobileLayout) return;
-        let renderer: THREE.WebGLRenderer;
-        try { renderer = new THREE.WebGLRenderer({alpha: true, antialias: true, powerPreference: "low-power"}); } catch { return; }
+        if (!host || reducedMotion) return;
         const quality = getDeviceQuality();
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, getMaxDpr(quality)));
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.1;
+        const lightweight = mobileLayout || quality === "low";
+        let renderer: THREE.WebGLRenderer;
+        try {
+            renderer = new THREE.WebGLRenderer({
+                alpha: true,
+                antialias: !lightweight,
+                powerPreference: lightweight ? "low-power" : "high-performance",
+            });
+        } catch { return; }
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, getMaxDpr(quality), lightweight ? 1 : 1.5));
+        renderer.toneMapping = lightweight ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = lightweight ? 1 : 1.1;
         host.appendChild(renderer.domElement);
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(33, 1, .1, 80);
@@ -33,19 +40,19 @@ export default function CreativeWorld() {
         const geometries: THREE.BufferGeometry[] = []; const materials: THREE.Material[] = [teal, copper, cream, lineMaterial];
         const makeMesh = (geometry: THREE.BufferGeometry, material: THREE.Material) => {geometries.push(geometry);const mesh = new THREE.Mesh(geometry, material);root.add(mesh);return mesh;};
         const makePart = (geometry: THREE.BufferGeometry, material: THREE.Material, parent: THREE.Object3D, position: [number, number, number]) => {geometries.push(geometry);const mesh = new THREE.Mesh(geometry, material);mesh.position.set(...position);parent.add(mesh);return mesh;};
-        const orb = makeMesh(new THREE.IcosahedronGeometry(.54, 2), teal);
-        const loop = makeMesh(new THREE.TorusGeometry(1.03, .018, 8, 80), lineMaterial); loop.rotation.x = .72;
-        const knot = makeMesh(new THREE.TorusKnotGeometry(.38, .11, 64, 10), copper);
-        const seed = makeMesh(new THREE.SphereGeometry(.15, 18, 12), cream);
+        const orb = makeMesh(new THREE.IcosahedronGeometry(.54, lightweight ? 1 : 2), teal);
+        const loop = makeMesh(new THREE.TorusGeometry(1.03, .018, 6, lightweight ? 40 : 80), lineMaterial); loop.rotation.x = .72;
+        const knot = makeMesh(new THREE.TorusKnotGeometry(.38, .11, lightweight ? 32 : 64, lightweight ? 6 : 10), copper);
+        const seed = makeMesh(new THREE.SphereGeometry(.15, lightweight ? 10 : 18, lightweight ? 8 : 12), cream);
         const path = new THREE.CatmullRomCurve3([new THREE.Vector3(-1.8,-2.5,0),new THREE.Vector3(1.3,-1.2,0),new THREE.Vector3(-1.25,.2,0),new THREE.Vector3(1.4,1.6,0),new THREE.Vector3(-.2,2.7,0)]);
-        const pathLine = new THREE.Mesh(new THREE.TubeGeometry(path, 96, .018, 8, false), lineMaterial); geometries.push(pathLine.geometry); root.add(pathLine);
-        const dustCount = quality === "high" ? 42 : quality === "medium" ? 30 : 18;
+        const pathLine = new THREE.Mesh(new THREE.TubeGeometry(path, lightweight ? 40 : 96, .018, 6, false), lineMaterial); geometries.push(pathLine.geometry); root.add(pathLine);
+        const dustCount = lightweight ? 10 : quality === "high" ? 42 : quality === "medium" ? 30 : 18;
         const dustPositions = new Float32Array(dustCount * 3);
         for (let i = 0; i < dustCount; i++) {dustPositions[i * 3] = (Math.random() - .5) * 7;dustPositions[i * 3 + 1] = (Math.random() - .5) * 6;dustPositions[i * 3 + 2] = (Math.random() - .5) * 2 - 1;}
         const dustGeometry = new THREE.BufferGeometry();dustGeometry.setAttribute("position", new THREE.BufferAttribute(dustPositions, 3));geometries.push(dustGeometry);
         const dustMaterial = new THREE.PointsMaterial({color: 0x69b9b1, size: .025, transparent: true, opacity: .42});materials.push(dustMaterial);
         const dust = new THREE.Points(dustGeometry, dustMaterial);root.add(dust);
-        const signal = makeMesh(new THREE.SphereGeometry(.07, 16, 10), copper);
+        const signal = makeMesh(new THREE.SphereGeometry(.07, lightweight ? 8 : 16, lightweight ? 6 : 10), copper);
         const serviceModules = [0,1,2,3].map((index) => {
             const cluster = new THREE.Group();root.add(cluster);
             if (index === 0) {makePart(new THREE.BoxGeometry(1.7,1.15,.08), teal, cluster, [0,0,0]);makePart(new THREE.BoxGeometry(1.35,.08,.05), cream, cluster, [0,.28,.07]);makePart(new THREE.BoxGeometry(.5,.45,.05), copper, cluster, [-.42,-.15,.07]);}
@@ -74,7 +81,7 @@ export default function CreativeWorld() {
         const resize=()=>{const {width,height}=host.getBoundingClientRect();if(!width||!height)return;renderer.setSize(width,height);camera.aspect=width/height;camera.updateProjectionMatrix();};
         const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(host);resize();
         const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;});observer.observe(host);
-        const render=(time:number)=>{frame=requestAnimationFrame(render);const delta=Math.min((time-last)/1000,.05);last=time;if(!visible||document.hidden)return;progress+=(target-progress)*(1-Math.exp(-delta*5));const chapter=progress*4;const chapterLabel=progress<.14?"hero":progress<.3?"systems":progress<.48?"services":progress<.66?"process":progress<.84?"faq":"journey";const tint=new THREE.Color().setHSL(.52-progress*.03,.32,.09+progress*.025);document.documentElement.style.setProperty("--world-tint",tint.getStyle());syncWorldState(progress, chapterLabel);
+        const render=(time:number)=>{frame=requestAnimationFrame(render);if(lightweight&&time-last<33)return;const delta=Math.min((time-last)/1000,.05);last=time;if(!visible||document.hidden)return;progress+=(target-progress)*(1-Math.exp(-delta*5));const chapter=progress*4;const chapterLabel=progress<.14?"hero":progress<.3?"systems":progress<.48?"services":progress<.66?"process":progress<.84?"faq":"journey";const tint=new THREE.Color().setHSL(.52-progress*.03,.32,.09+progress*.025);document.documentElement.style.setProperty("--world-tint",tint.getStyle());syncWorldState(progress, chapterLabel);
             faqPulse=Math.max(0,faqPulse-delta*2.4);root.rotation.y+=delta*.12+faqPulse*.035+journeyEnergy*.002;root.rotation.x+=(pointerY*.035-root.rotation.x)*.035;root.position.x+=(pointerX*.12-root.position.x)*.035;orb.position.set(Math.sin(chapter*.9)*.65,Math.cos(chapter*.55)*.25,0);orb.rotation.x=chapter*.35+faqPulse*.5;orb.rotation.z=Math.sin(chapter*Math.PI*2)*.12;orb.scale.setScalar(1+journeyEnergy*.45);copper.emissive.setHex(0x5b1806);copper.emissiveIntensity=journeyEnergy*.55;
             knot.position.set(Math.sin(chapter*1.2+1)*.8,Math.cos(chapter*.75+1)*.65,.15);knot.rotation.x+=delta*.25;knot.rotation.y+=delta*.42;seed.position.set(Math.cos(chapter*1.5)*1.35,Math.sin(chapter*.8)*1.2,.1);loop.rotation.z+=delta*.3;
             chapterDots.forEach(dot=>{const p=dot.userData.progress as number;dot.position.copy(path.getPoint((p+1)/2));dot.scale.setScalar(.75+Math.max(0,1-Math.abs(progress-(p+1)/2)*8)*.55);});

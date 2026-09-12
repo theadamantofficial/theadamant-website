@@ -5,6 +5,7 @@ export interface MotionCapabilitySignals {
     saveData?: boolean;
     effectiveType?: string;
     deviceMemory?: number;
+    pointerCoarse?: boolean;
 }
 
 const CONSTRAINED_CONNECTIONS = new Set(["slow-2g", "2g"]);
@@ -14,6 +15,7 @@ export function getMotionCapability({
     saveData = false,
     effectiveType,
     deviceMemory,
+    pointerCoarse = false,
 }: MotionCapabilitySignals): MotionCapability {
     if (prefersReducedMotion) {
         return "reduced";
@@ -22,7 +24,7 @@ export function getMotionCapability({
     const constrainedConnection = CONSTRAINED_CONNECTIONS.has(effectiveType ?? "");
     const constrainedMemory = typeof deviceMemory === "number" && deviceMemory <= 4;
 
-    if (saveData || constrainedConnection || constrainedMemory) {
+    if (saveData || constrainedConnection || constrainedMemory || pointerCoarse) {
         return "lite";
     }
 

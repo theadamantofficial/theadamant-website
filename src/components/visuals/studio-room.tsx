@@ -35,15 +35,11 @@ export default function StudioRoom({onEnter, paused, resetKey, palette, progress
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enablePan = false;
         controls.enableZoom = false;
-        controls.enableDamping = true;
-        // Let the visitor inspect the complete workstation, including its
-        // back side. The scene remains framed by the polar limits so it
-        // cannot flip upside down, while azimuth is intentionally unlimited.
+        controls.enableDamping = false;
+        controls.enableRotate = false;
         controls.minPolarAngle = 0.22;
         controls.maxPolarAngle = Math.PI - 0.22;
         controls.target.set(0, 2, 0);
-        // Touch scrolling remains native; desktop visitors can drag to look around.
-        controls.enableRotate = matchMedia("(pointer: fine)").matches;
         renderer.domElement.style.touchAction = "pan-y";
         const materials: THREE.Material[] = [];
         const geometries: THREE.BufferGeometry[] = [];
@@ -226,24 +222,16 @@ export default function StudioRoom({onEnter, paused, resetKey, palette, progress
         // a true portal into the next chapter, without exposing empty bands around it.
         const entryPosition = new THREE.Vector3(0,3.63,0.86);
         const entryTarget = new THREE.Vector3(0,3.63,-.05);
-        let userDragging = false;let lastDrag = 0;
         let rotationTime = 0;
         let lastProgress = 0;
-        const dragStart = () => {userDragging = true;};
-        const dragEnd = () => {userDragging = false;lastDrag=performance.now();};
-        controls.addEventListener('start',dragStart);controls.addEventListener('end',dragEnd);
         const reset=()=>{rotationTime=0;camera.position.copy(overview);controls.target.copy(overviewTarget);controls.update();};resetRef.current=reset;reset();
         const resize=()=>{const {width,height}=host.getBoundingClientRect();if(!width||!height)return;renderer.setSize(width,height);camera.aspect=width/height;camera.fov=width<650?48:35;camera.updateProjectionMatrix();};
         const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(host);resize();
-        const raycaster=new THREE.Raycaster();const pointer=new THREE.Vector2();let startX=0;let startY=0;let chairDragging=false;let assembly=0;
-        const dragPlane = new THREE.Plane(new THREE.Vector3(0,1,0), 0);
-        const dragPoint = new THREE.Vector3();
-        const chairRotation = chair.rotation.y;
+        const raycaster=new THREE.Raycaster();const pointer=new THREE.Vector2();let startX=0;let startY=0;let assembly=0;
         const intersects=(event:PointerEvent)=>{const r=host.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);raycaster.setFromCamera(pointer,camera);return raycaster.intersectObject(computer,true).length>0;};
-        const chairHit=(e:PointerEvent)=>{const r=host.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);raycaster.setFromCamera(pointer,camera);return raycaster.intersectObject(chair,true).length>0;};
-        const down=(e:PointerEvent)=>{startX=e.clientX;startY=e.clientY;if(chairHit(e)){chairDragging=true;controls.enabled=false;renderer.domElement.setPointerCapture(e.pointerId);}};
-        const up=(e:PointerEvent)=>{if(chairDragging){chairDragging=false;controls.enabled=true;lastDrag=performance.now();return;}if(Math.hypot(e.clientX-startX,e.clientY-startY)<6&&intersects(e))enterRef.current();};
-        const move=(e:PointerEvent)=>{if(chairDragging){const r=host.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);raycaster.setFromCamera(pointer,camera);if(raycaster.ray.intersectPlane(dragPlane,dragPoint)){chair.position.x=THREE.MathUtils.clamp(dragPoint.x,-3.1,3.1);chair.position.z=THREE.MathUtils.clamp(dragPoint.z,1,4);chair.rotation.y=THREE.MathUtils.clamp(chairRotation+(e.clientX-startX)*.006,-1.3,.3);}return;}renderer.domElement.style.cursor=chairHit(e)?'grab':intersects(e)?'pointer':'default';};
+        const down=(e:PointerEvent)=>{startX=e.clientX;startY=e.clientY;};
+        const up=(e:PointerEvent)=>{if(Math.hypot(e.clientX-startX,e.clientY-startY)<6&&intersects(e))enterRef.current();};
+        const move=(e:PointerEvent)=>{renderer.domElement.style.cursor=intersects(e)?'pointer':'default';};
         const contextLost=(e:Event)=>{e.preventDefault();lost=true;delete host.dataset.ready;};
         const restored=()=>{lost=false;host.dataset.ready='true';};
         host.addEventListener('pointerdown',down);host.addEventListener('pointerup',up);host.addEventListener('pointermove',move);
@@ -265,7 +253,7 @@ export default function StudioRoom({onEnter, paused, resetKey, palette, progress
                 camera.lookAt(new THREE.Vector3().lerpVectors(overviewTarget, entryTarget, eased));
             } else {
                 if (lastProgress > 0) reset();
-                if (!pausedRef.current && !reduced.matches && !userDragging && performance.now()-lastDrag>2500) {
+                if (!pausedRef.current && !reduced.matches) {
                     rotationTime += delta;
                     // A gentle back-and-forth orbit keeps the monitor facing visitors.
                     const angle = .42 + Math.sin(rotationTime * .22) * .22;
@@ -277,7 +265,7 @@ export default function StudioRoom({onEnter, paused, resetKey, palette, progress
             }
             lastProgress = progress;
             renderer.render(scene,camera);host.dataset.ready='true';};frame=requestAnimationFrame(render);
-        return()=>{themeObserver.disconnect();cancelAnimationFrame(frame);observer.disconnect();resizeObserver.disconnect();controls.removeEventListener('start',dragStart);controls.removeEventListener('end',dragEnd);controls.dispose();resetRef.current=null;paletteRef.current=null;
+        return()=>{themeObserver.disconnect();cancelAnimationFrame(frame);observer.disconnect();resizeObserver.disconnect();controls.dispose();resetRef.current=null;paletteRef.current=null;
             host.removeEventListener('pointerdown',down);host.removeEventListener('pointerup',up);host.removeEventListener('pointermove',move);
             renderer.domElement.removeEventListener('webglcontextlost',contextLost);renderer.domElement.removeEventListener('webglcontextrestored',restored);
             geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());renderer.dispose();renderer.domElement.remove();delete host.dataset.ready;};

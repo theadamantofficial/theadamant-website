@@ -76,7 +76,14 @@ export function ServiceScrollStory({
 
                     <div className="service-sculpture-frame">
                         <div className="service-sculpture-fallback">
-                            <Image src={items[displayedIndex].image} alt="" fill className="object-contain" sizes="(max-width: 1024px) 85vw, 44vw"/>
+                            <Image
+                                src={items[displayedIndex].image}
+                                alt={items[displayedIndex].imageAlt ?? `${items[displayedIndex].title} illustration`}
+                                fill
+                                priority={displayedIndex === 0}
+                                className="object-contain"
+                                sizes="(max-width: 1024px) 85vw, 44vw"
+                            />
                         </div>
                     </div>
 

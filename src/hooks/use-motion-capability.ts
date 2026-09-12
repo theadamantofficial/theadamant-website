@@ -34,6 +34,7 @@ export function useMotionCapability(): {
                 saveData: Boolean(browserNavigator.connection?.saveData),
                 effectiveType: browserNavigator.connection?.effectiveType,
                 deviceMemory: browserNavigator.deviceMemory,
+                pointerCoarse: window.matchMedia("(pointer: coarse)").matches,
             });
             setIsReady(true);
         };

@@ -15,7 +15,7 @@ export function Reveal({children, className, delay = 0, ...props}: RevealProps) 
     return (
         <motion.div
             className={cn("motion-reveal", className)}
-            initial={{opacity: 0, y: 28}}
+            initial={false}
             whileInView={{opacity: 1, y: 0}}
             viewport={{once: true, amount: 0.22}}
             transition={{duration: 0.65, ease: smoothEase, delay}}
@@ -34,7 +34,7 @@ export function StaggerGroup({children, className, ...props}: StaggerGroupProps)
     return (
         <motion.div
             className={cn("motion-reveal", className)}
-            initial="hidden"
+            initial={false}
             whileInView="show"
             viewport={{once: true, amount: 0.18}}
             variants={{
