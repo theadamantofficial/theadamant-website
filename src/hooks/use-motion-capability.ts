@@ -12,6 +12,9 @@ function subscribe(listener: () => void) {
         const reduced = matchMedia("(prefers-reduced-motion: reduce)");
         const coarse = matchMedia("(pointer: coarse)");
         const browser = navigator as SignalsNavigator;
+        const visibility = () => {document.documentElement.dataset.motionHidden = String(document.hidden);};
+        visibility();
+        document.addEventListener("visibilitychange", visibility);
         const update = () => {
             const capability = getMotionCapability({
                 prefersReducedMotion: reduced.matches, pointerCoarse: coarse.matches,
@@ -30,6 +33,7 @@ function subscribe(listener: () => void) {
             reduced.removeEventListener("change", update);
             coarse.removeEventListener("change", update);
             browser.connection?.removeEventListener("change", update);
+            document.removeEventListener("visibilitychange", visibility);
         };
         update();
     }

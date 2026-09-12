@@ -10,6 +10,7 @@ import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPagePath, getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 import {BLOG_LABELS, MEDIUM_URL} from "@/lib/blog-config";
 import {SectionDepth} from "@/components/visuals/section-depth";
+import {MascotHeading} from "@/components/visuals/section-character";
 const MEDIUM_COPY: Record<SiteLocale, {
     kicker: string;
     title: string;
@@ -119,6 +120,7 @@ export default function Footer({
             <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr_0.9fr]">
                 <div>
                     <div className="flex flex-col gap-4">
+                        <MascotHeading mood="waving" side="right">
                         <AppLogo includeText={false} href={getLocalizedPath(locale)}/>
                         <div>
                             <h2 className="text-2xl font-semibold tracking-tight text-foreground">Adamant</h2>
@@ -126,6 +128,7 @@ export default function Footer({
                                 Firm in vision, bold in action
                             </p>
                         </div>
+                        </MascotHeading>
                         <p className="max-w-md text-sm leading-7 text-foreground/68">
                             {copy.description}
                         </p>

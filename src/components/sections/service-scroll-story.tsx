@@ -88,9 +88,8 @@ export function ServiceScrollStory({
                                 src={items[displayedIndex].image}
                                 alt={items[displayedIndex].imageAlt ?? `${items[displayedIndex].title} illustration`}
                                 fill
-                                priority={displayedIndex === 0}
                                 className="object-contain"
-                                sizes="(max-width: 1024px) 85vw, 44vw"
+                                sizes="(max-width: 1024px) 85vw, (max-width: 1440px) 44vw, 640px"
                             />
                         </div>
                     </div>

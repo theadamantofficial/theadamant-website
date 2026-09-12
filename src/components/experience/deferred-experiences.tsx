@@ -11,16 +11,17 @@ const PathToSuccess = dynamic(() => import("@/components/experience/path-to-succ
 function useNearViewport(margin: string) {
     const ref = useRef<HTMLDivElement>(null);
     const [isNear, setIsNear] = useState(false);
+    const [hasEntered, setHasEntered] = useState(false);
 
     useEffect(() => {
         const node = ref.current;
         if (!node) return;
-        const observer = new IntersectionObserver(([entry]) => setIsNear(entry.isIntersecting), {rootMargin: margin});
+        const observer = new IntersectionObserver(([entry]) => {setIsNear(entry.isIntersecting); if(entry.isIntersecting) setHasEntered(true);}, {rootMargin: margin});
         observer.observe(node);
         return () => observer.disconnect();
     }, [margin]);
 
-    return {ref, isNear};
+    return {ref, isNear, hasEntered};
 }
 
 export function DeferredAdamantSystem({services}: {services: SiteCopy["services"]}) {
@@ -32,9 +33,9 @@ export function DeferredAdamantSystem({services}: {services: SiteCopy["services"
 }
 
 export function DeferredPathToSuccess({locale}: {locale: SiteLocale}) {
-    const {ref, isNear} = useNearViewport("500px 0px");
+    const {ref, hasEntered} = useNearViewport("500px 0px");
 
     return <div ref={ref} className="min-h-[min(880px,92svh)]">
-        {isNear ? <PathToSuccess locale={locale}/> : null}
+        {hasEntered ? <PathToSuccess locale={locale}/> : null}
     </div>;
 }

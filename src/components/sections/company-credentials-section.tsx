@@ -134,7 +134,7 @@ export default function CompanyCredentialsSection({
                                                 alt="Government of India DPIIT Certificate of Recognition for JSSS Adamant Technologies Private Limited"
                                                 width={1600}
                                                 height={1131}
-                                                sizes="(max-width: 1024px) 100vw, 52vw"
+                                                sizes="(max-width: 767px) calc(100vw - 88px), (max-width: 1280px) 54vw, 680px"
                                                 className="h-auto w-full rounded-[0.9rem] object-contain transition duration-500 group-hover:scale-[1.012]"
                                             />
                                             <span className="absolute bottom-5 right-5 flex h-10 w-10 items-center justify-center rounded-full bg-[#172124] text-[#f9f6ef] shadow-lg transition duration-300 group-hover:-translate-y-1 group-hover:translate-x-1">
@@ -260,7 +260,7 @@ function IndependentCertificateCard({
                     alt={imageAlt}
                     width={1100}
                     height={imageHeight}
-                    sizes="(max-width: 1280px) 100vw, 44vw"
+                    sizes="(max-width: 767px) calc(100vw - 112px), (max-width: 1280px) 40vw, 500px"
                     className="h-[20rem] w-full object-contain transition duration-500 group-hover:scale-[1.02] md:h-[15rem] lg:h-[18rem] xl:h-[20rem]"
                 />
             </Link>

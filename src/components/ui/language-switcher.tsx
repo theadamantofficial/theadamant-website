@@ -11,7 +11,7 @@ import {
     SiteLocale,
 } from "@/lib/site-locale";
 
-export function LanguageSwitcher({mobile = false}: { mobile?: boolean }) {
+export function LanguageSwitcher({mobile = false, autoFocus = false}: { mobile?: boolean; autoFocus?: boolean }) {
     const pathname = usePathname();
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -31,6 +31,7 @@ export function LanguageSwitcher({mobile = false}: { mobile?: boolean }) {
 
             <div className="flex min-w-0 flex-1 items-center gap-2">
                 <select
+                    autoFocus={autoFocus}
                     aria-label="Change website language"
                     className="w-full min-w-0 bg-transparent text-sm font-medium text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-60"
                     value={selectedLocale}

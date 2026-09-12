@@ -1,0 +1,32 @@
+.service-tilt-card.service-prism-card {transform:perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg));transition:transform .18s ease;border-radius:1.5rem;overflow:hidden}
+.service-prism-grid .service-prism-card:hover {filter:none;box-shadow:0 24px 45px -30px #183c3940}
+.service-art {position:relative;height:220px;overflow:hidden;background:radial-gradient(circle at 50% 35%,#e5eee5,#d7e5df);perspective:800px}
+.dark .service-art {background:radial-gradient(circle at 50% 35%,#25494b,#112e33)}
+.service-art-platform {position:absolute;left:18%;right:18%;top:68%;height:24%;border-radius:50%;background:#195b5b20;transform:rotateX(65deg)}
+.service-art-object {position:absolute;left:27%;right:27%;top:18%;height:56%;transform:rotateY(-20deg) rotateX(10deg);transform-style:preserve-3d}
+.service-art-object i,.service-art-object b,.service-art-object span {position:absolute;display:block;border-radius:7px}
+.service-art-0 .service-art-object i {width:54%;height:42%;background:linear-gradient(135deg,#fff8e7,#e5c9a4);border:2px solid #fff4d8;box-shadow:5px 7px 0 #b08a68}
+.service-art-0 .service-art-object i:nth-child(1){left:-10%;top:0;transform:translateZ(25px)}
+.service-art-0 .service-art-object i:nth-child(2){right:-10%;top:10%;background:#81c9ba;transform:translateZ(10px)}
+.service-art-0 .service-art-object i:nth-child(3){left:0;bottom:0;background:#ee9d76;transform:translateZ(40px)}
+.service-art-0 .service-art-object i:nth-child(4){right:-15%;bottom:-8%;height:52%;transform:translateZ(30px)}
+.service-art-1 .service-art-object {left:20%;right:20%;top:21%;height:51%;background:#17494d;border:7px solid #286568;border-radius:10px;box-shadow:6px 5px 0 #113639}
+.service-art-1 .service-art-object:before {content:"";position:absolute;inset:5px;background:linear-gradient(#f3ead6 0 15%,#ec9b74 15% 52%,#d6e4d7 52%);border-radius:3px}
+.service-art-1 .service-art-object:after {content:"";position:absolute;top:100%;left:-15%;right:-15%;height:22%;background:linear-gradient(#9ac2b5,#577f77);transform:rotateX(45deg);border-radius:0 0 8px 8px;box-shadow:0 4px 0 #375c54}
+.service-art-2 .service-art-object i:nth-child(-n+2) {height:110%;width:52%;background:#123b40;border:6px solid #285f62;box-shadow:5px 3px 0 #0c282f}
+.service-art-2 .service-art-object i:nth-child(1){left:0;top:0;transform:rotate(-10deg) translateZ(15px)}
+.service-art-2 .service-art-object i:nth-child(2){right:-25%;top:12%;transform:rotate(9deg) translateZ(35px)}
+.service-art-2 .service-art-object i:nth-child(-n+2):after {content:"";position:absolute;inset:6px 2px;border-radius:4px;background:linear-gradient(#efb688 0 34%,#e8e6d3 34% 60%,#87c6b5 60%)}
+.service-art-3 .service-art-object {transform:rotateY(-25deg) rotateX(8deg)}
+.service-art-3 .service-art-object i {bottom:0;width:25%;background:linear-gradient(90deg,#66b8a3,#a0d5bb);box-shadow:5px 2px 0 #3e8e7e;border-radius:4px 4px 0 0}
+.service-art-3 .service-art-object i:nth-child(1){height:28%;left:-10%}.service-art-3 .service-art-object i:nth-child(2){height:47%;left:25%}.service-art-3 .service-art-object i:nth-child(3){height:72%;left:60%}.service-art-3 .service-art-object i:nth-child(4){height:100%;left:95%;background:linear-gradient(90deg,#d17e53,#f2b38b);box-shadow:5px 2px 0 #a5593f}
+.service-art-caption {position:absolute;bottom:15px;left:0;right:0;text-align:center;font:8px monospace;letter-spacing:.14em;color:#397269}
+.dark .service-art-caption {color:#99c7bc}
+.service-prism-content {display:flex;flex-direction:column;flex:1;min-width:0}
+.service-deliverables {margin:1rem 0 .65rem;display:grid;gap:.35rem;font-size:.75rem;line-height:1.6}
+.service-proof-link {font-size:.75rem;text-decoration:underline;text-underline-offset:3px;margin-bottom:1rem}
+.service-prism-content .service-prism-cta {margin-top:auto;padding-top:1rem}
+.service-prism-meta {flex-wrap:wrap;line-height:1.5}
+.service-prism-grid {align-items:stretch}
+@media(max-width:700px){.service-art{height:200px}.service-tilt-card.service-prism-card{transform:none}}
+@media(prefers-reduced-motion:reduce){.service-tilt-card.service-prism-card{transform:none;transition:none}}

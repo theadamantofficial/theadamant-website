@@ -1,6 +1,6 @@
 "use client";
 
-import dynamic from "next/dynamic";
+import {DeferredLanguageSwitcher as LanguageSwitcher} from "@/components/ui/deferred-language-switcher";
 import {useEffect, useState} from "react";
 import {
     MobileNav,
@@ -15,10 +15,6 @@ import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPagePath, getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 import {BLOG_LABELS} from "@/lib/blog-config";
 
-const LanguageSwitcher = dynamic(
-    () => import("@/components/ui/language-switcher").then((module) => module.LanguageSwitcher),
-    {ssr: false},
-);
 
 export function Navbar({
     copy,

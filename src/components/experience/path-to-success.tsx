@@ -6,6 +6,7 @@ import {type CSSProperties, useCallback, useEffect, useRef, useState} from "reac
 import {Volume2, VolumeX} from "lucide-react";
 import {JOURNEY_CHALLENGES} from "@/components/experience/journey-data";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
+import {useMotionCapability} from "@/hooks/use-motion-capability";
 
 type JourneyMode = "intro" | "playing" | "blocked" | "transforming" | "success";
 type JourneyPosition = {x: number; z: number};
@@ -18,6 +19,9 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
     const velocityRef = useRef<JourneyPosition>({x: 0, z: 0});
     const keysRef = useRef(new Set<string>());
     const timerRef = useRef<number | null>(null);
+    const startTimerRef = useRef<number | null>(null);
+    const wakeRef = useRef<(() => void) | null>(null);
+    const {capability} = useMotionCapability();
     const [mode, setMode] = useState<JourneyMode>("intro");
     const [challengeIndex, setChallengeIndex] = useState(0);
     const [businessProgress, setBusinessProgress] = useState(10);
@@ -29,7 +33,7 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
         const shell = shellRef.current;
         if (!shell) return;
         const observer = new IntersectionObserver(([entry]) => setIsInViewport(entry.isIntersecting), {
-            rootMargin: "160px 0px",
+            rootMargin: "0px",
         });
         observer.observe(shell);
         return () => observer.disconnect();
@@ -55,7 +59,7 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
             oscillator.start(start);
             oscillator.stop(start + .4);
         });
-        return () => {window.setTimeout(() => void context.close(), 50);};
+        return () => {void context.close();};
     }, [mode, soundOn]);
 
     const updatePosition = useCallback((next: JourneyPosition) => {
@@ -72,7 +76,8 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
         updatePosition({x: 0, z: 0}); velocityRef.current = {x: 0, z: 0};
         dispatchWorld("playing", 0, 10);
         const shell = shellRef.current;
-        window.setTimeout(() => {
+        if (startTimerRef.current) window.clearTimeout(startTimerRef.current);
+        startTimerRef.current = window.setTimeout(() => {
             if (!shell) return;
             const rect = shell.getBoundingClientRect();
             const top = window.scrollY + rect.top - Math.max(0, (innerHeight - rect.height) / 2);
@@ -117,14 +122,15 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
         const down = (event: KeyboardEvent) => {
             const key = event.key.toLowerCase();
             if (!isActive() || mode === "intro" || mode === "success") return;
-            if (["arrowup", "arrowdown", "arrowleft", "arrowright", "w", "a", "s", "d", " "].includes(key)) event.preventDefault();
+            if (!["arrowup", "arrowdown", "arrowleft", "arrowright", "w", "a", "s", "d", " "].includes(key)) return;
+            event.preventDefault();
             if (key === " ") activate();
-            else {keysRef.current.add(key); shellRef.current?.classList.add("is-moving");}
+            else if (mode === "playing") {keysRef.current.add(key); wakeRef.current?.();}
         };
         const up = (event: KeyboardEvent) => {keysRef.current.delete(event.key.toLowerCase()); if (!keysRef.current.size) shellRef.current?.classList.remove("is-moving");};
-        const blur = () => {keysRef.current.clear(); shellRef.current?.classList.remove("is-moving");};
+        const blur = () => {keysRef.current.clear(); velocityRef.current = {x:0,z:0}; shellRef.current?.classList.remove("is-moving");};
         window.addEventListener("keydown", down); window.addEventListener("keyup", up); window.addEventListener("blur", blur);
-        return () => {window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); window.removeEventListener("blur", blur);};
+        return () => {window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); window.removeEventListener("blur", blur); blur();};
     }, [activate, isInViewport, mode]);
 
     useEffect(() => {
@@ -132,6 +138,8 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
         const shell = shellRef.current;
         let frame = 0; let last = performance.now();
         const update = (time: number) => {
+            frame = 0;
+            if (document.hidden) return;
             const delta = Math.min((time - last) / 1000, .04); last = time;
             const keys = keysRef.current;
             const targetX = (keys.has("arrowright") || keys.has("d") ? 1 : 0) - (keys.has("arrowleft") || keys.has("a") ? 1 : 0);
@@ -144,26 +152,33 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
             if (next.z >= STOPS[challengeIndex]) {
                 next.z = STOPS[challengeIndex]; velocityRef.current = {x: 0, z: 0}; keysRef.current.clear(); shell?.classList.remove("is-moving");
                 setMode("blocked"); dispatchWorld("blocked", challengeIndex, businessProgress);
+                updatePosition(next);
+                return;
             }
-            updatePosition(next); frame = requestAnimationFrame(update);
+            updatePosition(next);
+            if (keys.size || Math.abs(velocityRef.current.x) + Math.abs(velocityRef.current.z) > .01) frame = requestAnimationFrame(update);
         };
-        frame = requestAnimationFrame(update);
-        return () => {cancelAnimationFrame(frame); shell?.classList.remove("is-moving");};
+        const wake = () => {if (!frame && !document.hidden) {last = performance.now(); frame = requestAnimationFrame(update);}};
+        const pause = () => {if (document.hidden) {cancelAnimationFrame(frame); frame = 0; keysRef.current.clear(); velocityRef.current={x:0,z:0}; shell?.classList.remove("is-moving");}};
+        wakeRef.current = wake;
+        document.addEventListener("visibilitychange", pause);
+        return () => {cancelAnimationFrame(frame); wakeRef.current=null; keysRef.current.clear(); velocityRef.current={x:0,z:0}; document.removeEventListener("visibilitychange",pause); shell?.classList.remove("is-moving");};
     }, [businessProgress, challengeIndex, dispatchWorld, isInViewport, mode, updatePosition]);
 
     useEffect(() => () => {
         if (timerRef.current) window.clearTimeout(timerRef.current);
+        if (startTimerRef.current) window.clearTimeout(startTimerRef.current);
         window.dispatchEvent(new CustomEvent("adamant:journey", {detail: {mode: "intro", index: 0, progress: 0}}));
     }, []);
 
     const hold = (key: string, active: boolean) => {
-        if (active) {keysRef.current.add(key); shellRef.current?.classList.add("is-moving");}
+        if (active && mode === "playing") {keysRef.current.add(key); wakeRef.current?.();}
         else {keysRef.current.delete(key); if (!keysRef.current.size) shellRef.current?.classList.remove("is-moving");}
     };
     const release = (key: string) => () => hold(key, false);
     const playerStyle = {"--player-x": 0, "--player-z": 0} as CSSProperties;
 
-    return <section ref={shellRef} id="path-to-success" className={`journey-shell journey-${mode}`} aria-label="The Path to Success interactive business journey" data-challenge={challenge.kind} style={{"--journey-z": 0} as CSSProperties} tabIndex={-1}>
+return <section ref={shellRef} id="path-to-success" className={`journey-shell journey-${mode}`} aria-label="The Path to Success interactive business journey" data-motion={capability} data-motion-active={isInViewport && capability !== "reduced"} data-challenge={challenge.kind} style={{"--journey-z": 0} as CSSProperties} tabIndex={-1}>
         <h2 className="sr-only">The Path to Success</h2>
         <div className="journey-vignette" aria-hidden="true"/>
         <div className="journey-road" aria-hidden="true"><i/><i/><i/><i/><i/><i/><i/></div>
@@ -176,7 +191,7 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
             <div className="journey-next-check"><span>NEXT SYSTEM CHECK</span><b>{challenge.kind === "connected" ? "CONNECTED ARCHITECTURE" : `${challenge.kind.toUpperCase()} EXPERIENCE`}</b></div>
             <ChallengeVisual kind={challenge.kind}/>
             <div ref={characterRef} className="journey-character" style={playerStyle}>
-                <Image src="/images/adamant-avatar/walking.webp" alt="" fill sizes="(max-width: 800px) 90px, 130px" className="journey-character-image"/>
+                <Image src={mode === "success" ? "/images/adamant-mascot/champion.webp" : "/images/adamant-mascot/walking-tablet.webp"} alt="" fill sizes="(max-width: 800px) 90px, 130px" className="journey-character-image"/>
                 <span className="character-head"/><span className="character-body"/><span className="character-arm arm-left"/><span className="character-arm arm-right"/><span className="character-leg leg-left"/><span className="character-leg leg-right"/>
             </div>
             <div className="journey-success-car"><Image src="/images/adamant-avatar/roadster.webp" alt="" fill sizes="(max-width: 800px) 320px, 600px"/></div>

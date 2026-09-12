@@ -135,7 +135,7 @@ export function ServiceLandingHero({page}: {page: ServiceLandingPageConfig}) {
                                 alt={page.title}
                                 fill
                                 className="object-cover"
-                                sizes="(max-width: 1024px) 100vw, 45vw"
+                                sizes="(max-width: 1024px) calc(100vw - 96px), (max-width: 1440px) 40vw, 560px"
                                 priority
                             />
                         </div>

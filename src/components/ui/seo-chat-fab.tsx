@@ -19,10 +19,10 @@ const initialLeadState: SeoChatLead = {
     issue: "",
 };
 
-export function SeoChatFab() {
-    const [isOpen, setIsOpen] = useState(false);
+export function SeoChatFab({initialOpen = false, initialDetail}: {initialOpen?: boolean; initialDetail?: OpenSeoChatEventDetail} = {}) {
+    const [isOpen, setIsOpen] = useState(initialOpen);
     const [isExpanded, setIsExpanded] = useState(false);
-    const [lead, setLead] = useState<SeoChatLead>(initialLeadState);
+    const [lead, setLead] = useState<SeoChatLead>({...initialLeadState, websiteUrl: initialDetail?.websiteUrl ?? "", issue: initialDetail?.issue ?? ""});
     const [messages, setMessages] = useState<SeoChatMessage[]>([]);
     const [draft, setDraft] = useState("");
     const [sessionId, setSessionId] = useState("");

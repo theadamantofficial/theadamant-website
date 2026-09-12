@@ -175,10 +175,6 @@ export const MobileNav = ({children, className, visible, hidden}: MobileNavProps
     return (
         <motion.div
             animate={{
-                backdropFilter: visible ? "blur(16px)" : "none",
-                boxShadow: visible
-                    ? "0 28px 70px -42px rgba(15, 23, 42, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08) inset"
-                    : "none",
                 borderRadius: visible ? "999px" : "999px",
                 scale: visible ? 0.98 : 1,
                 y: visible ? 2 : 0,
@@ -190,7 +186,7 @@ export const MobileNav = ({children, className, visible, hidden}: MobileNavProps
             }}
             className={cn(
                 "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between border border-transparent bg-transparent px-3 py-3 xl:hidden",
-                visible && "border-black/8 bg-white/75 dark:border-[#5fcabd]/20 dark:bg-[#071820]/88",
+                visible && "border-black/8 bg-white/95 dark:border-[#5fcabd]/20 dark:bg-[#071820]/95",
                 className,
             )}
             style={{

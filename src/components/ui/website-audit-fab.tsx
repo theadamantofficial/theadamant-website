@@ -45,8 +45,8 @@ const EMAILJS_AUDIT_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_AUDIT_TEMPLATE
     || DEFAULT_EMAILJS_AUDIT_TEMPLATE_ID;
 const AUDIT_NOTIFICATION_EMAIL = process.env.NEXT_PUBLIC_AUDIT_NOTIFICATION_EMAIL || "admin@theadamant.com";
 
-export function WebsiteAuditFab({locale}: { locale: SiteLocale }) {
-    const [isOpen, setIsOpen] = useState(false);
+export function WebsiteAuditFab({locale, initialOpen = false}: { locale: SiteLocale; initialOpen?: boolean }) {
+    const [isOpen, setIsOpen] = useState(initialOpen);
     const [websiteUrl, setWebsiteUrl] = useState("");
     const [visitorEmail, setVisitorEmail] = useState("");
     const [status, setStatus] = useState<AuditStatus>("idle");
