@@ -3,7 +3,7 @@ import {ProspectsScreen} from "@/features/crm/prospects/prospects-screen";
 import {canViewProspectDatabase} from "@/features/crm/permissions";
 import {getCrmPageActor} from "@/lib/crm/auth";
 
-export const metadata = {title: "Lead Database"};
+export const metadata = {title: "WhatsApp Lead Database"};
 export const dynamic = "force-dynamic";
 
 export default async function ProspectsPage() {

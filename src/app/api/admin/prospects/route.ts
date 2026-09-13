@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
     try {
-        const {actor} = await getCrmRequestContext(request);
+        const {actor, client} = await getCrmRequestContext(request);
         if (!canViewProspectDatabase(actor)) {
             throw new CrmApiError("You do not have access to the lead database.", 403);
         }
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
             city: clean(params.get("city"), 100),
             industry: clean(params.get("industry"), 100),
             hasPhone: params.get("hasPhone") === "true",
-        });
+        }, client);
         return NextResponse.json(result);
     } catch (error) {
         const {message, status} = crmErrorResponse(error);

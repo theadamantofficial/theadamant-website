@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {cn} from "@/lib/utils";
-import Image from "next/image";
+import {ContactVisual} from "@/components/visuals/contact-visual";
 import {Dropdown} from "@/components/ui/dropdown";
 import {Textarea} from "@/components/ui/text-area";
 import {Calendar, CheckCircle2, Clock3, FileText, Mail, MessageCircle, MessageSquareText, Target} from "lucide-react";
@@ -140,24 +140,7 @@ export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["c
                         </StaggerGroup>
                     </div>
 
-                    <div className="contact-visual-3d overflow-hidden rounded-[1.75rem] border border-black/8 bg-[#edf4f1] pt-6 dark:border-white/10 dark:bg-[#122326]">
-                        <Image
-                            src="/images/img-contact-us-light.webp"
-                            alt=""
-                            className="max-h-[250px] w-full object-cover object-center dark:hidden"
-                            width={480}
-                            height={250}
-                            sizes="(max-width: 1024px) 100vw, 46vw"
-                        />
-                        <Image
-                            src="/images/img-contact-us-dark.webp"
-                            alt=""
-                            className="hidden max-h-[250px] w-full object-cover object-center dark:block"
-                            width={480}
-                            height={250}
-                            sizes="(max-width: 1024px) 100vw, 46vw"
-                        />
-                    </div>
+                    <ContactVisual/>
                 </Reveal>
 
                 <Reveal className="glass-panel h-full p-2 sm:p-3" delay={0.12}>

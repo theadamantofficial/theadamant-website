@@ -77,10 +77,15 @@ email or Discord notification. Website references are deduplicated through `lead
 
 ### External USA lead database
 
-The protected `/admin/prospects` section reads the supplied SQLite database directly in read-only mode. Configure
-`USA_LEADS_DATABASE_PATH` with an absolute path that is mounted on every production application instance. Because the
-source currently contains more than ten million records (about 5.3 GB), it is intentionally not bundled in Git or
-copied into the operational CRM tables.
+To import the purchased records into the separate production Supabase table
+`whatsapp-lead-db`, follow [the production setup steps](docs/import-whatsapp-lead-db.md).
+The importer defaults to a local preview and supports batched, resumable writes.
+Use `PROSPECT_DATABASE_MODE=supabase` in production and deploy the updated reader.
+
+The protected `/admin/prospects` section reads the purchased Supabase database in
+production. Local SQLite access remains available with `PROSPECT_DATABASE_MODE=sqlite`
+and `USA_LEADS_DATABASE_PATH` pointing to the mounted source. More than ten million
+records (about 5.3 GB in SQLite) are kept outside Git and the operational CRM tables.
 
 Super admins and admins always have access. Either role can grant or remove access for an employee in the Team screen.
 That permission is enforced in both the page and API. Initiating a WhatsApp message opens the standard `wa.me` flow

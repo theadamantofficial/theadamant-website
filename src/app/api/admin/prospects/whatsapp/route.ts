@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
         const message = typeof payload.message === "string" ? payload.message.trim() : "";
         if (!Number.isSafeInteger(recordId) || recordId <= 0) throw new CrmApiError("Choose a valid lead.");
 
-        const prospect = await getProspectById(recordId);
+        const prospect = await getProspectById(recordId, client);
         if (!prospect) throw new CrmApiError("Lead not found in the source database.", 404);
         const rawPhone = prospect.phone?.trim() || prospect.company_phone?.trim() || "";
         const destination = normalizeWhatsAppPhone(rawPhone, prospect.country);

@@ -1,10 +1,12 @@
 import {existsSync} from "node:fs";
 import {isAbsolute, resolve} from "node:path";
 import {Worker} from "node:worker_threads";
+import type {SupabaseClient} from "@supabase/supabase-js";
 import type {Prospect} from "@/features/crm/types";
 import {CrmApiError} from "@/lib/crm/errors";
 
 const DEFAULT_DATABASE_PATH = "/Volumes/Yashverma/Adamant/leads/USA_Leads_Combined.sqlite";
+const SUPABASE_TABLE = "whatsapp-lead-db";
 const PROSPECT_COLUMNS = [
     "l.record_id",
     "s.relative_path as source_file",
@@ -69,7 +71,29 @@ try {
 }
 `;
 
-export async function queryProspects(input: ProspectQuery) {
+export async function queryProspects(input: ProspectQuery, client?: SupabaseClient) {
+    if (usesSupabase()) {
+        if (!client) throw new CrmApiError("Sign in to access the WhatsApp lead database.", 401);
+        const {data, error} = await client.rpc("query_whatsapp_lead_db", {
+            p_after: input.after,
+            p_page_size: input.pageSize,
+            p_search: input.search?.trim().slice(0, 120) || null,
+            p_state: input.state?.trim().slice(0, 100) || null,
+            p_city: input.city?.trim().slice(0, 100) || null,
+            p_industry: input.industry?.trim().slice(0, 100) || null,
+            p_has_phone: input.hasPhone ?? false,
+        });
+        if (error) throwSupabaseError(error.code);
+        const result = data as {rows: Prospect[]; database: {total: number; createdAt: string | null}} | null;
+        if (!result || !Array.isArray(result.rows)) throw new CrmApiError("The WhatsApp lead database returned an invalid response.", 503);
+        const prospects = result.rows.slice(0, input.pageSize);
+        const hasMore = result.rows.length > input.pageSize;
+        return {
+            prospects,
+            page: {hasMore, nextAfter: hasMore ? prospects.at(-1)?.record_id || null : null},
+            database: result.database,
+        };
+    }
     const where = ["l.record_id > ?"];
     const params: SqlInputValue[] = [input.after];
 
@@ -127,7 +151,16 @@ export async function queryProspects(input: ProspectQuery) {
     };
 }
 
-export async function getProspectById(recordId: number) {
+export async function getProspectById(recordId: number, client?: SupabaseClient) {
+    if (usesSupabase()) {
+        if (!client) throw new CrmApiError("Sign in to access the WhatsApp lead database.", 401);
+        const columns = PROSPECT_COLUMNS.split(",").map(column => column.trim().replace(/^l\./, ""));
+        columns[1] = "source_file";
+        columns[2] = "source_sheet";
+        const {data, error} = await client.from(SUPABASE_TABLE).select(columns.join(",")).eq("record_id", recordId).maybeSingle();
+        if (error) throwSupabaseError(error.code);
+        return data ? data as unknown as Prospect : null;
+    }
     const [row] = await runStatements([{
         sql: `
             select ${PROSPECT_COLUMNS}
@@ -139,6 +172,18 @@ export async function getProspectById(recordId: number) {
         method: "get",
     }]);
     return row ? ({...row} as Prospect) : null;
+}
+
+function usesSupabase() {
+    const mode = process.env.PROSPECT_DATABASE_MODE?.trim().toLowerCase() || (process.env.VERCEL ? "supabase" : "sqlite");
+    if (mode !== "sqlite" && mode !== "supabase") throw new CrmApiError("Configure PROSPECT_DATABASE_MODE as supabase or sqlite.", 503);
+    return mode === "supabase";
+}
+
+function throwSupabaseError(code: string | undefined): never {
+    if (code === "57014") throw new CrmApiError("This lead database search took too long. Try a narrower filter.", 408);
+    if (code === "42501") throw new CrmApiError("You do not have access to the lead database.", 403);
+    throw new CrmApiError("The WhatsApp lead database is not ready. Apply the whatsapp-lead-db Supabase migration and import the purchased records.", 503);
 }
 
 function getProspectDatabasePath() {

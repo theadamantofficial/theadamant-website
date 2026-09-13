@@ -751,28 +751,39 @@
 .contact-visual-3d {
     position: relative;
     isolation: isolate;
-    perspective: 900px;
+    height: clamp(270px, 28vw, 330px);
     box-shadow: 0 24px 45px -30px color-mix(in srgb, var(--foreground) 45%, transparent);
 }
-.contact-visual-3d::before {
-    content: "";
+.contact-visual-fallback, .contact-diorama-canvas {
     position: absolute;
-    inset: 9% 7%;
-    z-index: -1;
-    border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
-    border-radius: 1.25rem;
-    transform: translateZ(-20px) rotateX(4deg) rotateY(-3deg);
-    box-shadow: 14px 16px 0 color-mix(in srgb, var(--primary) 8%, transparent);
+    inset: 0;
 }
-.contact-visual-3d img {
-    position: relative;
-    transform: translateZ(18px) rotateX(2deg);
-    filter: drop-shadow(0 22px 18px color-mix(in srgb, var(--foreground) 18%, transparent));
+.contact-diorama-canvas { opacity: 0; cursor: grab; }
+.contact-diorama-canvas:active { cursor: grabbing; }
+.contact-diorama-canvas:focus-visible { outline: 2px solid var(--primary); outline-offset: -5px; border-radius: inherit; }
+.contact-diorama-canvas canvas { display: block; width: 100%; height: 100%; }
+.contact-diorama-canvas[data-ready="true"] { opacity: 1; }
+.contact-visual-3d:has(.contact-diorama-canvas[data-ready="true"]) .contact-visual-fallback { visibility: hidden; }
+.contact-diorama-tools {
+    position: absolute;
+    inset: auto 18px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--foreground);
+    visibility: hidden;
+    pointer-events: none;
 }
-@media (pointer: coarse) {
-    .contact-visual-3d { perspective: none; box-shadow: none; }
-    .contact-visual-3d::before { transform: translateZ(-8px); }
-    .contact-visual-3d img { transform: translateZ(8px); }
+.contact-visual-3d:has(.contact-diorama-canvas[data-ready="true"]) .contact-diorama-tools { visibility: visible; }
+.contact-diorama-tools>span { opacity: .6; }
+.contact-diorama-tools button {
+    pointer-events: auto;
+    cursor: pointer;
+    border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+    background: color-mix(in srgb, var(--background) 85%, transparent);
+    border-radius: 999px;
+    padding: 5px 10px;
 }
 .dark .workspace-scroll-track .workspace-hero[data-palette="1"]{background:radial-gradient(ellipse at 60% 40%,#292f56,#111526 75%);}
 .dark .workspace-scroll-track .workspace-hero[data-palette="2"]{background:radial-gradient(ellipse at 60% 40%,#482a48,#1b1424 75%);}

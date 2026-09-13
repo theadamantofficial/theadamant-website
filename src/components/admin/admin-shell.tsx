@@ -15,7 +15,7 @@ const NAV_ITEMS = [
     {href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard},
     {href: "/admin/leads", label: "Leads", icon: BriefcaseBusiness},
     {href: "/admin/whatsapp", label: "WhatsApp", icon: MessageCircle},
-    {href: "/admin/prospects", label: "Lead Database", icon: Database},
+    {href: "/admin/prospects", label: "WhatsApp Lead DB", icon: Database},
     {href: "/admin/pipeline", label: "Pipeline", icon: Workflow},
     {href: "/admin/development", label: "Development", icon: Workflow},
     {href: "/admin/tasks", label: "Tasks", icon: CheckSquare2},
@@ -138,7 +138,7 @@ function AdminShellInner({actor, children}: {actor: CrmActor; children: ReactNod
 
 function getPageTitle(pathname: string) {
     if (pathname.includes("/leads/new")) return "New lead";
-    if (pathname.startsWith("/admin/prospects")) return "Lead Database";
+    if (pathname.startsWith("/admin/prospects")) return "WhatsApp Lead Database";
     if (/\/leads\/[^/]+\/edit$/.test(pathname)) return "Edit lead";
     if (/\/leads\/[^/]+$/.test(pathname)) return "Lead details";
     return NAV_ITEMS.find((item) => pathname.startsWith(item.href))?.label || (pathname.startsWith("/admin/settings") ? "Settings" : "Admin");

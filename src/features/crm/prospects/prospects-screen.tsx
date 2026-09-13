@@ -22,7 +22,7 @@ export function ProspectsScreen() {
     const [activeFilters, setActiveFilters] = useState<Filters>(EMPTY_FILTERS);
     const [cursorStack, setCursorStack] = useState<number[]>([0]);
     const [nextAfter, setNextAfter] = useState<number | null>(null);
-    const [databaseTotal, setDatabaseTotal] = useState(0);
+    const [databaseTotal, setDatabaseTotal] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [selected, setSelected] = useState<Prospect | null>(null);
@@ -83,8 +83,8 @@ export function ProspectsScreen() {
     return <div className="space-y-5">
         <PageHeader
             eyebrow="USA prospect source"
-            title="Lead Database"
-            description={`${databaseTotal ? databaseTotal.toLocaleString("en-US") : "10M+"} source records · Access is controlled by administrators · Outreach is logged for future CRM integration.`}
+            title="WhatsApp Lead Database"
+            description={`${databaseTotal === null ? "Purchased USA records" : `${databaseTotal.toLocaleString("en-US")} source records`} · Access is controlled by administrators · Outreach is logged for future CRM integration.`}
             actions={<span className="inline-flex items-center gap-2 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] px-3 py-2 text-[11px] text-[var(--crm-muted)]"><Database className="h-3.5 w-3.5"/> Read-only source</span>}
         />
         {error ? <DataError message={error} onRetry={() => void load(currentAfter, activeFilters)}/> : null}
