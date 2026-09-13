@@ -1,14 +1,14 @@
 "use client";
 
 import {useEffect, useRef, useState} from "react";
-import {FileText, Loader2, Send} from "lucide-react";
+import {Loader2, Send} from "lucide-react";
 import toast from "react-hot-toast";
 import {Modal} from "@/components/admin/admin-ui";
 import {crmFetch} from "@/features/crm/api";
 import type {Prospect} from "@/features/crm/types";
 import {getProposalRecipients} from "@/lib/crm/proposal-email";
 
-type ProposalDraft = {configured: boolean; subject: string; message: string; draftSource: string; attachment: {filename: string; size: number}};
+type ProposalDraft = {configured: boolean; subject: string; message: string; draftSource: string};
 
 export function ProposalEmailModal({prospect, onClose}: {prospect: Prospect; onClose: () => void}) {
     const recipients = getProposalRecipients(prospect);
@@ -36,7 +36,7 @@ export function ProposalEmailModal({prospect, onClose}: {prospect: Prospect; onC
             const result = await crmFetch<{sent: boolean; outreachLogged: boolean}>("/api/admin/prospects/email", {
                 method: "POST", body: JSON.stringify({recordId: prospect.record_id, to, subject, message}),
             });
-            toast.success("Proposal email sent with PDF attachment");
+            toast.success("Proposal email sent");
             if (!result.outreachLogged) toast.error("The email was sent, but its outreach status could not be saved. Do not resend.");
             onClose();
         } catch (sendError) {
@@ -44,12 +44,11 @@ export function ProposalEmailModal({prospect, onClose}: {prospect: Prospect; onC
         } finally {sendingRef.current = false; setSending(false);}
     }
 
-    return <Modal title="Email client proposal" description="Review the recipient and proposal before sending. Your client proposal PDF is attached." onClose={() => {if (!sendingRef.current) onClose();}}>
+    return <Modal title="Email client proposal" description="Review the recipient and proposal before sending." onClose={() => {if (!sendingRef.current) onClose();}}>
         {error ? <p role="alert" className="text-sm text-red-500">{error}</p> : !draft ? <p role="status" className="py-4 text-xs text-[var(--crm-muted)]">Loading client proposal…</p> : <form className="space-y-4" onSubmit={(event) => {event.preventDefault(); void sendEmail();}}>
             <label className="block text-xs font-medium">To<select aria-label="Proposal recipient" value={to} onChange={(event) => setTo(event.target.value)} disabled={sending} required className="admin-input mt-1.5">{recipients.map((recipient) => <option key={recipient.email} value={recipient.email}>{recipient.email} · {recipient.label}</option>)}</select></label>
             <label className="block text-xs font-medium">Subject<input value={subject} onChange={(event) => setSubject(event.target.value)} disabled={sending} required maxLength={240} className="admin-input mt-1.5"/></label>
             <label className="block text-xs font-medium">Message<span className="ml-2 font-normal text-[var(--crm-muted)]">{draft.draftSource}</span><textarea value={message} onChange={(event) => setMessage(event.target.value)} disabled={sending} required maxLength={16000} rows={10} className="admin-input mt-1.5 h-auto resize-y py-3"/></label>
-            <a href="/api/admin/prospects/email?attachment=1" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-subtle)] p-3 text-xs"><FileText className="h-4 w-4 shrink-0"/><span className="min-w-0"><span className="block break-all font-medium">{draft.attachment.filename}</span><span className="mt-1 block text-[var(--crm-muted)]">Attached · {Math.ceil(draft.attachment.size / 1024)} KB · Preview PDF</span></span></a>
             {!draft.configured ? <p role="status" className="text-xs text-[var(--crm-muted)]">Proposal email sending is not configured yet. Configure the client proposal email template to enable sending.</p> : null}
             <div className="flex justify-end gap-2"><button type="button" onClick={onClose} disabled={sending} className="crm-button-secondary">Cancel</button><button disabled={sending || !draft.configured || !to || !subject.trim() || !message.trim()} className="crm-button-primary">{sending ? <Loader2 className="h-3.5 w-3.5 animate-spin"/> : <Send className="h-3.5 w-3.5"/>}{sending ? "Sending…" : "Send proposal"}</button></div>
         </form>}

@@ -32,8 +32,6 @@ export function clientProposalEmailBody(templateBody?: string) {
         `2. ${CLIENT_PROPOSAL_LINKS["2"]}`,
         `3. ${CLIENT_PROPOSAL_LINKS["3"]}`,
         "",
-        "Our client proposal is attached for your review.",
-        "",
         "Have a project in mind? Share your requirement and we will explore the best way to bring it to life.",
         "",
         "Adamant Technologies",

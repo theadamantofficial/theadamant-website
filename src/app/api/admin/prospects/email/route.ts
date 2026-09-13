@@ -2,8 +2,8 @@ import {NextRequest, NextResponse} from "next/server";
 import {canAccessSales, canViewProspectDatabase} from "@/features/crm/permissions";
 import {crmErrorResponse, CrmApiError, getCrmRequestContext} from "@/lib/crm/auth";
 import {getProspectById} from "@/lib/crm/prospect-database";
-import {clientProposalEmailBody, getProposalRecipients, PROPOSAL_PDF_FILENAME} from "@/lib/crm/proposal-email";
-import {getProposalEmailConfig, readProposalPdf, sendProposalEmail} from "@/lib/crm/proposal-email-server";
+import {clientProposalEmailBody, getProposalRecipients} from "@/lib/crm/proposal-email";
+import {getProposalEmailConfig, sendProposalEmail} from "@/lib/crm/proposal-email-server";
 import {getCrmServiceClient} from "@/lib/crm/server-client";
 import {getApprovedWhatsAppTemplates} from "@/lib/crm/whatsapp-cloud";
 import {isClientProposalTemplate} from "@/lib/crm/whatsapp-proposal";
@@ -22,14 +22,6 @@ async function getProposalContext(request: NextRequest) {
 export async function GET(request: NextRequest) {
     try {
         await getProposalContext(request);
-        const pdf = await readProposalPdf();
-        if (request.nextUrl.searchParams.get("attachment") === "1") {
-            return new NextResponse(new Uint8Array(pdf), {headers: {
-                "Content-Type": "application/pdf",
-                "Content-Disposition": `inline; filename="${PROPOSAL_PDF_FILENAME}"`,
-                "Cache-Control": "private, no-store",
-            }});
-        }
         let templateBody = "";
         if (process.env.WHATSAPP_ACCESS_TOKEN?.trim() && process.env.WHATSAPP_BUSINESS_ACCOUNT_ID?.trim()) {
             try {
@@ -45,7 +37,6 @@ export async function GET(request: NextRequest) {
             subject: "Client Proposal | Adamant Technologies",
             message: clientProposalEmailBody(templateBody),
             draftSource: templateBody ? "Client proposal template" : "Draft from proposal PDF",
-            attachment: {filename: PROPOSAL_PDF_FILENAME, size: pdf.length},
         });
     } catch (error) {
         const {message, status} = crmErrorResponse(error);
@@ -75,7 +66,6 @@ export async function POST(request: NextRequest) {
         }
         const config = getProposalEmailConfig();
         if (!config.configured) throw new CrmApiError("Configure the client proposal EmailJS template before sending.", 503);
-        const pdf = await readProposalPdf();
         const service = getCrmServiceClient();
         const logged = await service.from("prospect_outreach_events").insert({
             prospect_source: "usa_leads_sqlite",
@@ -85,14 +75,14 @@ export async function POST(request: NextRequest) {
             destination: to,
             message_body: message,
             status: "initiated",
-            metadata: {subject, attachment_name: PROPOSAL_PDF_FILENAME, attachment_size: pdf.length,
+            metadata: {subject,
                 provider: "emailjs", template_id: config.templateId,
                 contact_name: prospect.name || prospect.contact_person,
                 company_name: prospect.company_name || prospect.business_name},
         }).select("id").single();
         if (logged.error || !logged.data) throw new CrmApiError("The email outreach could not be logged. Apply the email outreach migration before sending.", 503);
         outreachId = String(logged.data.id);
-        await sendProposalEmail({to, name: prospect.name || prospect.contact_person || "Client", subject, message, pdf});
+        await sendProposalEmail({to, name: prospect.name || prospect.contact_person || "Client", subject, message});
         accepted = true;
         let outreachLogged = false;
         try {

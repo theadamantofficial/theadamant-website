@@ -1,12 +1,12 @@
 import {NextRequest} from "next/server";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 
-const mocks = vi.hoisted(() => ({context: vi.fn(), service: vi.fn(), prospect: vi.fn(), send: vi.fn(), pdf: vi.fn(), templates: vi.fn()}));
+const mocks = vi.hoisted(() => ({context: vi.fn(), service: vi.fn(), prospect: vi.fn(), send: vi.fn(), templates: vi.fn()}));
 vi.mock("@/lib/crm/auth", async () => ({...await import("@/lib/crm/errors"), getCrmRequestContext: mocks.context}));
 vi.mock("@/lib/crm/server-client", () => ({getCrmServiceClient: mocks.service}));
 vi.mock("@/lib/crm/prospect-database", () => ({getProspectById: mocks.prospect}));
 vi.mock("@/lib/crm/proposal-email-server", async (actual) => ({
-    ...await actual<typeof import("@/lib/crm/proposal-email-server")>(), readProposalPdf: mocks.pdf, sendProposalEmail: mocks.send,
+    ...await actual<typeof import("@/lib/crm/proposal-email-server")>(), sendProposalEmail: mocks.send,
 }));
 vi.mock("@/lib/crm/whatsapp-cloud", () => ({getApprovedWhatsAppTemplates: mocks.templates}));
 import {GET, POST} from "@/app/api/admin/prospects/email/route";
@@ -16,7 +16,6 @@ const update = vi.fn();
 let actor: {id: string; role: string; canAccessProspectDatabase: boolean};
 let auditError: boolean;
 let statusError: boolean;
-const pdf = Buffer.from("%PDF-1.7\nproposal");
 
 beforeEach(() => {
     vi.clearAllMocks();
@@ -28,7 +27,6 @@ beforeEach(() => {
     auditError = false;
     statusError = false;
     mocks.context.mockImplementation(async () => ({client: {source: "authenticated"}, actor}));
-    mocks.pdf.mockResolvedValue(pdf);
     mocks.send.mockResolvedValue(undefined);
     mocks.prospect.mockResolvedValue({record_id: 7, corporate_email: "client@example.com (OK)", email: "personal@example.com", name: "Client"});
     mocks.templates.mockResolvedValue([{name: "client_proposal", language: "en_US", components: [{type: "BODY", text: "Our work {{1}}, {{2}}, {{3}}. Proposal attached."}]}]);
@@ -43,28 +41,18 @@ const request = (payload?: unknown, suffix = "") => new NextRequest(`http://loca
 const payload = {recordId: 7, to: "client@example.com", subject: "Client proposal", message: "Our proposal is attached."};
 
 describe("authenticated client proposal email API", () => {
-    it("loads the exact approved template wording with the supplied links and pre-attached PDF metadata", async () => {
+    it("loads the approved template wording with the supplied links", async () => {
         const response = await GET(request());
         expect(response.status).toBe(200);
         expect(await response.json()).toMatchObject({configured: true, draftSource: "Client proposal template",
-            message: "Our work https://aetherseo.com/en, https://prep-vista-five.vercel.app/, https://prep-vista-five.vercel.app/. Proposal attached.",
-            attachment: {filename: "Adamant_Technologies_Client_Proposal.pdf", size: pdf.length}});
+            message: "Our work https://aetherseo.com/en, https://prep-vista-five.vercel.app/, https://prep-vista-five.vercel.app/. Proposal attached."});
         expect(mocks.send).not.toHaveBeenCalled();
     });
 
-    it("labels its PDF-based draft when the live template cannot be loaded", async () => {
+    it("labels its fallback draft when the live template cannot be loaded", async () => {
         mocks.templates.mockRejectedValue(new Error("Meta unavailable"));
         const response = await GET(request());
-        expect(await response.json()).toMatchObject({draftSource: "Draft from proposal PDF", message: expect.stringContaining("Our client proposal is attached")});
-    });
-
-    it("serves a private PDF preview only after checking database and CRM access", async () => {
-        const response = await GET(request(undefined, "?attachment=1"));
-        expect(response.headers.get("Content-Type")).toBe("application/pdf");
-        expect(response.headers.get("Cache-Control")).toBe("private, no-store");
-        expect(Buffer.from(await response.arrayBuffer())).toEqual(pdf);
-        actor.role = "employee";
-        expect((await GET(request(undefined, "?attachment=1"))).status).toBe(403);
+        expect(await response.json()).toMatchObject({draftSource: "Draft from proposal PDF", message: expect.not.stringContaining("attached")});
     });
 
     it("rejects an ungranted employee before contacting the source, audit or provider", async () => {
@@ -75,11 +63,11 @@ describe("authenticated client proposal email API", () => {
         expect(mocks.send).not.toHaveBeenCalled();
     });
 
-    it("sends to a verified corporate recipient with the actual PDF and records outreach", async () => {
+    it("sends to a verified corporate recipient and records outreach", async () => {
         const response = await POST(request(payload));
         expect(response.status).toBe(201);
         expect(await response.json()).toEqual({sent: true, outreachLogged: true});
-        expect(mocks.send).toHaveBeenCalledWith({to: payload.to, name: "Client", subject: payload.subject, message: payload.message, pdf});
+        expect(mocks.send).toHaveBeenCalledWith({to: payload.to, name: "Client", subject: payload.subject, message: payload.message});
         expect(insert).toHaveBeenCalledWith("prospect_outreach_events", expect.objectContaining({channel: "email", prospect_record_id: 7, destination: payload.to, status: "initiated"}));
         expect(update).toHaveBeenCalledWith("prospect_outreach_events", {status: "sent"});
     });
