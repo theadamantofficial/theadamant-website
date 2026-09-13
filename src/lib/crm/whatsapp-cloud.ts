@@ -138,6 +138,10 @@ export function parseWhatsAppWebhook(payload: unknown): WhatsAppWebhookEvent[] {
                     const errors = Array.isArray(item.errors) ? item.errors : [];
                     const firstError = isRecord(errors[0]) ? errors[0] : {};
                     const errorData = isRecord(firstError.error_data) ? firstError.error_data : {};
+                    const details = text(errorData.details);
+                    const title = text(firstError.title) || text(firstError.message);
+                    const sameDescription = details.replace(/[.!]+$/, "").toLowerCase() === title.replace(/[.!]+$/, "").toLowerCase();
+                    const errorDescription = details && title && !sameDescription ? `${title}: ${details}` : details || title;
                     events.push({
                         kind: "status",
                         messageId,
@@ -145,7 +149,7 @@ export function parseWhatsAppWebhook(payload: unknown): WhatsAppWebhookEvent[] {
                         timestamp: timestamp(text(item.timestamp)),
                         recipientId: digits(text(item.recipient_id)) || null,
                         errorCode: text(firstError.code) || null,
-                        errorMessage: truncate(text(errorData.details) || text(firstError.title), 500) || null,
+                        errorMessage: truncate(errorDescription, 500) || null,
                     });
                 }
             }

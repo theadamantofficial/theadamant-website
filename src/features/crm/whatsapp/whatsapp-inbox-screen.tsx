@@ -4,7 +4,7 @@ import {useCallback, useEffect, useMemo, useState} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import {AlertCircle, ArrowLeft, AudioLines, BadgeIndianRupee, CalendarPlus, Check, CheckCheck, ChevronDown, Clock3, Download, FileText, Languages, Loader2, MapPin, Phone, PhoneIncoming, RefreshCw, Search, Send, SmilePlus, UserRound} from "lucide-react";
+import {ArrowLeft, AudioLines, BadgeIndianRupee, CalendarPlus, ChevronDown, Clock3, Download, FileText, Languages, Loader2, MapPin, Phone, PhoneIncoming, RefreshCw, Search, Send, SmilePlus, UserRound} from "lucide-react";
 import {useAdminActor} from "@/components/admin/admin-shell";
 import {DataError, EmptyState, PageHeader, Skeleton, UserAvatar} from "@/components/admin/admin-ui";
 import {crmFetch} from "@/features/crm/api";
@@ -14,6 +14,7 @@ import {formatCrmDate} from "@/features/crm/format";
 import {WhatsAppPaymentModal} from "@/features/crm/whatsapp/whatsapp-payment-modal";
 import {CLIENT_PROPOSAL_LINKS, isClientProposalTemplate} from "@/lib/crm/whatsapp-proposal";
 import {uploadProposalPdf} from "@/features/crm/whatsapp/upload-proposal-pdf";
+import {WhatsAppMessageStatus} from "@/features/crm/whatsapp/message-status";
 
 type TeamMember = {id: string; full_name: string; email: string; active: boolean};
 type WhatsAppTemplate = {
@@ -299,8 +300,8 @@ function MessageBubble({message, reactions, reacting, onReact}: {message: WhatsA
     return <div className={`group flex ${outbound ? "justify-end" : "justify-start"}`}><div className={`relative max-w-[88%] rounded-2xl px-3.5 py-2.5 shadow-[0_2px_8px_rgba(15,23,42,.06)] sm:max-w-[72%] ${outbound ? "rounded-br-sm bg-[#0d5c63] text-white crm-dark:bg-[#116b72]" : "rounded-bl-sm border border-[#d7dedb] bg-white text-[#172321] crm-dark:border-white/10 crm-dark:bg-[#24312f] crm-dark:text-white"}`}>
         <MessageContent message={message}/>
         {translation && (outbound ? translation.targetLanguage : String(translation.detectedLanguageCode || "") !== "en") ? <details className={`mt-1.5 text-[9px] ${outbound ? "text-white/70" : "text-[#61716d] crm-dark:text-white/55"}`}><summary className="cursor-pointer select-none">{outbound ? `Sent in ${String(translation.targetLanguage || "recipient language")}` : `Translated from ${String(translation.detectedLanguage || "another language")}`}</summary><p className="mt-1 whitespace-pre-wrap rounded bg-black/5 p-1.5">{outbound ? String(translation.translatedText || "") : message.body}</p></details> : null}
-        <span className={`mt-1.5 flex items-center justify-end gap-1 text-[9px] ${outbound ? "text-white/70" : "text-[#61716d] crm-dark:text-white/55"}`}>{formatCrmDate(message.message_timestamp, true)}{outbound ? <MessageStatus status={message.status}/> : null}</span>
-        {message.status === "failed" ? <p className={`mt-1 text-[9px] ${outbound ? "text-rose-100" : "text-rose-600"}`}>{message.error_message || "Delivery failed"}</p> : null}
+        <span className={`mt-1.5 flex flex-wrap items-center justify-end gap-1 text-[9px] ${outbound ? "text-white/70" : "text-[#61716d] crm-dark:text-white/55"}`}>{formatCrmDate(message.message_timestamp, true)}{outbound ? <WhatsAppMessageStatus status={message.status}/> : null}</span>
+        {message.status === "failed" ? <div className={`mt-2 rounded-lg border border-current/20 bg-black/10 p-2 text-[10px] ${outbound ? "text-rose-100" : "text-rose-600"}`}><p>{message.error_message || "Delivery failed"}</p>{message.error_code ? <p className="mt-1 font-semibold">Meta error: {message.error_code}</p> : null}<p className="mt-1 opacity-80">This message was not delivered.</p></div> : null}
         <div className={`absolute -bottom-3 ${outbound ? "right-2" : "left-2"} flex items-center gap-1`}>{reactions.map((emoji, index) => <span key={`${emoji}-${index}`} className="rounded-full border border-[var(--crm-border)] bg-[var(--crm-surface)] px-1.5 py-0.5 text-xs shadow-sm">{emoji}</span>)}<span className="relative"><button type="button" disabled={reacting || !message.whatsapp_message_id} aria-label="React to message" className="flex h-6 w-6 items-center justify-center rounded-full border border-[var(--crm-border)] bg-[var(--crm-surface)] text-[var(--crm-muted)] opacity-100 shadow-sm sm:opacity-0 sm:group-hover:opacity-100"><SmilePlus className="h-3.5 w-3.5"/></button><span className="absolute bottom-7 left-0 z-10 hidden gap-0.5 rounded-full border border-[var(--crm-border)] bg-[var(--crm-surface)] p-1 shadow-xl focus-within:flex hover:flex">{["👍", "❤️", "😂", "😮", "😢", "🙏"].map((emoji) => <button key={emoji} type="button" onClick={() => onReact(emoji)} className="flex h-7 w-7 items-center justify-center rounded-full text-base hover:bg-[var(--crm-subtle)]">{emoji}</button>)}</span></span></div>
     </div></div>;
 }
@@ -330,13 +331,6 @@ function MessageContent({message}: {message: WhatsAppMessage}) {
         {location && location.latitude && location.longitude ? <a href={`https://www.google.com/maps?q=${encodeURIComponent(`${location.latitude},${location.longitude}`)}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-lg border border-current/15 px-3 py-2 text-[11px] font-semibold"><MapPin className="h-4 w-4"/>Open shared location</a> : null}
         {visibleBody ? <p className="whitespace-pre-wrap break-words text-[13px] leading-5">{visibleBody === "[Unsupported message]" ? "WhatsApp did not provide the content of this older message." : visibleBody}</p> : null}
     </div>;
-}
-
-function MessageStatus({status}: {status: WhatsAppMessage["status"]}) {
-    if (status === "queued") return <Clock3 aria-label="Queued" className="h-3 w-3"/>;
-    if (status === "failed") return <AlertCircle aria-label="Failed" className="h-3 w-3"/>;
-    if (status === "delivered" || status === "read") return <CheckCheck aria-label={status} className={`h-3 w-3 ${status === "read" ? "text-sky-200" : ""}`}/>;
-    return <Check aria-label="Sent" className="h-3 w-3"/>;
 }
 
 export function WhatsAppComposer({conversation, translation, sending, onSend, initialBody = "", preferClientProposal = false}: {conversation: WhatsAppConversation; translation: TranslationDirection | null; sending: boolean; onSend: (payload: OutgoingMessage) => Promise<boolean>; initialBody?: string; preferClientProposal?: boolean}) {

@@ -22,6 +22,23 @@ afterEach(() => {
 });
 
 describe("WhatsApp Cloud API webhook", () => {
+    it("keeps the Meta failure code, title and details so delivery failures can be diagnosed", () => {
+        const events = parseWhatsAppWebhook({entry: [{changes: [{value: {statuses: [{
+            id: "wamid.failed", status: "failed", timestamp: "1789310874",
+            errors: [{code: 131026, title: "Receiver is incapable of receiving this message", error_data: {details: "Message Undeliverable."}}],
+        }]}}]}]});
+        expect(events[0]).toMatchObject({status: "failed", errorCode: "131026",
+            errorMessage: "Receiver is incapable of receiving this message: Message Undeliverable."});
+    });
+
+    it("avoids repeating the same Meta error description", () => {
+        const events = parseWhatsAppWebhook({entry: [{changes: [{value: {statuses: [{
+            id: "wamid.failed", status: "failed", timestamp: "1789310874",
+            errors: [{code: 131026, title: "Message undeliverable", error_data: {details: "Message Undeliverable."}}],
+        }]}}]}]});
+        expect(events[0]).toMatchObject({errorMessage: "Message Undeliverable."});
+    });
+
     it("completes Meta's verification challenge only for the configured token", () => {
         const params = new URLSearchParams({
             "hub.mode": "subscribe",
