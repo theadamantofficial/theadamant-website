@@ -180,6 +180,13 @@ positional variables 1, 2 and 3 are editable links, initially set to
 Other required variables and a required PDF header must be filled before sending.
 If the template is unavailable, the user chooses another approved template.
 
+Proposal PDFs up to 4 MB upload directly through the CRM to Meta. PDFs above
+4 MB and up to the existing 10 MB limit use a signed Supabase Storage upload
+with `PUT`, then the CRM uploads the stored PDF to Meta. For that larger-file
+path, apply `supabase/migrations/20260911140000_add_whatsapp_document_upload_storage.sql`
+to create/configure the private `whatsapp-template-documents` bucket. The
+existing `whatsapp_template_documents` table stores reusable Meta media IDs.
+
 Local development can continue using the mounted SQLite source with
 `PROSPECT_DATABASE_MODE=sqlite`. For local testing against Supabase, use
 `PROSPECT_DATABASE_MODE=supabase`.

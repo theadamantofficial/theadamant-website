@@ -13,6 +13,7 @@ import type {WhatsAppConversation, WhatsAppMessage} from "@/features/crm/types";
 import {formatCrmDate} from "@/features/crm/format";
 import {WhatsAppPaymentModal} from "@/features/crm/whatsapp/whatsapp-payment-modal";
 import {CLIENT_PROPOSAL_LINKS, isClientProposalTemplate} from "@/lib/crm/whatsapp-proposal";
+import {uploadProposalPdf} from "@/features/crm/whatsapp/upload-proposal-pdf";
 
 type TeamMember = {id: string; full_name: string; email: string; active: boolean};
 type WhatsAppTemplate = {
@@ -437,20 +438,9 @@ function PdfAttachment({value, documents, busy, onChange, onBusy}: {value: Whats
             if (selected) onChange(selected);
         }}><option value="">{documents.length ? "Choose a previously uploaded PDF…" : "No previously uploaded PDFs"}</option>{documents.map((item) => <option key={item.mediaId} value={item.mediaId}>{item.filename}</option>)}</select><label className="crm-button-secondary cursor-pointer"><FileText className="h-3.5 w-3.5"/>{busy ? "Uploading…" : "Upload PDF"}<input type="file" accept="application/pdf,.pdf" className="sr-only" disabled={busy} onChange={async (event) => {
             const file = event.target.files?.[0]; event.target.value = ""; if (!file) return;
-            if (file.type !== "application/pdf" || file.size > 10 * 1024 * 1024) {toast.error("Choose a PDF up to 10 MB."); return;}
             onBusy(true);
             try {
-                const prepared = await crmFetch<{path: string; signedUrl: string}>("/api/admin/whatsapp/templates/media", {
-                    method: "POST", body: JSON.stringify({action: "prepare", filename: file.name}),
-                });
-                const uploadBody = new FormData();
-                uploadBody.set("cacheControl", "3600");
-                uploadBody.set("", file);
-                const storageResponse = await fetch(prepared.signedUrl, {method: "POST", body: uploadBody});
-                if (!storageResponse.ok) throw new Error("The PDF could not be uploaded to storage.");
-                const uploaded = await crmFetch<{mediaId: string; filename: string}>("/api/admin/whatsapp/templates/media", {
-                    method: "POST", body: JSON.stringify({action: "complete", path: prepared.path, filename: file.name}),
-                });
+                const uploaded = await uploadProposalPdf(file);
                 onChange(uploaded);
             } catch (error) {toast.error(error instanceof Error ? error.message : "PDF upload failed.");}
             finally {onBusy(false);}

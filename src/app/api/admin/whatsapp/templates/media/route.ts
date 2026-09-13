@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
                 if (!filename.toLowerCase().endsWith(".pdf")) throw new CrmApiError("Choose a PDF file.");
                 const path = `${actor.id}/${Date.now()}-${randomUUID()}.pdf`;
                 const signed = await serviceClient.storage.from("whatsapp-template-documents").createSignedUploadUrl(path);
-                if (signed.error || !signed.data) throw new CrmApiError("Could not prepare PDF upload.", 502);
+                if (signed.error || !signed.data) throw new CrmApiError("Could not prepare PDF storage upload. Check that the whatsapp-template-documents bucket exists by applying the document-storage migration.", 502);
                 return NextResponse.json({path, signedUrl: signed.data.signedUrl});
             }
             if (payload.action === "complete" && typeof payload.path === "string" && typeof payload.filename === "string") {
