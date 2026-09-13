@@ -6,7 +6,8 @@ export function normalizeWhatsAppPhone(value: string, country?: string | null) {
     let digits = beforeExtension.replace(/\D/g, "");
     if (digits.startsWith("00")) digits = digits.slice(2);
 
-    const likelyUsNumber = !country || /^(us|usa|united states|united states of america)$/i.test(country.trim());
+    const countryLabel = country?.trim() || "";
+    const likelyUsNumber = !countryLabel || /^(us|usa|united states|united states of america)$/i.test(countryLabel);
     if (likelyUsNumber && digits.length === 10) digits = `1${digits}`;
     if (digits.length < 8 || digits.length > 15) {
         throw new CrmApiError("This lead does not have a valid WhatsApp phone number.");

@@ -11,6 +11,15 @@ describe("CRM WhatsApp preparation", () => {
         expect(() => normalizeWhatsAppPhone("N/A", "USA")).toThrow("valid WhatsApp phone");
     });
 
+    it.each([null, undefined, "", "   ", " USA ", " United States "])("adds the USA country code for country label %s", (country) => {
+        expect(normalizeWhatsAppPhone("(312) 612-0082", country)).toBe("13126120082");
+    });
+
+    it("preserves existing country codes and removes extensions", () => {
+        expect(normalizeWhatsAppPhone("+1 (312) 612-0082 ext. 123", "USA")).toBe("13126120082");
+        expect(normalizeWhatsAppPhone("0013126120082", "USA")).toBe("13126120082");
+    });
+
     it("creates an encoded click-to-chat URL", () => {
         expect(createWhatsAppUrl("13126120082", "Hello & welcome"))
             .toBe("https://wa.me/13126120082?text=Hello%20%26%20welcome");

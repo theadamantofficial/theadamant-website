@@ -2,11 +2,14 @@
 
 import {FormEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import toast from "react-hot-toast";
-import {Building2, ChevronLeft, ChevronRight, Database, MapPin, MessageCircle, Phone, UserRound} from "lucide-react";
+import {Building2, ChevronLeft, ChevronRight, Database, Mail, MapPin, MessageCircle, Phone, UserRound} from "lucide-react";
 import {DataError, EmptyState, Modal, PageHeader, SearchInput, Skeleton} from "@/components/admin/admin-ui";
 import {crmFetch} from "@/features/crm/api";
 import type {Prospect, WhatsAppConversation} from "@/features/crm/types";
 import {WhatsAppComposer, type OutgoingMessage} from "@/features/crm/whatsapp/whatsapp-inbox-screen";
+import {normalizeWhatsAppPhone} from "@/lib/crm/whatsapp";
+import {getProposalRecipients} from "@/lib/crm/proposal-email";
+import {ProposalEmailModal} from "@/features/crm/prospects/proposal-email-modal";
 
 type ProspectPage = {
     whatsappStatusAvailable: boolean;
@@ -29,6 +32,7 @@ export function ProspectsScreen() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [selected, setSelected] = useState<Prospect | null>(null);
+    const [selectedEmail, setSelectedEmail] = useState<Prospect | null>(null);
 
     const currentAfter = cursorStack.at(-1) || 0;
     const load = useCallback(async (after: number, requestedFilters: Filters) => {
@@ -108,21 +112,25 @@ export function ProspectsScreen() {
             </form>
 
             {loading ? <div className="space-y-4 p-5">{Array.from({length: 9}).map((_, index) => <Skeleton key={index} className="h-12 w-full"/>)}</div> : prospects.length ? <div className="overflow-x-auto">
-                <table className="w-full min-w-[1050px] text-left">
-                    <thead><tr className="border-b border-[var(--crm-border)] bg-[var(--crm-subtle)] text-[10px] uppercase tracking-[.09em] text-[var(--crm-muted)]"><th className="px-5 py-2.5 font-medium">Contact</th><th className="px-3 py-2.5 font-medium">Company</th><th className="px-3 py-2.5 font-medium">Phone</th><th className="px-3 py-2.5 font-medium">Email</th><th className="px-3 py-2.5 font-medium">Location</th><th className="px-3 py-2.5 font-medium">Industry</th><th className="px-5 py-2.5 font-medium">Action</th></tr></thead>
+                <table className="w-full min-w-[1250px] text-left">
+                    <thead><tr className="border-b border-[var(--crm-border)] bg-[var(--crm-subtle)] text-[10px] uppercase tracking-[.09em] text-[var(--crm-muted)]"><th className="px-5 py-2.5 font-medium">Contact</th><th className="px-3 py-2.5 font-medium">Company</th><th className="px-3 py-2.5 font-medium">Phone</th><th className="px-3 py-2.5 font-medium">Email</th><th className="px-3 py-2.5 font-medium">Corporate email</th><th className="px-3 py-2.5 font-medium">Location</th><th className="px-3 py-2.5 font-medium">Industry</th><th className="px-5 py-2.5 font-medium">Action</th></tr></thead>
                     <tbody className="divide-y divide-[var(--crm-border)]">{prospects.map((prospect) => {
                         const name = prospect.name || prospect.contact_person || joinName(prospect) || "Unnamed contact";
                         const company = prospect.company_name || prospect.business_name || "—";
                         const phone = prospect.phone || prospect.company_phone;
-                        const email = cleanEmail(prospect.email || prospect.corporate_email || prospect.company_email);
+                        const displayPhone = internationalProspectPhone(prospect);
+                        const email = cleanEmail(prospect.email);
+                        const corporateEmails = getProposalRecipients({...prospect, email: null});
+                        const emailRecipients = getProposalRecipients(prospect);
                         return <tr key={prospect.record_id} className="text-xs transition hover:bg-[var(--crm-subtle)]">
                             <td className="px-5 py-3"><span className="flex items-start gap-2.5"><span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--crm-subtle)]"><UserRound className="h-3.5 w-3.5 text-[var(--crm-muted)]"/></span><span><span className="block max-w-64 font-semibold">{name}</span>{prospect.job_title ? <span className="mt-0.5 block text-[10px] text-[var(--crm-muted)]">{prospect.job_title}</span> : null}</span></span></td>
                             <td className="max-w-56 px-3 py-3"><span className="flex items-start gap-1.5"><Building2 className="mt-0.5 h-3 w-3 shrink-0 text-[var(--crm-muted)]"/><span className="line-clamp-2">{company}</span></span></td>
-                            <td className="px-3 py-3">{phone ? <a href={`tel:${phone}`} className="inline-flex items-center gap-1.5 hover:text-[#0d5c63]"><Phone className="h-3 w-3"/>{phone}</a> : <span className="text-[var(--crm-muted)]">—</span>}</td>
+                            <td className="px-3 py-3">{phone ? <a href={`tel:${displayPhone}`} title={`Source number: ${phone}`} className="inline-flex items-center gap-1.5 hover:text-[#0d5c63]"><Phone className="h-3 w-3"/>{displayPhone}</a> : <span className="text-[var(--crm-muted)]">—</span>}</td>
                             <td className="max-w-56 px-3 py-3">{email ? <a href={`mailto:${email}`} className="block truncate hover:text-[#0d5c63]">{email}</a> : <span className="text-[var(--crm-muted)]">—</span>}</td>
+                            <td className="max-w-64 px-3 py-3">{corporateEmails.length ? <div className="space-y-1.5">{corporateEmails.map((recipient) => <div key={recipient.email}><a href={`mailto:${recipient.email}`} title={recipient.email} className="block truncate hover:text-[#0d5c63]">{recipient.email}</a>{recipient.label === "Company email" ? <span className="text-[10px] text-[var(--crm-muted)]">Company email</span> : null}</div>)}</div> : <span className="text-[var(--crm-muted)]">—</span>}</td>
                             <td className="px-3 py-3"><span className="flex items-start gap-1.5"><MapPin className="mt-0.5 h-3 w-3 shrink-0 text-[var(--crm-muted)]"/><span>{[prospect.city, prospect.state, prospect.country].filter(Boolean).join(", ") || prospect.location || "—"}</span></span></td>
                             <td className="px-3 py-3 text-[var(--crm-muted)]">{prospect.industry || prospect.sub_industry || "—"}</td>
-                            <td className="px-5 py-3"><div className="flex flex-col items-start gap-1.5"><button disabled={!phone} onClick={() => setSelected(prospect)} className="crm-button-secondary whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-50"><MessageCircle className="h-3.5 w-3.5 text-emerald-600"/> WhatsApp</button>{prospect.whatsapp?.initialMessageSent ? <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] font-medium text-emerald-600 crm-dark:text-emerald-400">Initial message sent</span> : prospect.whatsapp?.conversationId ? <span className="rounded-full bg-amber-500/10 px-2 py-1 text-[10px] font-medium text-amber-700 crm-dark:text-amber-300">In CRM · not sent</span> : null}</div></td>
+                            <td className="px-5 py-3"><div className="flex flex-col items-start gap-1.5"><div className="flex gap-2"><button disabled={!phone} onClick={() => setSelected(prospect)} className="crm-button-secondary whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-50"><MessageCircle className="h-3.5 w-3.5 text-emerald-600"/> WhatsApp</button>{emailRecipients.length ? <a href={`mailto:${emailRecipients[0].email}`} title={`Open email app for ${emailRecipients[0].email}`} className="crm-button-secondary whitespace-nowrap"><Mail className="h-3.5 w-3.5"/> Email</a> : <button disabled className="crm-button-secondary cursor-not-allowed whitespace-nowrap opacity-50"><Mail className="h-3.5 w-3.5"/> Email</button>}</div>{emailRecipients.length ? <button onClick={() => setSelectedEmail(prospect)} className="text-[10px] font-medium text-[var(--crm-muted)] hover:text-[var(--crm-text)] hover:underline">Send proposal via CRM</button> : null}{prospect.whatsapp?.initialMessageSent ? <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] font-medium text-emerald-600 crm-dark:text-emerald-400">Initial message sent</span> : prospect.whatsapp?.conversationId ? <span className="rounded-full bg-amber-500/10 px-2 py-1 text-[10px] font-medium text-amber-700 crm-dark:text-amber-300">In CRM · not sent</span> : null}</div></td>
                         </tr>;
                     })}</tbody>
                 </table>
@@ -132,6 +140,7 @@ export function ProspectsScreen() {
         </section>
         {!whatsappStatusAvailable ? <p role="status" className="text-xs text-[var(--crm-muted)]">WhatsApp contact status is unavailable. Apply the latest contact-status migration and check the WhatsApp configuration.</p> : null}
         {selected ? <WhatsAppModal prospect={selected} onClose={() => setSelected(null)} onSent={() => {setSelected(null); void load(currentAfter, activeFilters);}}/> : null}
+        {selectedEmail ? <ProposalEmailModal key={selectedEmail.record_id} prospect={selectedEmail} onClose={() => setSelectedEmail(null)}/> : null}
     </div>;
 }
 
@@ -175,6 +184,7 @@ function WhatsAppModal({prospect, onClose, onSent}: {prospect: Prospect; onClose
 
     return <Modal title="Send WhatsApp from CRM" description="Send from your connected WhatsApp Business account. Messages and delivery status appear in the CRM inbox." onClose={() => {if (!sendingRef.current) onClose();}}>
         <div className="rounded-lg border border-[var(--crm-border)] bg-[var(--crm-subtle)] p-3 text-xs"><p className="font-semibold">{prospect.name || prospect.contact_person || "Lead"}</p><p className="mt-1 text-[var(--crm-muted)]">{prospect.phone || prospect.company_phone}</p></div>
+        {conversation ? <p className="mt-2 text-xs text-[var(--crm-muted)]">Sending to <span className="font-semibold text-[var(--crm-text)]">+{conversation.wa_id}</span> from your connected WhatsApp Business account.</p> : null}
         <div className="mt-4">{error ? <p role="alert" className="text-sm text-red-500">{error}</p> : conversation ? <WhatsAppComposer key={conversation.id} conversation={conversation} translation={null} sending={sending} onSend={sendMessage} initialBody={message} preferClientProposal/> : <p role="status" className="py-4 text-xs text-[var(--crm-muted)]">Preparing CRM conversation…</p>}</div>
         <div className="mt-4 flex justify-end"><button disabled={sending} onClick={onClose} className="crm-button-secondary">Cancel</button></div>
     </Modal>;
@@ -185,5 +195,10 @@ function FilterInput({label, value, placeholder, onChange}: {label: string; valu
 }
 
 function joinName(prospect: Prospect) { return [prospect.first_name, prospect.last_name].filter(Boolean).join(" "); }
+function internationalProspectPhone(prospect: Prospect) {
+    const raw = prospect.phone?.trim() || prospect.company_phone?.trim() || "";
+    try { return `+${normalizeWhatsAppPhone(raw, prospect.country)}`; }
+    catch { return raw; }
+}
 function cleanEmail(value?: string | null) { return value?.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0] || null; }
 function firstNameFromDisplay(value?: string | null) { return value?.replace(/^(mr|mrs|ms|miss|dr)\.?\s+/i, "").split(/[\s,(]/)[0] || ""; }

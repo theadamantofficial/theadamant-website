@@ -79,6 +79,8 @@ email or Discord notification. Website references are deduplicated through `lead
 
 To import the purchased records into the separate production Supabase table
 `whatsapp-lead-db`, follow [the production setup steps](docs/import-whatsapp-lead-db.md).
+To send client proposals by email with the supplied PDF, follow
+[the EmailJS proposal setup](docs/client-proposal-email.md).
 The importer defaults to a local preview and supports batched, resumable writes.
 Use `PROSPECT_DATABASE_MODE=supabase` in production and deploy the updated reader.
 
@@ -88,9 +90,9 @@ and `USA_LEADS_DATABASE_PATH` pointing to the mounted source. More than ten mill
 records (about 5.3 GB in SQLite) are kept outside Git and the operational CRM tables.
 
 Super admins and admins always have access. Either role can grant or remove access for an employee in the Team screen.
-That permission is enforced in both the page and API. Initiating a WhatsApp message opens the standard `wa.me` flow
-and writes an auditable `prospect_outreach_events` record. The table already includes CRM lead and provider message
-fields so a future WhatsApp Business API integration can update delivery status without replacing this workflow.
+That permission is enforced in both the page and API. WhatsApp actions send through the connected Business API
+and store messages in the CRM inbox. The Email action sends a reviewed client proposal with its PDF attachment
+through the existing EmailJS service. Both channels write auditable `prospect_outreach_events` records.
 
 Apply the latest Supabase migration before using this feature:
 
