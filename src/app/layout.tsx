@@ -9,6 +9,7 @@ import {DEFAULT_SITE_LOCALE, isSiteLocale, localeToHtmlLang, SiteLocale} from "@
 import {getSiteMetadataBase} from "@/lib/site-url";
 import {buildOpenGraphMetadata, buildTwitterMetadata} from "@/lib/social-metadata";
 import {MotionProvider} from "@/components/providers/motion-provider";
+import SiteBackgroundMusic from "@/components/ui/site-background-music";
 
 export const metadata: Metadata = {
     title: {
@@ -76,6 +77,7 @@ export default async function RootLayout({children}: Readonly<{
                 containerClassName="mt-14"/>
 
             {children}
+            <SiteBackgroundMusic src={process.env.NEXT_PUBLIC_BACKGROUND_MUSIC_URL || "/audio/here-comes-the-sun.mp3"} title={process.env.NEXT_PUBLIC_BACKGROUND_MUSIC_TITLE || "The Beatles · Here Comes the Sun (2019 Mix)"}/>
         </MotionProvider>
         </body>
         </html>

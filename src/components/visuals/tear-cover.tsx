@@ -4,6 +4,7 @@ import {useCallback, useEffect, useRef, useState} from "react";
 import * as THREE from "three";
 import {TearableCloth} from "./tearable-cloth";
 import {useWebGLSlot} from "@/hooks/use-webgl-slot";
+import IntroCoverArt from "./intro-cover-art";
 
 /** Transparent holes are missing cloth faces, not a progress-based wipe. */
 export default function TearCover() {
@@ -163,10 +164,17 @@ export default function TearCover() {
         };
         resize();
         print();
-        logo.onload = print;
+        // Keep the branded first paint until the logo and a complete frame exist.
+        const reveal = () => {
+            if (disposed) return;
+            print();
+            renderer.render(scene, camera);
+            host.dataset.ready = "true";
+            window.dispatchEvent(new Event("adamant:tear-ready"));
+        };
+        logo.onload = reveal;
+        logo.onerror = reveal;
         logo.src = "/vectors/logo-the-adamant.svg";
-        host.dataset.ready = "true";
-        window.dispatchEvent(new Event("adamant:tear-ready"));
         const pointer = new THREE.Vector2(), raycaster = new THREE.Raycaster();
         const activePointers = new Set<number>();
         const point = (event: PointerEvent) => ({
@@ -260,6 +268,7 @@ export default function TearCover() {
             host.removeEventListener("pointercancel", up);
             host.removeEventListener("lostpointercapture", up);
             logo.onload = null;
+            logo.onerror = null;
             geometry.dispose();
             texture.dispose();
             material.dispose();
@@ -278,9 +287,7 @@ export default function TearCover() {
 
     if (!visible) return null;
     return <div ref={hostRef} className="peel-reveal" role="dialog" aria-modal="true" aria-label="Tear to reveal Adamant">
-        <div className="peel-reveal-fallback" aria-hidden="true">
-            <strong>ADAMANT®</strong><em>Firm in vision. Bold in action.</em><small>Grab anywhere. Pull to tear.</small>
-        </div>
+        <IntroCoverArt/>
         <p className="sr-only">Drag the cover to stretch and tear it, or use Skip intro to enter the website.</p>
         <button className="peel-reveal-skip" type="button" onClick={finish} autoFocus>Skip intro</button>
     </div>;

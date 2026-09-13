@@ -5,11 +5,11 @@ import type {ReactNode, PointerEvent as ReactPointerEvent} from "react";
 import {useRef} from "react";
 export type MascotMood = "thinking" | "walking-tablet" | "champion" | "phone-wave" | "thumbs-up" | "waving" | "looking-back" | "idea" | "creative" | "builder";
 export function SectionCharacter({mood, side = "right", className = "", interactive = false}: {mood: MascotMood; side?: "left" | "right"; className?: string; interactive?: boolean}) {
-    // The earlier studio characters have the finished eyes, trainers and
-    // richer shading the transparent pose pack loses on dark backgrounds.
-    const pose = mood === "creative" || mood === "thinking" || mood === "idea" || mood === "looking-back" || mood === "phone-wave"
-        ? "creative-guide"
-        : "builder-guide";
+    const studioPose = mood === "creative" || mood === "builder";
+    const pose = studioPose ? mood + "-guide" : mood;
+    const source = studioPose
+        ? "/images/adamant-character/" + pose + ".webp"
+        : "/images/adamant-mascot/" + pose + "-cutout.webp";
     const start = useRef({x: 0, rotation: 0});
     const rotate = useRef(0);
     const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -30,8 +30,8 @@ export function SectionCharacter({mood, side = "right", className = "", interact
     };
     return <div className={"section-character section-character-" + side + " mascot-pose-" + pose + " " + className} aria-hidden="true"
         onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}>
-        <Image src={"/images/adamant-character/" + pose + ".webp"} alt="" width={1184} height={1328}
-            sizes="(max-width: 600px) 74px, (max-width: 1000px) 110px, 156px" className="mascot-image"/>
+        <Image src={source} alt="" width={studioPose ? 1184 : 1122} height={studioPose ? 1328 : 1402} quality={90}
+            sizes={interactive ? "(max-width: 600px) 175px, 220px" : "(max-width: 600px) 74px, (max-width: 1000px) 110px, 156px"} className="mascot-image"/>
     </div>;
 }
 export function MascotHeading({mood, side, children}: {mood: MascotMood; side: "left" | "right"; children: ReactNode}) {

@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     },
     images: {
         formats: ["image/avif", "image/webp"],
+        qualities: [75, 90],
         // No homepage slot needs a 3840px source. Keeping the ladder bounded also
         // prevents broad `sizes` values from producing oversized derivatives.
         deviceSizes: [360, 480, 640, 768, 1024, 1280, 1600, 1920],

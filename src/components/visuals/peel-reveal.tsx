@@ -1,7 +1,7 @@
 "use client";
 import dynamic from "next/dynamic";
 import {useCallback, useEffect, useState} from "react";
-import Image from "next/image";
+import IntroCoverArt from "./intro-cover-art";
 const TearCover = dynamic(() => import("./tear-cover"), {ssr: false});
 /** Reduced-motion visitors never download or initialize the Three.js intro. */
 export default function PeelReveal() {
@@ -25,10 +25,7 @@ export default function PeelReveal() {
     if (done) return null;
     return <>
         {!ready && <div className="peel-reveal peel-loading-cover" role="dialog" aria-modal="true" aria-label="Welcome to Adamant">
-            <div className="peel-reveal-fallback" aria-hidden="true">
-                <Image src="/vectors/logo-the-adamant.svg" width={80} height={80} alt=""/>
-                <strong>ADAMANT®</strong><em>Firm in vision. Bold in action.</em><small>Grab anywhere. Pull to tear.</small>
-            </div>
+            <IntroCoverArt/>
             <button className="peel-reveal-skip" type="button" onClick={finish}>Skip intro</button>
         </div>}
         {canTear && <TearCover/>}

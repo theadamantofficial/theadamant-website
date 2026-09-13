@@ -606,6 +606,7 @@
 @layer base {
     html {
         position: relative;
+        background-color: var(--bg-primary);
         scroll-behavior: smooth;
     }
 
@@ -937,20 +938,11 @@
 .peel-reveal-fallback {
     position: absolute;
     inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    padding: 2rem;
     background: #eae0ce;
     color: #183c39;
     pointer-events: none;
-    text-align: center;
 }
-.peel-reveal-fallback strong { font: 800 clamp(2rem, 12vw, 8rem)/1 Arial, sans-serif; letter-spacing: -.06em; }
-.peel-reveal-fallback em { color: #bd613c; font: italic clamp(1rem, 3.5vw, 2rem)/1.4 Georgia, serif; }
-.peel-reveal-fallback small { margin-top: 2rem; font: 500 .7rem/1.4 monospace; letter-spacing: .12em; text-transform: uppercase; }
+.peel-reveal-logo {position:absolute;left:50%;top:29%;width:12vmin;height:12vmin;transform:translate(-50%,-50%);}
 .peel-reveal[data-ready="true"] .peel-reveal-fallback { display: none; }
 .peel-reveal-skip {
     position: absolute;

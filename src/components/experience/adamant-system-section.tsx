@@ -15,7 +15,7 @@ export default function AdamantSystemSection({services}: {services: SiteCopy["se
         <SectionDepth variant="services"/>
         <div className="capability-lab-layout">
             <div className="capability-lab-intro">
-                <MascotHeading mood="idea" side="left">
+                <MascotHeading mood="creative" side="left">
                     <p className="section-kicker">ADAMANT · SYSTEM ONLINE</p>
                     <h2 id="adamant-system-title">One system.<br/><em>Every capability connected.</em></h2>
                     <p>Good ideas need more than separate tools. We bring design, engineering and growth into a connected system that moves with your business.</p>

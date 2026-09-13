@@ -12,7 +12,7 @@ export default function SystemScene() {
         const release = claim();
         if (!release) return;
         let renderer: THREE.WebGLRenderer;
-        try {renderer = new THREE.WebGLRenderer({alpha: true, antialias: false, powerPreference: "low-power"});}
+        try {renderer = new THREE.WebGLRenderer({alpha: true, antialias: true, powerPreference: "low-power"});}
         catch {release(); return;}
         renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.25));
         renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -23,9 +23,11 @@ export default function SystemScene() {
         const fill = new THREE.DirectionalLight("#8fe3d8", 1.2); fill.position.set(4, 1, -2); scene.add(fill);
         const group = new THREE.Group(); scene.add(group);
         const geometries: THREE.BufferGeometry[] = [], materials: THREE.Material[] = [];
+        const themedMaterials: {material: THREE.MeshStandardMaterial; accent: boolean}[] = [];
         const add = (geometry: THREE.BufferGeometry, color: string, parent: THREE.Object3D = group) => {
             const material = new THREE.MeshStandardMaterial({color, roughness: .48, metalness: .25});
             geometries.push(geometry); materials.push(material);
+            themedMaterials.push({material, accent: color === "#f29b71"});
             const mesh = new THREE.Mesh(geometry, material); parent.add(mesh); return mesh;
         };
         const core = add(new THREE.IcosahedronGeometry(.68, 1), "#f29b71");
@@ -37,6 +39,13 @@ export default function SystemScene() {
             const satellite = add(new THREE.OctahedronGeometry(.11, 0), index % 2 ? "#f29b71" : "#81d8ca");
             return satellite;
         });
+        const updateTheme = () => {
+            const style = getComputedStyle(document.documentElement);
+            themedMaterials.forEach(({material, accent}) => material.color.set(style.getPropertyValue(accent ? "--accent" : "--primary").trim()));
+        };
+        const themeObserver = new MutationObserver(updateTheme);
+        themeObserver.observe(document.documentElement, {attributes: true, attributeFilter: ["class"]});
+        updateTheme();
         let progress = .5, frame = 0, last = 0, elapsed = 0, visible = true, lost = false;
         const section = host.closest("section") as HTMLElement;
         const removeScroll = registerViewportMotion({element: section, write: value => {progress = value;}});
@@ -72,7 +81,7 @@ export default function SystemScene() {
         document.addEventListener("visibilitychange", pause); wake();
         return () => {
             cancelAnimationFrame(frame); renderer.setAnimationLoop(null);
-            observer.disconnect(); resizeObserver.disconnect(); removeScroll();
+            observer.disconnect(); resizeObserver.disconnect(); themeObserver.disconnect(); removeScroll();
             document.removeEventListener("visibilitychange", pause);
             renderer.domElement.removeEventListener("webglcontextlost", contextLost);
             geometries.forEach(geometry => geometry.dispose()); materials.forEach(material => material.dispose());

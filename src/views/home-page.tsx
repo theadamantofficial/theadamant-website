@@ -4,8 +4,9 @@ import dynamic from "next/dynamic";
 import {SiteCopy} from "@/lib/site-copy";
 import {SiteLocale} from "@/lib/site-locale";
 import AdamantSystemSection from "@/components/experience/adamant-system-section";
+import HeroSection from "@/components/sections/hero-section";
+import PeelReveal from "@/components/visuals/peel-reveal";
 
-const HeroSection = dynamic(() => import("@/components/sections/hero-section"));
 const CompanyCredentialsSection = dynamic(() => import("@/components/sections/company-credentials-section"));
 const PartnerProofStrip = dynamic(() => import("@/components/sections/partner-proof-strip"));
 const ValuePropsSection = dynamic(() => import("@/components/sections/value-props-section"));
@@ -14,7 +15,6 @@ const ProcessSection = dynamic(() => import("@/components/sections/process-secti
 const FaqSection = dynamic(() => import("@/components/sections/faq-section"));
 const ContactUsSection = dynamic(() => import("@/components/sections/contact-us-section"));
 const CursorHalo = dynamic(() => import("@/components/visuals/cursor-halo"));
-const PeelReveal = dynamic(() => import("@/components/visuals/peel-reveal"));
 const DeferredPathToSuccess = dynamic(() => import("@/components/experience/deferred-experiences").then((module) => module.DeferredPathToSuccess));
 const NonCriticalTools = dynamic(() => import("@/components/ui/non-critical-tools").then((module) => module.NonCriticalTools));
 

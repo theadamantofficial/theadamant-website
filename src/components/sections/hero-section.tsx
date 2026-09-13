@@ -50,7 +50,7 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
             hero.style.setProperty("--studio-progress", String(progress));
             hero.dataset.zoomed = String(progress > .35);
         };
-        const schedule = () => {cancelAnimationFrame(frame);frame = requestAnimationFrame(update);};
+        const schedule = () => {if (!frame) frame = requestAnimationFrame(() => {frame = 0; update();});};
         window.addEventListener("scroll", schedule, {passive:true});
         window.addEventListener("resize", schedule);
         update();
@@ -77,9 +77,6 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
                     <div className="workspace-controls">
                         <Link href={getLocalizedPath(locale,"services")} className="workspace-scroll">Explore services <ArrowDown size={14}/></Link>
                     </div>
-                </div>
-                <div className="workspace-audio-avatar" aria-hidden="true">
-                    <Image src="/images/adamant-avatar/listening.webp" alt="" fill sizes="(max-width: 600px) 110px, (max-width: 1100px) 160px, 220px"/>
                 </div>
                 <div className="workspace-footer"><span>FIRM IN VISION. BOLD IN ACTION.</span><span>BUILT IN INDIA. CONNECTED TO THE WORLD.</span></div>
             </div>

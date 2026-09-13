@@ -63,7 +63,7 @@ export default function PartnerProofStrip({
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(13,92,99,0.14),transparent_34%),radial-gradient(circle_at_86%_14%,rgba(214,106,69,0.12),transparent_28%)]"/>
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/30 to-transparent"/>
                 <div className="relative space-y-8">
-                    <MascotHeading mood="walking-tablet" side="right">
+                    <MascotHeading mood="champion" side="right">
                         <p className="section-kicker">{copy.kicker}</p>
                         <h2 id="partner-proof-heading" className="section-title">
                             {copy.title}

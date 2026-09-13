@@ -6,6 +6,7 @@ import {RoundedBoxGeometry} from "three/addons/geometries/RoundedBoxGeometry.js"
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {getDeviceQuality, getMaxDpr} from "@/lib/device-quality";
 import {useWebGLSlot} from "@/hooks/use-webgl-slot";
+import {createStudioMonitorMedia} from "./studio-monitor-media";
 
 export default function StudioRoom({onEnter, onReady, paused, resetKey, palette, progressRef}: {progressRef: RefObject<number>; onEnter: () => void; onReady?: () => void; paused: boolean; resetKey: number; palette: number}) {
     const {available, claim} = useWebGLSlot();
@@ -111,37 +112,14 @@ export default function StudioRoom({onEnter, onReady, paused, resetKey, palette,
         box(5.85,.12,.12,teal,0,.55,-1.1);
         // Slim aluminium desktop display with a compact workstation below.
         const computer=new THREE.Group();scene.add(computer);
+        const screenWidth = 3.08, screenHeight = screenWidth * 9 / 16;
         box(1.15,.1,.75,edge,0,2.39,-.35,computer);
         box(.22,.52,.2,cream,0,2.68,-.43,computer);
         box(3.35,1.92,.16,cream,0,3.63,-.4,computer,.08);
-        box(3.08,1.66,.07,dark,0,3.63,-.22,computer,.045);
-        // A quiet in-world browser view replaces the old video in the PC.
-        const screenCanvas = document.createElement("canvas");screenCanvas.width=960;screenCanvas.height=540;
-        const screenContext = screenCanvas.getContext("2d");
-        const drawMonitor = (phase: number, time: number) => {
-            if (!screenContext) return;
-            screenContext.fillStyle="#071820";screenContext.fillRect(0,0,960,540);
-            const glow=screenContext.createRadialGradient(540,270,10,540,270,520);glow.addColorStop(0,phase>.45?"#17464e":"#0d3942");glow.addColorStop(1,"#06131a");screenContext.fillStyle=glow;screenContext.fillRect(0,0,960,540);
-            screenContext.fillStyle="#155c61";screenContext.fillRect(0,0,960,34);
-            screenContext.fillStyle="#f2e9d7";screenContext.font="600 22px Arial";screenContext.fillText("ADAMANT®",34,23);
-            if (phase < .48) {
-                screenContext.fillStyle="#e9895e";screenContext.fillRect(58,122,300,10);screenContext.fillRect(58,150,205,10);
-                screenContext.fillStyle="#d5ebe4";screenContext.font="500 54px Arial";screenContext.fillText("Ideas in motion",58,236);
-                screenContext.fillStyle="#6fb8b0";screenContext.fillRect(58,282,844,2);screenContext.fillRect(58,326,610,2);screenContext.fillRect(58,370,740,2);
-                screenContext.fillStyle="#e9895e";screenContext.fillRect(58,430,142,42);
-            } else {
-                screenContext.fillStyle="#77d4c7";screenContext.font="500 16px monospace";screenContext.fillText("SYSTEM ONLINE",58,95);
-                screenContext.fillStyle="#e9f3f0";screenContext.font="500 45px Arial";screenContext.fillText("Every capability connected.",58,160);
-                const nodes=[[180,295,"BUILD"],[380,230,"GROW"],[560,330,"AUTOMATE"],[740,225,"CONNECT"],[800,390,"SCALE"]] as const;
-                screenContext.lineWidth=2;screenContext.strokeStyle="#5bc6b8";screenContext.beginPath();screenContext.moveTo(nodes[0][0],nodes[0][1]);nodes.slice(1).forEach(node=>screenContext.lineTo(node[0],node[1]));screenContext.stroke();
-                nodes.forEach((node,index)=>{const pulse=4+Math.sin(time*1.4+index)*2;screenContext.fillStyle=index===Math.floor(time*.5)%nodes.length?"#ed956c":"#52bcb0";screenContext.beginPath();screenContext.arc(node[0],node[1],11+pulse,0,Math.PI*2);screenContext.fill();screenContext.fillStyle="#d9ebe7";screenContext.font="500 13px monospace";screenContext.fillText(node[2],node[0]-28,node[1]+40);});
-                screenContext.fillStyle="#8ba9a5";screenContext.font="500 13px monospace";screenContext.fillText("FIRM IN VISION. BOLD IN ACTION.",58,488);
-            }
-        };
-        drawMonitor(0,0);
-        const screenTexture = new THREE.CanvasTexture(screenCanvas);screenTexture.colorSpace = THREE.SRGBColorSpace;textures.push(screenTexture);
-        const screenMat = new THREE.MeshBasicMaterial({map:screenTexture});materials.push(screenMat);
-        const screen=mesh(new THREE.PlaneGeometry(2.96,1.665),screenMat,0,3.63,-.178,computer);screen.castShadow=false;
+        mesh(new THREE.BoxGeometry(screenWidth,screenHeight,.07),dark,0,3.63,-.22,computer);
+        const monitorMedia = createStudioMonitorMedia(host, Math.min(8, renderer.capabilities.getMaxAnisotropy()));
+        const screenMat = new THREE.MeshBasicMaterial({map: monitorMedia.update(0), toneMapped: false});materials.push(screenMat);
+        const screen=mesh(new THREE.PlaneGeometry(screenWidth,screenHeight),screenMat,0,3.63,-.178,computer);screen.castShadow=false;
         box(.78,.045,.014,edge,-.86,2.7,-.18,computer);
         cylinder(.035,.035,.035,teal,1.18,2.71,-.18,computer).rotation.x=Math.PI/2;
         for(let i=0;i<6;i++) box(.28,.025,.01,dark,.38+i*.06,2.71,-.18,computer);
@@ -222,33 +200,42 @@ export default function StudioRoom({onEnter, onReady, paused, resetKey, palette,
             new THREE.Vector3(0, 1.8, -.2), new THREE.Vector3(-.2, 1.2, .6), new THREE.Vector3(0, .7, 1),
             new THREE.Vector3(-.8, 1.2, -.4), new THREE.Vector3(.8, 1.3, -.3), new THREE.Vector3(.8, 1.3, -.3), new THREE.Vector3(.8, 1.3, -.3),
         ];
-        let frame=0;let visible=true;let lost=false;let previous=0;let elapsed=0;let lastScreenPaint=0;
-        const overview = new THREE.Vector3(9.6,7.4,13.8);
+        let frame=0;let visible=true;let lost=false;let previous=0;let elapsed=0;
+        const frontOverview = new THREE.Vector3(9.6,7.4,13.8);
+        const overview = frontOverview.clone();
         const overviewTarget = new THREE.Vector3(0,1.8,0);
-        // Move close enough to the 16:9 display that the final frame becomes
-        // a true portal into the next chapter, without exposing empty bands around it.
+        // Cover desktop viewports at the end; keep the full monitor on portrait screens.
         const entryPosition = new THREE.Vector3(0,3.63,0.86);
-        const entryTarget = new THREE.Vector3(0,3.63,-.05);
+        const entryTarget = new THREE.Vector3(0,3.63,-.178);
         let lastProgress = 0;
         const reset=()=>{camera.position.copy(overview);controls.target.copy(overviewTarget);controls.update();};resetRef.current=reset;reset();
-        const resize=()=>{const {width,height}=host.getBoundingClientRect();if(!width||!height)return;renderer.setSize(width,height);camera.aspect=width/height;camera.fov=width<650?48:35;camera.updateProjectionMatrix();};
+        let viewportWidth = 1, viewportHeight = 1;
+        const resize=()=>{const {width,height}=host.getBoundingClientRect();if(!width||!height)return;viewportWidth=width;viewportHeight=height;renderer.setSize(width,height);camera.aspect=width/height;camera.updateProjectionMatrix();};
         const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(host);resize();
-        const raycaster=new THREE.Raycaster();const pointer=new THREE.Vector2();let startX=0;let startY=0;let assembly=0;
+        const raycaster=new THREE.Raycaster();const pointer=new THREE.Vector2();let startX=0;let startY=0;let assembly=0;let dragging=false;
         const intersects=(event:PointerEvent)=>{const r=host.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);raycaster.setFromCamera(pointer,camera);return raycaster.intersectObject(computer,true).length>0;};
-        const down=(e:PointerEvent)=>{startX=e.clientX;startY=e.clientY;};
-        const up=(e:PointerEvent)=>{if(Math.hypot(e.clientX-startX,e.clientY-startY)<6&&intersects(e))enterRef.current();};
+        const down=(e:PointerEvent)=>{dragging=true;startX=e.clientX;startY=e.clientY;};
+        const up=(e:PointerEvent)=>{dragging=false;if(Math.hypot(e.clientX-startX,e.clientY-startY)<6&&intersects(e))enterRef.current();};
+        const cancel=()=>{dragging=false;};
         const move=(e:PointerEvent)=>{renderer.domElement.style.cursor=intersects(e)?'pointer':'grab';};
-        const contextLost=(e:Event)=>{e.preventDefault();lost=true;cancelAnimationFrame(frame);frame=0;delete host.dataset.ready;};
+        const contextLost=(e:Event)=>{e.preventDefault();monitorMedia.setPlayback(false);lost=true;cancelAnimationFrame(frame);frame=0;delete host.dataset.ready;};
         const restored=()=>{lost=false;host.dataset.ready='true';wake();};
-        host.addEventListener('pointerdown',down);host.addEventListener('pointerup',up);host.addEventListener('pointermove',move);
+        host.addEventListener('pointerdown',down);host.addEventListener('pointerup',up);host.addEventListener('pointercancel',cancel);host.addEventListener('pointermove',move);
         renderer.domElement.addEventListener('webglcontextlost',contextLost);renderer.domElement.addEventListener('webglcontextrestored',restored);
         const wake=()=>{if(!frame&&visible&&!document.hidden&&!lost){frame=requestAnimationFrame(render);}};
-        const visibilityChanged=()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;}else wake();};
-        const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)wake();else{cancelAnimationFrame(frame);frame=0;}});observer.observe(host);
+        const visibilityChanged=()=>{monitorMedia.setPlayback(!document.hidden && visible && !pausedRef.current);if(document.hidden){cancelAnimationFrame(frame);frame=0;}else wake();};
+        const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;monitorMedia.setPlayback(visible && !document.hidden && !pausedRef.current);if(visible)wake();else{cancelAnimationFrame(frame);frame=0;}});observer.observe(host);
         document.addEventListener('visibilitychange',visibilityChanged);
+        const zoomOverview = new THREE.Vector3(), cameraTarget = new THREE.Vector3();
+        const orbitOffset = new THREE.Vector3(), zoomOrbit = new THREE.Spherical();
+        const frontOrbit = new THREE.Spherical().setFromVector3(frontOverview.clone().sub(overviewTarget));
+        const visitorOrbit = new THREE.Spherical();
         let ready = false, lastRender = 0;
         const render=(time:number)=>{frame=0;if(!visible||document.hidden||lost)return;
-            if(time-lastRender<1000/30){wake();return;}lastRender=time;
+            const progress = reduced.matches ? 0 : progressRef.current;
+            // Scroll and dragging render at the display rate; ambient motion stays bounded.
+            if(ready && assembly===1 && !dragging && progress===lastProgress && time-lastRender<1000/30){wake();return;}
+            lastRender=time;
             const delta=Math.min((time-previous)/1000,.05);previous=time;
             assembly=Math.min(1,assembly+delta/.9);
             if (assembly < 1) assemblyParts.forEach((part,index)=>{part.position.lerpVectors(assemblyOffsets[index],assemblyTargets[index],assembly);});
@@ -256,13 +243,27 @@ export default function StudioRoom({onEnter, onReady, paused, resetKey, palette,
                 knot.rotation.y=elapsed*.25;knot.rotation.z=Math.sin(elapsed*.5)*.15;knot.position.y=4.35+Math.sin(elapsed)*.12;
                 gem.rotation.y=-elapsed*.3;gem.position.y=4.7+Math.sin(elapsed*.8)*.12;orbit.rotation.z=elapsed*.15;ball.position.y=5.05+Math.sin(elapsed*.8)*.12;
             }
-            const progress = reduced.matches ? 0 : progressRef.current;
-            if(time-lastScreenPaint>65){drawMonitor(progress,elapsed);screenTexture.needsUpdate=true;lastScreenPaint=time;}
+            // Move the projection rather than resizing/clearing the drawing buffer on scroll.
+            const compact = viewportWidth < 1100;
+            camera.fov = THREE.MathUtils.lerp(compact ? 55 : 45, 35, progress);
+            camera.setViewOffset(viewportWidth, viewportHeight, -viewportWidth * (compact ? 0 : .08) * (1-progress), -viewportHeight * (compact ? .2 : .12) * (1-progress), viewportWidth, viewportHeight);
+            monitorMedia.setPlayback(visible && !document.hidden && !pausedRef.current);
+            const monitorTexture = monitorMedia.update(progress);
+            if (screenMat.map !== monitorTexture) {screenMat.map = monitorTexture; screenMat.needsUpdate = true;}
+            const visibleScreenHeight = camera.aspect > 1 ? Math.min(screenHeight, screenWidth / camera.aspect) : Math.max(screenHeight, screenWidth / camera.aspect);
+            entryPosition.z = entryTarget.z + visibleScreenHeight / (2 * Math.tan(THREE.MathUtils.degToRad(35) / 2));
             controls.enabled = progress === 0;
             if (progress > 0) {
-                const eased = progress * progress * (3 - 2 * progress);
-                camera.position.lerpVectors(overview, entryPosition, eased);
-                camera.lookAt(new THREE.Vector3().lerpVectors(overviewTarget, entryTarget, eased));
+                // Return to the front before entering; an orbit behind the display must
+                // never send the visitor through its blank casing.
+                const align = THREE.MathUtils.smoothstep(progress, 0, .3);
+                const zoom = THREE.MathUtils.smoothstep(progress, .15, 1);
+                visitorOrbit.setFromVector3(orbitOffset.copy(overview).sub(overviewTarget));
+                const angle = frontOrbit.theta - visitorOrbit.theta;
+                zoomOrbit.set(THREE.MathUtils.lerp(visitorOrbit.radius, frontOrbit.radius, align), THREE.MathUtils.lerp(visitorOrbit.phi, frontOrbit.phi, align), visitorOrbit.theta + Math.atan2(Math.sin(angle), Math.cos(angle)) * align);
+                zoomOverview.setFromSpherical(zoomOrbit).add(overviewTarget);
+                camera.position.lerpVectors(zoomOverview, entryPosition, zoom);
+                camera.lookAt(cameraTarget.lerpVectors(overviewTarget, entryTarget, zoom));
             } else {
                 if (lastProgress > 0) reset();
                 // Preserve a visitor's drag angle instead of overwriting it every frame.
@@ -271,9 +272,9 @@ export default function StudioRoom({onEnter, onReady, paused, resetKey, palette,
             }
             lastProgress = progress;
             renderer.render(scene,camera);if(!ready){ready=true;host.dataset.ready='true';readyRef.current?.();}wake();};wake();
-        return()=>{themeObserver.disconnect();cancelAnimationFrame(frame);observer.disconnect();resizeObserver.disconnect();controls.dispose();resetRef.current=null;paletteRef.current=null;
+        return()=>{monitorMedia.dispose();themeObserver.disconnect();cancelAnimationFrame(frame);observer.disconnect();resizeObserver.disconnect();controls.dispose();resetRef.current=null;paletteRef.current=null;
             document.removeEventListener('visibilitychange',visibilityChanged);
-            host.removeEventListener('pointerdown',down);host.removeEventListener('pointerup',up);host.removeEventListener('pointermove',move);
+            host.removeEventListener('pointerdown',down);host.removeEventListener('pointerup',up);host.removeEventListener('pointercancel',cancel);host.removeEventListener('pointermove',move);
             renderer.domElement.removeEventListener('webglcontextlost',contextLost);renderer.domElement.removeEventListener('webglcontextrestored',restored);
             geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());renderer.setAnimationLoop(null);renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();delete host.dataset.ready;release();};
     },[progressRef, available, claim]);
