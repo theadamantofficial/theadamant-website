@@ -12,6 +12,7 @@ import {canManageLeads} from "@/features/crm/permissions";
 import type {WhatsAppConversation, WhatsAppMessage} from "@/features/crm/types";
 import {formatCrmDate} from "@/features/crm/format";
 import {WhatsAppPaymentModal} from "@/features/crm/whatsapp/whatsapp-payment-modal";
+import {CLIENT_PROPOSAL_LINKS, isClientProposalTemplate} from "@/lib/crm/whatsapp-proposal";
 
 type TeamMember = {id: string; full_name: string; email: string; active: boolean};
 type WhatsAppTemplate = {
@@ -23,7 +24,7 @@ type WhatsAppTemplate = {
 };
 type TranslationDirection = {targetLanguage: string; targetLanguageCode: string};
 type WhatsAppDocument = {mediaId: string; filename: string};
-type OutgoingMessage = {body: string; template?: {name: string; language: string; parameters: Array<{name?: string; value: string}>; document?: {mediaId: string; filename: string}}; translation?: TranslationDirection};
+export type OutgoingMessage = {body: string; template?: {name: string; language: string; parameters: Array<{name?: string; value: string}>; document?: {mediaId: string; filename: string}}; translation?: TranslationDirection};
 
 export function WhatsAppInboxScreen({initialLeadId = ""}: {initialLeadId?: string}) {
     const actor = useAdminActor();
@@ -259,7 +260,7 @@ export function WhatsAppInboxScreen({initialLeadId = ""}: {initialLeadId?: strin
                     <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                         {messageLoading ? <div className="space-y-4">{Array.from({length: 5}).map((_, index) => <Skeleton key={index} className={`h-16 ${index % 2 ? "ml-auto w-2/3" : "w-3/5"}`}/>)}</div> : messages.length ? <div className="mx-auto flex max-w-3xl flex-col gap-3">{messages.filter((message) => message.message_type !== "reaction").map((message) => <MessageBubble key={message.id} message={message} reactions={getMessageReactions(messages, message)} reacting={reactingTo === message.id} onReact={(emoji) => void sendReaction(message.id, emoji)}/>)}</div> : <EmptyState title="No stored messages" description="Messages received after the webhook is connected will appear here."/>}
                     </div>
-                    <Composer key={selected.id} conversation={selected} translation={translationDirection} sending={sending} onSend={sendMessage}/>
+                    <WhatsAppComposer key={selected.id} conversation={selected} translation={translationDirection} sending={sending} onSend={sendMessage}/>
                 </> : <div className="flex flex-1 items-center justify-center"><EmptyState title="Select a conversation" description="Choose a WhatsApp conversation to view its messages and reply."/></div>}
             </main>
         </section>
@@ -337,7 +338,7 @@ function MessageStatus({status}: {status: WhatsAppMessage["status"]}) {
     return <Check aria-label="Sent" className="h-3 w-3"/>;
 }
 
-function Composer({conversation, translation, sending, onSend}: {conversation: WhatsAppConversation; translation: TranslationDirection | null; sending: boolean; onSend: (payload: OutgoingMessage) => Promise<boolean>}) {
+export function WhatsAppComposer({conversation, translation, sending, onSend, initialBody = "", preferClientProposal = false}: {conversation: WhatsAppConversation; translation: TranslationDirection | null; sending: boolean; onSend: (payload: OutgoingMessage) => Promise<boolean>; initialBody?: string; preferClientProposal?: boolean}) {
     const windowOpen = Boolean(conversation.customer_service_window_expires_at && new Date(conversation.customer_service_window_expires_at).getTime() > Date.now());
     const [templates, setTemplates] = useState<WhatsAppTemplate[]>([]);
     const [templateKey, setTemplateKey] = useState("");
@@ -351,10 +352,20 @@ function Composer({conversation, translation, sending, onSend}: {conversation: W
         if (windowOpen) return;
         setLoadingTemplates(true);
         void crmFetch<{templates: WhatsAppTemplate[]}>("/api/admin/whatsapp/templates")
-            .then((data) => setTemplates(data.templates))
+            .then((data) => {
+                setTemplates(data.templates);
+                if (preferClientProposal) {
+                    const preferred = data.templates.find((template) => isClientProposalTemplate(template.name) && /^en(?:_|$)/i.test(template.language))
+                        || data.templates.find((template) => isClientProposalTemplate(template.name));
+                    if (preferred) {
+                        setTemplateKey(`${preferred.name}:${preferred.language}`);
+                        setParameters({...CLIENT_PROPOSAL_LINKS});
+                    }
+                }
+            })
             .catch((loadError) => toast.error(loadError instanceof Error ? loadError.message : "Approved templates could not be loaded."))
             .finally(() => setLoadingTemplates(false));
-    }, [windowOpen]);
+    }, [windowOpen, preferClientProposal]);
 
     useEffect(() => {
         if (windowOpen) return;
@@ -367,9 +378,9 @@ function Composer({conversation, translation, sending, onSend}: {conversation: W
         event.preventDefault();
         const form = event.currentTarget;
         const body = String(new FormData(form).get("body") || "").trim();
-        if (!body) return;
+        if (!body || sending) return;
         void onSend({body}).then((sent) => {if (sent) form.reset();});
-    }} className="mx-auto max-w-3xl"><div className="flex items-end gap-2"><textarea name="body" required maxLength={4096} rows={2} className="admin-input h-auto min-h-12 flex-1 resize-none py-3 sm:resize-y" placeholder={translation ? `Type in English — sends in ${translation.targetLanguage}…` : "Write a WhatsApp reply…"}/><button disabled={sending} className="crm-button-primary h-12 px-4">{sending ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>}<span className="hidden sm:inline">Send</span></button></div>{translation ? <p className="mt-1.5 flex items-center gap-1 text-[9px] text-[var(--crm-muted)]"><Languages className="h-3 w-3"/>Only your team sees English; the customer receives {translation.targetLanguage}.</p> : null}</form></div>;
+    }} className="mx-auto max-w-3xl"><div className="flex items-end gap-2"><textarea name="body" aria-label="WhatsApp message" defaultValue={initialBody} required maxLength={4096} rows={2} className="admin-input h-auto min-h-12 flex-1 resize-none py-3 sm:resize-y" placeholder={translation ? `Type in English — sends in ${translation.targetLanguage}…` : "Write a WhatsApp reply…"}/><button disabled={sending} className="crm-button-primary h-12 px-4">{sending ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>}<span className="hidden sm:inline">Send</span></button></div>{translation ? <p className="mt-1.5 flex items-center gap-1 text-[9px] text-[var(--crm-muted)]"><Languages className="h-3 w-3"/>Only your team sees English; the customer receives {translation.targetLanguage}.</p> : null}</form></div>;
 
     const selectedTemplate = templates.find((template) => `${template.name}:${template.language}` === templateKey) || null;
     const templateText = getTemplateBody(selectedTemplate);
@@ -380,16 +391,24 @@ function Composer({conversation, translation, sending, onSend}: {conversation: W
     return <div className="max-h-[50dvh] overflow-y-auto border-t border-[var(--crm-border)] bg-[var(--crm-surface)] p-3 sm:p-4">
         <form onSubmit={(event) => {
         event.preventDefault();
-        if (!selectedTemplate || !complete) return;
+        if (!selectedTemplate || !complete || sending || uploadingDocument) return;
         const templateParameters = variables.map((variable) => ({...(variable.name ? {name: variable.name} : {}), value: parameters[variable.key].trim()}));
         void onSend({body: preview || `Template: ${selectedTemplate.name}`, template: {name: selectedTemplate.name, language: selectedTemplate.language, parameters: templateParameters, ...(document ? {document} : {})}});
     }} className="mx-auto max-w-3xl space-y-2">
         <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[10px] leading-4 text-amber-800"><Clock3 className="mt-0.5 h-3.5 w-3.5 shrink-0"/><span>The free-form reply window is closed. You can still start a message with an approved Meta template.</span></div>
-        <div className="flex items-end gap-2"><label className="min-w-0 flex-1"><span className="sr-only">Approved WhatsApp template</span><select value={templateKey} onChange={(event) => {setTemplateKey(event.target.value); setParameters({}); setDocument(null);}} disabled={loadingTemplates || sending} className="crm-control w-full"><option value="">{loadingTemplates ? "Loading approved templates…" : templates.length ? "Choose an approved template…" : "No usable approved templates"}</option>{templates.map((template) => <option key={`${template.name}:${template.language}`} value={`${template.name}:${template.language}`}>{template.name.replaceAll("_", " ")} · {template.language}</option>)}</select></label><button disabled={sending || uploadingDocument || !complete} className="crm-button-primary"><Send className="h-4 w-4"/><span className="hidden sm:inline">Send template</span></button></div>
+        <div className="flex items-end gap-2"><label className="min-w-0 flex-1"><span className="sr-only">Approved WhatsApp template</span><select value={templateKey} onChange={(event) => {
+            setTemplateKey(event.target.value);
+            const chosen = templates.find((template) => `${template.name}:${template.language}` === event.target.value);
+            setParameters(preferClientProposal && chosen && isClientProposalTemplate(chosen.name) ? {...CLIENT_PROPOSAL_LINKS} : {});
+            setDocument(null);
+        }} disabled={loadingTemplates || sending} className="crm-control w-full"><option value="">{loadingTemplates ? "Loading approved templates…" : templates.length ? "Choose an approved template…" : "No usable approved templates"}</option>{templates.map((template) => <option key={`${template.name}:${template.language}`} value={`${template.name}:${template.language}`}>{template.name.replaceAll("_", " ")} · {template.language}</option>)}</select></label><button disabled={sending || uploadingDocument || !complete} className="crm-button-primary">{sending ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>}<span className="hidden sm:inline">{sending ? "Sending…" : "Send template"}</span></button></div>
+        {preferClientProposal && selectedTemplate && isClientProposalTemplate(selectedTemplate.name) ? <p className="text-[10px] text-[var(--crm-muted)]">Review or change proposal links 1, 2 and 3 below before sending.</p> : null}
+        {preferClientProposal && !loadingTemplates && !templates.some((template) => isClientProposalTemplate(template.name)) ? <p role="status" className="text-[10px] text-[var(--crm-muted)]">Client proposal is not available as an approved template. Choose another approved template to send.</p> : null}
         {requiresPdf ? <PdfAttachment value={document} documents={documents} busy={uploadingDocument} onChange={setDocument} onBusy={setUploadingDocument}/> : null}
         {selectedTemplate ? <div className="rounded-lg border border-[var(--crm-border)] bg-[var(--crm-subtle)] p-2.5"><p className="whitespace-pre-wrap text-[11px] leading-4">{preview}</p>{variables.length ? <div className="mt-2 grid gap-2 sm:grid-cols-2">{variables.map((variable) => {
-            const inputType = templateVariableInputType(variable);
-            return <label key={variable.key} className="text-[9px] font-semibold capitalize text-[var(--crm-muted)]">{variable.label}
+            const proposalLink = preferClientProposal && isClientProposalTemplate(selectedTemplate.name) && Boolean(CLIENT_PROPOSAL_LINKS[variable.key]);
+            const inputType = proposalLink ? "url" : templateVariableInputType(variable);
+            return <label key={variable.key} className="text-[9px] font-semibold capitalize text-[var(--crm-muted)]">{proposalLink ? `Link ${variable.key}` : variable.label}
                 <div className="relative mt-1">
                     <input type={inputType} value={parameters[variable.key] || ""} onChange={(event) => setParameters((current) => ({...current, [variable.key]: event.target.value}))} maxLength={1024} required className="crm-control w-full" placeholder={inputType === "date" ? "Choose a date" : inputType === "datetime-local" ? "Choose date and time" : `Value for ${variable.label}`}/>
                     {inputType === "url" && <button type="button" className="mt-1 text-[10px] font-semibold text-[#0d5c63] hover:underline" onClick={() => window.open("https://meet.google.com/new", "_blank", "noopener,noreferrer")}>Create Google Meet link</button>}

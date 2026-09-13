@@ -155,8 +155,30 @@ Open `https://theadamant.com/admin/prospects`, now titled **WhatsApp Lead
 Database**. It reads `whatsapp-lead-db` with the signed-in user's Supabase access
 token. Admins have access automatically; employees need the existing Team-screen
 grant. Filters and cursor pagination operate on the purchased database. WhatsApp
-opens only after a user chooses a record and confirms a message; outreach is
-recorded in the existing `prospect_outreach_events` table.
+messages are sent through the CRM's connected WhatsApp Business account after a
+user chooses a record and confirms a message. New contacts and closed reply
+windows use an approved Meta template. Messages appear in the WhatsApp inbox;
+outreach and provider delivery status are recorded in the existing
+`prospect_outreach_events` table. Production needs the existing WhatsApp access
+token, phone-number ID and business-account ID configured. Preparing a
+conversation creates no operational CRM lead and sends no message.
+
+Apply `supabase/migrations/20260913195000_add_prospect_whatsapp_status.sql` in SQL
+Editor to enable contact badges. The listing matches normalized source phone
+numbers to the connected account's CRM conversations. **Initial message sent**
+requires a stored outbound message with a provider ID and sent/delivered/read
+status; queued, failed, inbound and reaction messages do not count. **In CRM ·
+not sent** identifies an existing conversation without a successful outbound
+message. Employees see status for conversations visible through their inbox
+permissions. A successful send refreshes the current lead page.
+
+For closed reply windows, the prospect composer selects the approved
+`client_proposal` template when available, preferring its English variant. Its
+positional variables 1, 2 and 3 are editable links, initially set to
+`https://aetherseo.com/en`, `https://prep-vista-five.vercel.app/` and
+`https://prep-vista-five.vercel.app/`. The repeated third link is intentional.
+Other required variables and a required PDF header must be filled before sending.
+If the template is unavailable, the user chooses another approved template.
 
 Local development can continue using the mounted SQLite source with
 `PROSPECT_DATABASE_MODE=sqlite`. For local testing against Supabase, use

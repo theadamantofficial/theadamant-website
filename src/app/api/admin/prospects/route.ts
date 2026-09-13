@@ -2,6 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 import {canViewProspectDatabase} from "@/features/crm/permissions";
 import {crmErrorResponse, CrmApiError, getCrmRequestContext} from "@/lib/crm/auth";
 import {queryProspects} from "@/lib/crm/prospect-database";
+import {getProspectWhatsAppStatus} from "@/lib/crm/prospect-whatsapp-status";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,7 +26,8 @@ export async function GET(request: NextRequest) {
             industry: clean(params.get("industry"), 100),
             hasPhone: params.get("hasPhone") === "true",
         }, client);
-        return NextResponse.json(result);
+        const status = await getProspectWhatsAppStatus(client, result.prospects);
+        return NextResponse.json({...result, ...status});
     } catch (error) {
         const {message, status} = crmErrorResponse(error);
         return NextResponse.json({error: message}, {status});

@@ -1,13 +1,15 @@
 "use client";
 
-import {FormEvent, useCallback, useEffect, useMemo, useState} from "react";
+import {FormEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import toast from "react-hot-toast";
-import {Building2, ChevronLeft, ChevronRight, Database, ExternalLink, MapPin, MessageCircle, Phone, UserRound} from "lucide-react";
+import {Building2, ChevronLeft, ChevronRight, Database, MapPin, MessageCircle, Phone, UserRound} from "lucide-react";
 import {DataError, EmptyState, Modal, PageHeader, SearchInput, Skeleton} from "@/components/admin/admin-ui";
 import {crmFetch} from "@/features/crm/api";
-import type {Prospect} from "@/features/crm/types";
+import type {Prospect, WhatsAppConversation} from "@/features/crm/types";
+import {WhatsAppComposer, type OutgoingMessage} from "@/features/crm/whatsapp/whatsapp-inbox-screen";
 
 type ProspectPage = {
+    whatsappStatusAvailable: boolean;
     prospects: Prospect[];
     page: {hasMore: boolean; nextAfter: number | null};
     database: {total: number; createdAt: string | null};
@@ -23,6 +25,7 @@ export function ProspectsScreen() {
     const [cursorStack, setCursorStack] = useState<number[]>([0]);
     const [nextAfter, setNextAfter] = useState<number | null>(null);
     const [databaseTotal, setDatabaseTotal] = useState<number | null>(null);
+    const [whatsappStatusAvailable, setWhatsAppStatusAvailable] = useState(true);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [selected, setSelected] = useState<Prospect | null>(null);
@@ -42,6 +45,7 @@ export function ProspectsScreen() {
             setProspects(data.prospects);
             setNextAfter(data.page.nextAfter);
             setDatabaseTotal(data.database.total);
+            setWhatsAppStatusAvailable(data.whatsappStatusAvailable);
         } catch (loadError) {
             setError(loadError instanceof Error ? loadError.message : "Lead database could not be loaded.");
         } finally {
@@ -84,7 +88,7 @@ export function ProspectsScreen() {
         <PageHeader
             eyebrow="USA prospect source"
             title="WhatsApp Lead Database"
-            description={`${databaseTotal === null ? "Purchased USA records" : `${databaseTotal.toLocaleString("en-US")} source records`} · Access is controlled by administrators · Outreach is logged for future CRM integration.`}
+            description={`${databaseTotal === null ? "Purchased USA records" : `${databaseTotal.toLocaleString("en-US")} source records`} · Access is controlled by administrators · Send WhatsApp messages and track outreach in the CRM.`}
             actions={<span className="inline-flex items-center gap-2 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-surface)] px-3 py-2 text-[11px] text-[var(--crm-muted)]"><Database className="h-3.5 w-3.5"/> Read-only source</span>}
         />
         {error ? <DataError message={error} onRetry={() => void load(currentAfter, activeFilters)}/> : null}
@@ -118,7 +122,7 @@ export function ProspectsScreen() {
                             <td className="max-w-56 px-3 py-3">{email ? <a href={`mailto:${email}`} className="block truncate hover:text-[#0d5c63]">{email}</a> : <span className="text-[var(--crm-muted)]">—</span>}</td>
                             <td className="px-3 py-3"><span className="flex items-start gap-1.5"><MapPin className="mt-0.5 h-3 w-3 shrink-0 text-[var(--crm-muted)]"/><span>{[prospect.city, prospect.state, prospect.country].filter(Boolean).join(", ") || prospect.location || "—"}</span></span></td>
                             <td className="px-3 py-3 text-[var(--crm-muted)]">{prospect.industry || prospect.sub_industry || "—"}</td>
-                            <td className="px-5 py-3"><button disabled={!phone} onClick={() => setSelected(prospect)} className="crm-button-secondary whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-50"><MessageCircle className="h-3.5 w-3.5 text-emerald-600"/> WhatsApp</button></td>
+                            <td className="px-5 py-3"><div className="flex flex-col items-start gap-1.5"><button disabled={!phone} onClick={() => setSelected(prospect)} className="crm-button-secondary whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-50"><MessageCircle className="h-3.5 w-3.5 text-emerald-600"/> WhatsApp</button>{prospect.whatsapp?.initialMessageSent ? <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] font-medium text-emerald-600 crm-dark:text-emerald-400">Initial message sent</span> : prospect.whatsapp?.conversationId ? <span className="rounded-full bg-amber-500/10 px-2 py-1 text-[10px] font-medium text-amber-700 crm-dark:text-amber-300">In CRM · not sent</span> : null}</div></td>
                         </tr>;
                     })}</tbody>
                 </table>
@@ -126,41 +130,53 @@ export function ProspectsScreen() {
 
             <div className="flex items-center justify-between border-t border-[var(--crm-border)] px-4 py-3 text-[11px] text-[var(--crm-muted)]"><span>Page {cursorStack.length} · {prospects.length} records shown</span><div className="flex items-center gap-2"><button disabled={cursorStack.length <= 1 || loading} onClick={previousPage} className="crm-button-secondary"><ChevronLeft className="h-3.5 w-3.5"/> Previous</button><button disabled={nextAfter === null || loading} onClick={nextPage} className="crm-button-secondary">Next <ChevronRight className="h-3.5 w-3.5"/></button></div></div>
         </section>
-        {selected ? <WhatsAppModal prospect={selected} onClose={() => setSelected(null)}/> : null}
+        {!whatsappStatusAvailable ? <p role="status" className="text-xs text-[var(--crm-muted)]">WhatsApp contact status is unavailable. Apply the latest contact-status migration and check the WhatsApp configuration.</p> : null}
+        {selected ? <WhatsAppModal prospect={selected} onClose={() => setSelected(null)} onSent={() => {setSelected(null); void load(currentAfter, activeFilters);}}/> : null}
     </div>;
 }
 
-function WhatsAppModal({prospect, onClose}: {prospect: Prospect; onClose: () => void}) {
+function WhatsAppModal({prospect, onClose, onSent}: {prospect: Prospect; onClose: () => void; onSent: () => void}) {
     const company = prospect.company_name || prospect.business_name || "your company";
     const firstName = prospect.first_name || firstNameFromDisplay(prospect.name || prospect.contact_person);
-    const [message, setMessage] = useState(`Hi${firstName ? ` ${firstName}` : ""}, I’m reaching out from Adamant. I came across ${company} and would love to explore how our digital services could support your growth. Would you be open to a quick conversation?`);
-    const [opening, setOpening] = useState(false);
+    const message = `Hi${firstName ? ` ${firstName}` : ""}, I’m reaching out from Adamant. I came across ${company} and would love to explore how our digital services could support your growth. Would you be open to a quick conversation?`;
+    const [conversation, setConversation] = useState<WhatsAppConversation | null>(null);
+    const [error, setError] = useState("");
+    const [sending, setSending] = useState(false);
+    const sendingRef = useRef(false);
 
-    async function openWhatsApp() {
-        setOpening(true);
-        const whatsappWindow = window.open("", "_blank");
+    useEffect(() => {
+        let active = true;
+        void crmFetch<{conversation: WhatsAppConversation}>("/api/admin/prospects/whatsapp", {
+            method: "POST", body: JSON.stringify({recordId: prospect.record_id}),
+        }).then((data) => {if (active) setConversation(data.conversation);})
+            .catch((loadError) => {if (active) setError(loadError instanceof Error ? loadError.message : "The CRM conversation could not be loaded.");});
+        return () => {active = false;};
+    }, [prospect.record_id]);
+
+    async function sendMessage(payload: OutgoingMessage) {
+        if (!conversation || sendingRef.current) return false;
+        sendingRef.current = true;
+        setSending(true);
         try {
-            const data = await crmFetch<{url: string}>("/api/admin/prospects/whatsapp", {method: "POST", body: JSON.stringify({recordId: prospect.record_id, message})});
-            if (whatsappWindow) {
-                whatsappWindow.opener = null;
-                whatsappWindow.location.assign(data.url);
-            } else {
-                window.location.assign(data.url);
-            }
-            toast.success("WhatsApp opened and outreach logged");
-            onClose();
+            await crmFetch(`/api/admin/whatsapp/conversations/${conversation.id}/messages`, {
+                method: "POST", body: JSON.stringify({...payload, prospectRecordId: prospect.record_id}),
+            });
+            toast.success("WhatsApp message sent from CRM");
+            onSent();
+            return true;
         } catch (error) {
-            whatsappWindow?.close();
-            toast.error(error instanceof Error ? error.message : "WhatsApp could not be opened.");
+            toast.error(error instanceof Error ? error.message : "The WhatsApp message could not be sent.");
+            return false;
         } finally {
-            setOpening(false);
+            sendingRef.current = false;
+            setSending(false);
         }
     }
 
-    return <Modal title="Message on WhatsApp" description="Review the message before opening WhatsApp. This action is logged in the CRM for future provider integration." onClose={onClose}>
+    return <Modal title="Send WhatsApp from CRM" description="Send from your connected WhatsApp Business account. Messages and delivery status appear in the CRM inbox." onClose={() => {if (!sendingRef.current) onClose();}}>
         <div className="rounded-lg border border-[var(--crm-border)] bg-[var(--crm-subtle)] p-3 text-xs"><p className="font-semibold">{prospect.name || prospect.contact_person || "Lead"}</p><p className="mt-1 text-[var(--crm-muted)]">{prospect.phone || prospect.company_phone}</p></div>
-        <label className="mt-4 block"><span className="mb-1.5 block text-xs font-medium">Message</span><textarea rows={7} maxLength={2000} value={message} onChange={(event) => setMessage(event.target.value)} className="admin-input h-auto resize-y py-3"/><span className="mt-1.5 block text-right text-[10px] text-[var(--crm-muted)]">{message.length}/2000</span></label>
-        <div className="mt-5 flex justify-end gap-2"><button onClick={onClose} className="crm-button-secondary">Cancel</button><button disabled={opening || !message.trim()} onClick={() => void openWhatsApp()} className="crm-button-primary"><MessageCircle className="h-3.5 w-3.5"/>{opening ? "Opening…" : "Open WhatsApp"}<ExternalLink className="h-3 w-3"/></button></div>
+        <div className="mt-4">{error ? <p role="alert" className="text-sm text-red-500">{error}</p> : conversation ? <WhatsAppComposer key={conversation.id} conversation={conversation} translation={null} sending={sending} onSend={sendMessage} initialBody={message} preferClientProposal/> : <p role="status" className="py-4 text-xs text-[var(--crm-muted)]">Preparing CRM conversation…</p>}</div>
+        <div className="mt-4 flex justify-end"><button disabled={sending} onClick={onClose} className="crm-button-secondary">Cancel</button></div>
     </Modal>;
 }
 

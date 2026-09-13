@@ -26,6 +26,7 @@ export type CrmActor = {
 };
 
 export type Prospect = {
+    whatsapp?: {conversationId: string | null; initialMessageSent: boolean};
     record_id: number;
     source_file: string | null;
     source_sheet: string | null;

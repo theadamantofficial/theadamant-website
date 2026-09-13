@@ -535,6 +535,12 @@ async function updateMessageStatus(client: SupabaseClient, event: WhatsAppStatus
         },
     }).eq("id", existing.data.id);
     if (error) throw new CrmApiError("WhatsApp delivery status could not be saved.", 502);
+    const metadata = isRecord(existing.data.metadata) ? existing.data.metadata : {};
+    if (metadata.prospect_outreach_id) {
+        const {error: outreachError} = await client.from("prospect_outreach_events").update({status: event.status})
+            .eq("id", metadata.prospect_outreach_id);
+        if (outreachError) throw new CrmApiError("Prospect outreach delivery status could not be saved.", 502);
+    }
     return true;
 }
 

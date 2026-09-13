@@ -3,6 +3,7 @@ import {crmErrorResponse, CrmApiError, getCrmRequestContext} from "@/lib/crm/aut
 import {getCrmServiceClient} from "@/lib/crm/server-client";
 import {sendWhatsAppReaction, sendWhatsAppTemplate, sendWhatsAppText, type WhatsAppTemplateParameter} from "@/lib/crm/whatsapp-cloud";
 import {translateEnglishForWhatsApp, translateWhatsAppMessagesToEnglish} from "@/lib/crm/whatsapp-translation";
+import {getProspectOutreach} from "@/lib/crm/prospect-outreach";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -50,11 +51,13 @@ export async function GET(request: NextRequest, context: Context) {
 
 export async function POST(request: NextRequest, context: Context) {
     let localMessageId = "";
+    let outreachId = "";
+    let providerAccepted = false;
     try {
         const {client, actor} = await getCrmRequestContext(request);
         const {id} = await context.params;
         const conversation = await requireAccessibleConversation(client, id);
-        const payload = await request.json() as {body?: unknown; template?: unknown; reaction?: unknown; translation?: unknown};
+        const payload = await request.json() as {body?: unknown; template?: unknown; reaction?: unknown; translation?: unknown; prospectRecordId?: unknown};
         const reaction = parseReaction(payload.reaction);
         if (reaction) {
             const target = await client.from("whatsapp_messages").select("id,whatsapp_message_id").eq("id", reaction.messageId).eq("conversation_id", id).maybeSingle();
@@ -85,10 +88,12 @@ export async function POST(request: NextRequest, context: Context) {
             throw new CrmApiError("The 24-hour customer reply window is closed. Ask the customer to message again or use an approved Meta message template.", 409);
         }
         const storedBody = template ? (body || `Template: ${template.name}`) : body;
+        const outreach = await getProspectOutreach(client, actor, payload.prospectRecordId, conversation, storedBody);
         const translation = template ? null : parseTranslation(payload.translation);
         const sentBody = translation ? await translateEnglishForWhatsApp(body, translation.targetLanguage, translation.targetLanguageCode) : body;
 
         const serviceClient = getCrmServiceClient();
+        const messageMetadata = translation ? {translation: {englishText: body, translatedText: sentBody, detectedLanguage: "English", detectedLanguageCode: "en", targetLanguage: translation.targetLanguage, targetLanguageCode: translation.targetLanguageCode}} : {};
         const queued = await serviceClient.from("whatsapp_messages").insert({
             conversation_id: id,
             whatsapp_message_id: null,
@@ -98,16 +103,29 @@ export async function POST(request: NextRequest, context: Context) {
             status: "queued",
             sent_by: actor.id,
             message_timestamp: new Date().toISOString(),
-            metadata: translation ? {translation: {englishText: body, translatedText: sentBody, detectedLanguage: "English", detectedLanguageCode: "en", targetLanguage: translation.targetLanguage, targetLanguageCode: translation.targetLanguageCode}} : {},
+            metadata: messageMetadata,
         }).select("id").single();
         if (queued.error || !queued.data) throw new CrmApiError("The outgoing WhatsApp message could not be queued.", 502);
         localMessageId = String(queued.data.id);
+
+        if (outreach) {
+            const logged = await serviceClient.from("prospect_outreach_events").insert({
+                ...outreach, metadata: {...outreach.metadata, local_message_id: localMessageId},
+            }).select("id").single();
+            if (logged.error || !logged.data) throw new CrmApiError("The outreach event could not be logged. The message was not sent.", 502);
+            outreachId = String(logged.data.id);
+            const linked = await serviceClient.from("whatsapp_messages").update({
+                metadata: {...messageMetadata, prospect_outreach_id: outreachId},
+            }).eq("id", localMessageId);
+            if (linked.error) throw new CrmApiError("The outreach delivery record could not be linked. The message was not sent.", 502);
+        }
 
         let sent: {messageId: string};
         try {
             sent = template
                 ? await sendWhatsAppTemplate(conversation.wa_id, template.name, template.language, template.parameters, template.document)
                 : await sendWhatsAppText(conversation.wa_id, sentBody);
+            providerAccepted = true;
         } catch (sendError) {
             const message = sendError instanceof Error ? sendError.message.slice(0, 500) : "Meta could not send this message.";
             await serviceClient.from("whatsapp_messages").update({status: "failed", error_message: message}).eq("id", localMessageId);
@@ -121,6 +139,12 @@ export async function POST(request: NextRequest, context: Context) {
             message_timestamp: timestamp,
         }).eq("id", localMessageId);
         if (updateError) throw new CrmApiError("The message was sent, but its delivery record could not be updated.", 502);
+        if (outreachId) {
+            const logged = await serviceClient.from("prospect_outreach_events").update({
+                provider_message_id: sent.messageId, status: "sent",
+            }).eq("id", outreachId);
+            if (logged.error) throw new CrmApiError("The message was sent, but its outreach record could not be updated. Check the CRM inbox before retrying.", 502);
+        }
         const {error: conversationError} = await serviceClient.from("whatsapp_conversations").update({
             last_message_at: timestamp,
             last_message_preview: storedBody.slice(0, 180),
@@ -134,6 +158,11 @@ export async function POST(request: NextRequest, context: Context) {
         if (saved.error) throw new CrmApiError("The sent message could not be loaded.", 502);
         return NextResponse.json({message: saved.data}, {status: 201});
     } catch (error) {
+        if (localMessageId && !providerAccepted) {
+            const service = getCrmServiceClient();
+            await service.from("whatsapp_messages").update({status: "failed"}).eq("id", localMessageId);
+            if (outreachId) await service.from("prospect_outreach_events").update({status: "failed"}).eq("id", outreachId);
+        }
         const {message, status} = crmErrorResponse(error);
         return NextResponse.json({error: message, localMessageId: localMessageId || undefined}, {status});
     }
