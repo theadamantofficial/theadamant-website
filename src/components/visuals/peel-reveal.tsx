@@ -3,8 +3,9 @@ import dynamic from "next/dynamic";
 import {useCallback, useEffect, useState} from "react";
 import IntroCoverArt from "./intro-cover-art";
 const TearCover = dynamic(() => import("./tear-cover"), {ssr: false});
-/** Reduced-motion visitors never download or initialize the Three.js intro. */
+/** Direct section links and reduced-motion visitors never initialize the Three.js intro. */
 export default function PeelReveal() {
+    const [checkedEntry, setCheckedEntry] = useState(false);
     const [canTear, setCanTear] = useState(false), [ready, setReady] = useState(false), [done, setDone] = useState(false);
     const finish = useCallback(() => {
         document.documentElement.dataset.introComplete = "true";
@@ -12,6 +13,13 @@ export default function PeelReveal() {
         setDone(true);
     }, []);
     useEffect(() => {
+        // URL fragments are only available in the browser. Decide before mounting
+        // either cover so section links never flash the intro or lock scrolling.
+        if (window.location.hash) {
+            finish();
+            return;
+        }
+        setCheckedEntry(true);
         delete document.documentElement.dataset.introComplete;
         const completed = () => setDone(true), initialized = () => setReady(true);
         window.addEventListener("adamant:intro-complete", completed);
@@ -22,7 +30,7 @@ export default function PeelReveal() {
         else setCanTear(true);
         return () => {clearTimeout(timer); window.removeEventListener("adamant:intro-complete", completed); window.removeEventListener("adamant:tear-ready", initialized);};
     }, [finish]);
-    if (done) return null;
+    if (!checkedEntry || done) return null;
     return <>
         {!ready && <div className="peel-reveal peel-loading-cover" role="dialog" aria-modal="true" aria-label="Welcome to Adamant">
             <IntroCoverArt/>
