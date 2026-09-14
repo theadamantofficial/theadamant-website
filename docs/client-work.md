@@ -56,6 +56,10 @@ display order, hide it, then delete it and confirm it stays absent on reload.
 ## Refreshing screenshots
 
 The preview images in `public/images/work/` are actual 1440 × 900 browser captures.
+When an existing PrepVista, AetherSEO, or Bakery Shop record has a blank screenshot
+field, the site and admin automatically use the corresponding captured image.
+This works without applying the preview URL migration. Custom admin screenshots
+take priority. Hidden or deleted project records remain absent from the showcase.
 Run `node scripts/capture-project-previews.mjs` with Google Chrome installed to
 refresh the three initial projects. Set `PROJECT_PREVIEW_CHROME` to use another
 Chrome executable path. Captures use isolated profiles, decline the cookie banner

@@ -3,6 +3,7 @@ import {crmErrorResponse, CrmApiError} from "@/lib/crm/errors";
 import {authorizeContentAdmin, contentRecordId, readContentPayload} from "@/lib/admin-content";
 import {getCrmServiceClient} from "@/lib/crm/server-client";
 import {parseProject, parseProjectStatus, PROJECT_PUBLIC_FIELDS, projectFromRecord} from "@/lib/projects";
+import {getProjectPreview} from "@/lib/project-previews";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,10 +42,10 @@ export async function PATCH(request: NextRequest) {
         const input = payload.name === undefined ? {status: parseProjectStatus(payload.status)} : parseProject(payload);
         if (payload.name === undefined && input.status === "published") {
             const {data: project, error} = await getCrmServiceClient().from("projects")
-                .select("image,image_alt").eq("id", id).maybeSingle();
+                .select("name,href,image,image_alt").eq("id", id).maybeSingle();
             if (error) throw new CrmApiError("Project could not be loaded.", 503);
             if (!project) throw new CrmApiError("Project not found.", 404);
-            if (!project.image || !project.image_alt) throw new CrmApiError("Add a real project screenshot and description before publishing.");
+            if (!getProjectPreview({...project, imageAlt: project.image_alt}).image) throw new CrmApiError("Add a real project screenshot and description before publishing.");
         }
         const {data, error} = await getCrmServiceClient().from("projects")
             .update({...input, updated_at: new Date().toISOString()}).eq("id", id).select(FIELDS).maybeSingle();

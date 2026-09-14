@@ -116,6 +116,10 @@ describe("content management APIs", () => {
     });
     it("maps stored screenshot descriptions for the public view", async () => {
         mocks.limit.mockResolvedValue({data: [{id, image_alt: "Project homepage"}], error: null});
-        expect(await (await publicGET()).json()).toEqual({projects: [{id, imageAlt: "Project homepage"}]});
+        expect(await (await publicGET()).json()).toEqual({projects: [{id, image: "", imageAlt: "Project homepage"}]});
+    });
+    it("returns bundled screenshots for published records with blank image fields", async () => {
+        mocks.limit.mockResolvedValue({data: [{id, name: "AetherSEO", href: "https://aetherseo.com/en", image: "", image_alt: ""}], error: null});
+        expect(await (await publicGET()).json()).toEqual({projects: [{id, name: "AetherSEO", href: "https://aetherseo.com/en", image: "/images/work/aetherseo.png", imageAlt: "AetherSEO search workflow platform homepage"}]});
     });
 });
