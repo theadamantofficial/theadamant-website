@@ -15,6 +15,7 @@ import {SiteCopy} from "@/lib/site-copy";
 import {SectionDepth} from "@/components/visuals/section-depth";
 import {SectionCharacter} from "@/components/visuals/section-character";
 import {buildWhatsAppContactUrl} from "@/lib/whatsapp-contact";
+import {trackSiteEvent} from "@/lib/firebase-analytics";
 
 const SUCCESS_RESET_MS = 4000;
 const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "default_service";
@@ -76,6 +77,7 @@ export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["c
             form.reset();
             setWhatsAppUrl(buildWhatsAppContactUrl({service: serviceType}));
             setIsSubmitted(true);
+            void trackSiteEvent("generate_lead", {method: "contact_form"});
             toast.success(copy.form.successToast);
         } catch (error) {
             console.error("Project details submission failed", error);

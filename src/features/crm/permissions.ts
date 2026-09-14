@@ -8,6 +8,10 @@ export function canManageLeads(role: CrmRole) {
     return role === "super_admin" || role === "admin";
 }
 
+export function canViewWebsiteAnalytics(role: CrmRole) {
+    return role === "super_admin" || role === "admin";
+}
+
 export function isEmployee(role: CrmRole) {
     return role === "employee";
 }

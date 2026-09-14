@@ -124,8 +124,12 @@ const sections: LegalSection[] = [
             <p>
                 The public website may use essential cookies or browser storage for preferences such as
                 language and theme. The internal CRM uses secure authentication cookies to keep authorised
-                users signed in. We may update this notice if optional analytics or advertising technologies
-                are introduced.
+                users signed in. We use Firebase Analytics (Google Analytics) and Google Tag Manager to
+                understand visits, section navigation, and contact interactions. These services may use
+                cookies and browser identifiers. We also collect diagnostic error reports to troubleshoot
+                failures and send alerts to our private Discord channel. Our custom analytics events do
+                not include enquiry form values, and diagnostic reports remove URL queries and common
+                credentials. Browser privacy controls and content blockers may limit analytics collection.
             </p>
         ),
     },
@@ -178,7 +182,7 @@ export default function PrivacyPolicyPage() {
             eyebrow="Privacy"
             title="Privacy Policy"
             description={description}
-            lastUpdated="14 August 2026"
+            lastUpdated="14 September 2026"
             sections={sections}
         />
     );

@@ -4,15 +4,16 @@ import {createContext, FormEvent, ReactNode, useContext, useEffect, useRef, useS
 import Image from "next/image";
 import Link from "next/link";
 import {usePathname, useRouter} from "next/navigation";
-import {Bell, BriefcaseBusiness, Building2, CheckSquare2, ChevronRight, Database, LayoutDashboard, LogOut, Menu, MessageCircle, Moon, PanelLeftClose, PanelLeftOpen, Plus, Search, Settings, Sun, Users, Workflow, X} from "lucide-react";
+import {BarChart3, Bell, BriefcaseBusiness, Building2, CheckSquare2, ChevronRight, Database, LayoutDashboard, LogOut, Menu, MessageCircle, Moon, PanelLeftClose, PanelLeftOpen, Plus, Search, Settings, Sun, Users, Workflow, X} from "lucide-react";
 import type {CrmActor} from "@/features/crm/types";
 import {ROLE_LABELS} from "@/features/crm/constants";
-import {canAccessDevelopment, canAccessSales, canManageLeads, canViewProspectDatabase} from "@/features/crm/permissions";
+import {canAccessDevelopment, canAccessSales, canManageLeads, canViewProspectDatabase, canViewWebsiteAnalytics} from "@/features/crm/permissions";
 import {AdminThemeProvider, useAdminTheme} from "@/components/admin/admin-theme-provider";
 import {UserAvatar} from "@/components/admin/admin-ui";
 
 const NAV_ITEMS = [
     {href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard},
+    {href: "/admin/analytics", label: "Website Analytics", icon: BarChart3},
     {href: "/admin/leads", label: "Leads", icon: BriefcaseBusiness},
     {href: "/admin/whatsapp", label: "WhatsApp", icon: MessageCircle},
     {href: "/admin/prospects", label: "WhatsApp Lead DB", icon: Database},
@@ -45,6 +46,7 @@ function AdminShellInner({actor, children}: {actor: CrmActor; children: ReactNod
     const {theme, setTheme} = useAdminTheme();
     const canCreate = canManageLeads(actor.role);
     const visibleNavItems = NAV_ITEMS.filter((item) => {
+        if (item.href === "/admin/analytics") return canViewWebsiteAnalytics(actor.role);
         if (item.href === "/admin/development") return canAccessDevelopment(actor.role);
         if (!canAccessSales(actor.role)) return item.href === "/admin/pipeline";
         if (actor.role === "employee" && item.href === "/admin/team") return false;

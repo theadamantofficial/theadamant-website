@@ -10,6 +10,9 @@ import {getSiteMetadataBase} from "@/lib/site-url";
 import {buildOpenGraphMetadata, buildTwitterMetadata} from "@/lib/social-metadata";
 import {MotionProvider} from "@/components/providers/motion-provider";
 import SiteBackgroundMusic from "@/components/ui/site-background-music";
+import Script from "next/script";
+import SiteAnalytics from "@/components/providers/site-analytics";
+import {GOOGLE_TAG_MANAGER_ID, googleTagManagerEnabled, googleTagManagerScript} from "@/lib/google-tag-manager";
 
 export const metadata: Metadata = {
     title: {
@@ -63,14 +66,20 @@ export default async function RootLayout({children}: Readonly<{
     const siteLocale = isSiteLocale(siteLocaleHeader ?? "")
         ? siteLocaleHeader as SiteLocale
         : DEFAULT_SITE_LOCALE;
+    const enableTagManager = googleTagManagerEnabled();
 
     return (
         <html lang={localeToHtmlLang(siteLocale)} suppressHydrationWarning>
+        <head>
+            {enableTagManager && <Script id="google-tag-manager" strategy="beforeInteractive">{googleTagManagerScript}</Script>}
+        </head>
         <body suppressHydrationWarning>
+        {enableTagManager && <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${GOOGLE_TAG_MANAGER_ID}`} height="0" width="0" style={{display: "none", visibility: "hidden"}} title="Google Tag Manager"/></noscript>}
         <noscript>
             <style>{`.motion-reveal{opacity:1!important;transform:none!important;filter:none!important}.animated-faq-panel{height:auto!important;opacity:1!important;transform:none!important}`}</style>
         </noscript>
         <MotionProvider>
+            <SiteAnalytics/>
             <Toaster
                 position="top-right"
                 reverseOrder={false}

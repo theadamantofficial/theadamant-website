@@ -8,6 +8,94 @@
 
 The internal blog uses the repository JSON file when `BLOG_STORAGE_MODE=filesystem`.
 
+## Website analytics and crash alerts
+
+Firebase project `adamant-3eada` sends public website analytics to the Google Analytics web stream
+with measurement ID `G-GTL1BQJ71E`. Google Tag Manager container `GTM-PFTRSVCF` is installed in the root layout,
+with its script in the head and its noscript iframe at the start of the body.
+The application sends `page_view`, `section_view`, `contact_click`, and successful contact-form
+`generate_lead` events. Custom events exclude form values and URL queries. Firebase Analytics
+events exclude `/admin` and `/tear-preview`. Content blockers and unsupported browsers are
+handled without affecting the website.
+
+Telemetry is enabled by default in production. Set `NEXT_PUBLIC_TELEMETRY_ENABLED=true` to
+verify locally or `false` to disable analytics, Tag Manager, and crash alerts. Public environment
+changes require rebuilding the application.
+
+In Google Analytics, open Admin → Data streams → the web stream for `G-GTL1BQJ71E`, and
+disable Enhanced measurement. This application sends its own page views and contact events;
+automatic history/form events can duplicate those events or collect raw URLs. In Tag Manager,
+publish the intended container changes, and avoid a second Google tag targeting `G-GTL1BQJ71E`.
+Other marketing tags can be managed through this container.
+
+Firebase Crashlytics has no web SDK. Website crash alerts instead use browser error and
+unhandled-rejection listeners, React error boundaries, and Next.js `onRequestError` for uncaught
+server errors. They do not create issues in the Firebase Crashlytics dashboard, detect complete
+browser/process crashes, or automatically capture exceptions that application code handles.
+
+To receive alerts, create a webhook in a private `#website-crashes` channel in the Adamant Discord
+server (Edit Channel → Integrations → Webhooks), then set the server-only
+`DISCORD_CRASH_WEBHOOK_URL` in local and deployment environment settings. Alerts include
+sanitized error messages/stacks, route, environment, release, and Next.js error reference.
+Never put this URL in a `NEXT_PUBLIC_` variable. Until a webhook is configured, crash delivery
+is disabled. Reports strip URL queries, emails, and common credentials, but avoid including
+customer data in thrown errors.
+
+The browser limits reports to ten per page load. The endpoint checks origins, validates reports,
+limits body size and requests, and the Discord sender groups repeated errors for five minutes
+and caps alerts at twenty per minute. Server limits are per instance, so separate serverless
+instances can each send an alert for the same issue. Discord delivery failures never interrupt
+the website. No durable crash database is created by this integration.
+
+After deployment, check Google Analytics Realtime and Tag Manager Preview. To verify a crash
+alert in a local browser with telemetry enabled and a webhook configured, run
+`setTimeout(() => { throw new Error("Adamant crash notification test"); }, 0)` in DevTools.
+
+### Analytics reports in the admin portal
+
+Administrators and super admins can open `/admin/analytics` from the sidebar or CRM dashboard.
+The server reads Google Analytics Data API reports with the `analytics.readonly` scope. The page
+shows distinct users, sessions, page views, engagement, a daily chart/table, top pages, traffic
+channels, countries, devices, tracked contact/section events, and recent active web users.
+
+Configure these server-only environment variables in local and deployment settings:
+
+- `GOOGLE_ANALYTICS_PROPERTY_ID`: the numeric GA4 Property ID from Admin → Property details.
+  This is different from measurement ID `G-GTL1BQJ71E`, the Firebase project ID, and GTM container ID.
+- `GOOGLE_ANALYTICS_AUTH_MODE`: `service-account` (default) or `adc` for Application Default Credentials.
+- `GOOGLE_ANALYTICS_SERVICE_ACCOUNT_JSON`: the full JSON key for a Google Cloud service account.
+  Enable the Google Analytics Data API in its project and grant the service-account email the
+  Viewer role under Google Analytics → Property access management.
+- `GOOGLE_ANALYTICS_STREAM_ID` (optional): the numeric web Stream ID from Admin → Data streams.
+  This filters reports to that stream, including realtime. Without it, historical reports are
+  still filtered to `theadamant.com` / `www.theadamant.com`, while the recent visitors card
+  explicitly counts all web streams in the selected property.
+
+For local development with your Google account, set `GOOGLE_ANALYTICS_AUTH_MODE=adc` and run:
+
+```bash
+gcloud auth application-default login --scopes="https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/analytics.readonly"
+```
+
+Complete the browser sign-in with an account that can view the GA4 property, then restart the
+local website. ADC mode uses Google's authentication library to load and refresh the credentials;
+`GOOGLE_ANALYTICS_SERVICE_ACCOUNT_JSON` is not needed in this mode. You still need the numeric
+`GOOGLE_ANALYTICS_PROPERTY_ID` and an enabled Analytics Data API. A login on your Mac does not
+configure a separately deployed server: configure that server with its own service account or
+supported ADC identity. Restart after changing the ADC login account.
+
+Missing/invalid credentials show connection instructions; the app does not manufacture sample
+analytics. Credentials and access tokens are never returned to the browser. The API and page both
+enforce administrator access, and API responses use private/no-store headers. Report requests
+are coalesced and cached for sixty seconds per property, credentials, stream, and reporting period
+within each server instance to limit Google quotas. Errors explain missing access, disabled API,
+or exhausted quotas without exposing Google's raw authentication responses.
+
+Historical periods cover the last 7, 30, or 90 complete days through yesterday using the GA4
+property's timezone. Distinct users come from Google's period aggregate, rather than summing
+daily users. CRM pages and other hosts are excluded. Empty periods show zero reported activity;
+failed requests show an error. A failed realtime request leaves historical reports available.
+
 ## Supabase blog deployment
 
 Blog records are stored in Supabase in production. Optional uploaded covers are stored in the public `blog_images`

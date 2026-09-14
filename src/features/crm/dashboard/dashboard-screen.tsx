@@ -9,7 +9,7 @@ import {DataError, EmptyState, MetricCard, PageHeader, Skeleton, StatusBadge, Us
 import {LEAD_STATUS_LABELS} from "@/features/crm/constants";
 import type {Activity, DashboardMetrics, Lead, PipelineSummary} from "@/features/crm/types";
 import {crmFetch} from "@/features/crm/api";
-import {canManageLeads} from "@/features/crm/permissions";
+import {canManageLeads, canViewWebsiteAnalytics} from "@/features/crm/permissions";
 
 type DashboardData = {metrics: DashboardMetrics; pipeline: PipelineSummary[]; recentLeads: Lead[]; followups: Lead[]; activities: Activity[]};
 
@@ -64,6 +64,8 @@ export function DashboardScreen() {
             actions={<><button onClick={() => void load()} className="crm-button-secondary"><RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}/> Refresh</button>{canManage ? <Link href="/admin/leads/new" className="crm-button-primary"><Plus className="h-3.5 w-3.5"/> Add lead</Link> : null}</>}
         />
         {error ? <DataError message={error} onRetry={() => void load()}/> : null}
+
+        {canViewWebsiteAnalytics(actor.role) ? <Link href="/admin/analytics" className="crm-card flex flex-wrap items-center justify-between gap-3 px-5 py-4 transition hover:bg-[var(--crm-subtle)]"><div><h2 className="text-sm font-semibold">Website Analytics</h2><p className="mt-1 text-xs text-[var(--crm-muted)]">See visitors, traffic sources, top pages and contact activity.</p></div><span className="flex items-center gap-2 text-xs font-semibold text-[#0d5c63]">View reports <ArrowRight className="h-3.5 w-3.5"/></span></Link> : null}
 
         <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-8">
             {loading && !data ? Array.from({length: 8}).map((_, index) => <div key={index} className="crm-card p-4"><Skeleton className="h-3 w-20"/><Skeleton className="mt-4 h-7 w-24"/><Skeleton className="mt-4 h-3 w-28"/></div>) : cards.map((card) => <MetricCard key={card.label} {...card}/>)}
