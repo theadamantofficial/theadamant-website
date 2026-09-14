@@ -83,11 +83,11 @@ export default function TestimonialsSection() {
             </div>
         </Reveal>
 
-        <div className="mt-10 grid items-start gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div>
-                {loading ? <div role="status" className="glass-panel flex min-h-64 items-center justify-center gap-3 rounded-[2rem] p-8 text-foreground/65"><LoaderCircle className="h-5 w-5 animate-spin" aria-hidden="true"/> Loading testimonials…</div>
+        <div className="mt-10 grid items-stretch gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="flex min-w-0 flex-col">
+                {loading ? <div role="status" className="glass-panel flex min-h-64 flex-1 items-center justify-center gap-3 rounded-[2rem] p-8 text-foreground/65"><LoaderCircle className="h-5 w-5 animate-spin" aria-hidden="true"/> Loading testimonials…</div>
                     : testimonials.length ? <>
-                        <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="grid flex-1 auto-rows-fr gap-4 sm:grid-cols-2">
                             {testimonials.slice(0, visibleCount).map((testimonial) => <article key={testimonial.id} className="glass-panel flex h-full min-w-0 flex-col rounded-[1.5rem] p-6">
                                 <div className="flex items-center justify-between gap-3">
                                     <span role="img" aria-label={`${testimonial.rating} out of 5 stars`} className="flex gap-1 text-[#b87516] dark:text-amber-400">
@@ -102,15 +102,14 @@ export default function TestimonialsSection() {
                                 </div>
                             </article>)}
                         </div>
-                        {visibleCount < testimonials.length && <button type="button" className="button-secondary mt-5" onClick={() => setVisibleCount((count) => count + 6)}>Show more testimonials</button>}
-                    </> : <div className="relative overflow-hidden rounded-[2rem] bg-[#0d363a] p-8 text-white sm:p-10">
+                        {visibleCount < testimonials.length && <button type="button" className="button-secondary mt-5 self-start" onClick={() => setVisibleCount((count) => count + 6)}>Show more testimonials</button>}
+                    </> : <div className="relative flex flex-1 flex-col overflow-hidden rounded-[2rem] bg-[#0d363a] p-8 text-white sm:p-10">
                         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(88,183,179,0.25),transparent_65%)]"/>
                         <Quote className="relative h-12 w-12 text-white/25" aria-hidden="true"/>
                         <h3 className="relative mt-8 text-3xl font-semibold tracking-tight">Every project has a story.<br/>We’d love to hear yours.</h3>
                         <p className="relative mt-5 max-w-md text-sm leading-7 text-white/75">{loadError ? "We couldn’t load testimonials right now. You can still share your experience or visit our Google profile." : "Worked with us? Share what we built together, what stood out, and how it helped your business. Your words could help someone take their next step."}</p>
-                        <a href="#write-testimonial" className="relative mt-8 inline-flex items-center gap-2 text-sm font-semibold text-white underline underline-offset-4">Share your experience <ArrowUpRight className="h-4 w-4" aria-hidden="true"/></a>
+                        <a href="#write-testimonial" className="relative mt-auto inline-flex w-fit items-center gap-2 pt-8 text-sm font-semibold text-white underline underline-offset-4">Share your experience <ArrowUpRight className="h-4 w-4" aria-hidden="true"/></a>
                     </div>}
-                <p className="mt-4 px-2 text-xs leading-5 text-foreground/60">These testimonials are submitted on our website. Google reviews are available on our Google profile.</p>
             </div>
 
             <Reveal className="glass-panel rounded-[2rem] p-6 sm:p-8">
@@ -155,5 +154,6 @@ export default function TestimonialsSection() {
                 </div>
             </Reveal>
         </div>
+        <p className="mt-4 px-2 text-xs leading-5 text-foreground/60">These testimonials are submitted on our website. Google reviews are available on our Google profile.</p>
     </section>;
 }

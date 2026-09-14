@@ -13,7 +13,6 @@ import toast from "react-hot-toast";
 import {loadEmailJs} from "@/lib/load-emailjs";
 import {SiteCopy} from "@/lib/site-copy";
 import {SectionDepth} from "@/components/visuals/section-depth";
-import {SectionCharacter} from "@/components/visuals/section-character";
 import {buildWhatsAppContactUrl} from "@/lib/whatsapp-contact";
 import {trackSiteEvent} from "@/lib/firebase-analytics";
 
@@ -188,7 +187,6 @@ export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["c
                             />
                             </LabelInputContainer>
 
-                            <SectionCharacter mood="phone-wave" side="left" className="contact-form-mascot" interactive />
 
                             <div className="mt-auto rounded-[1.5rem] border border-black/8 bg-black/[0.03] p-5 dark:border-white/10 dark:bg-white/[0.03]">
                                 <div className="flex items-start gap-3">
