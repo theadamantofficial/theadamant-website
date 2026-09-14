@@ -59,8 +59,8 @@ export function parseWhatsAppPaymentDraft(payload: DraftPayload): WhatsAppPaymen
     const tax_paise = rupeesToPaise(payload.tax, "Enter a valid tax amount.", true);
     const discount_paise = rupeesToPaise(payload.discount, "Enter a valid discount amount.", true);
     const total_paise = subtotal_paise + tax_paise - discount_paise;
-    if (!Number.isSafeInteger(total_paise) || total_paise <= 0) {
-        throw new CrmApiError("The final payment amount must be greater than ₹0.");
+    if (!Number.isSafeInteger(total_paise) || total_paise < 100) {
+        throw new CrmApiError("The final payment amount must be greater than or equal to ₹1 (100 paise).");
     }
 
     const expires_in_minutes = Number(payload.expiresInMinutes ?? 1440);

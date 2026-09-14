@@ -25,6 +25,7 @@ export async function sendProposalEmail(input: {to: string; name: string; subjec
             ...(config.privateKey ? {accessToken: config.privateKey} : {}),
             template_params: {
                 to_email: input.to,
+                email: input.to,
                 to_name: input.name,
                 subject: input.subject,
                 message: input.message,

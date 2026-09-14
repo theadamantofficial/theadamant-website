@@ -209,6 +209,9 @@ export type WhatsAppPaymentOrder = {
     quick_pay: boolean;
     expires_in_minutes: number;
     status: WhatsAppPaymentOrderStatus;
+    checkout_token: string | null;
+    razorpay_order_id: string | null;
+    razorpay_payment_id: string | null;
     whatsapp_message_id: string | null;
     last_status_message_id: string | null;
     last_status_description: string | null;

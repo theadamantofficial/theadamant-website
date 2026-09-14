@@ -151,11 +151,37 @@ request a fresh, short-lived download URL from Meta and streams the audio withou
 the browser. This uses the same permanent token and `whatsapp_business_messaging` permission as the messaging setup.
 
 WhatsApp payment orders are available to administrators and to the employee assigned to the conversation. Staff can
-save and edit drafts, control line items, tax, discounts, expiry and the final INR amount, and send Meta `order_details`
-messages through the active payment configuration. Sent amounts are immutable. Payment confirmation is deliberately
-manual: staff must first verify the reference and amount in Razorpay or the settlement account, then use **Confirm
-paid** to notify the customer and move the order to processing. Apply
-`supabase/migrations/20260815093000_add_whatsapp_payment_orders.sql` before using these controls.
+save and edit drafts, control line items, tax, discounts, expiry and the final INR amount (minimum ₹1), then use
+**Send payment** to send a secure `/pay/<token>` checkout link in WhatsApp during the open 24-hour reply window.
+Sent amounts are immutable. The customer clicks **Pay** to open Razorpay Standard Checkout. Successful payments move
+the existing CRM order to **Payment confirmed** only after server-side signature, order, amount, currency and capture
+checks. **Open checkout** opens the same customer page; refresh payment history to see the latest confirmation.
+Completion/cancellation updates for these orders are sent as WhatsApp text messages. Historical native UPI requests
+retain their original manual confirmation/status flow.
+
+Apply `supabase/migrations/20260815093000_add_whatsapp_payment_orders.sql` if not already installed, then
+`supabase/migrations/20260914090000_add_whatsapp_razorpay_checkout.sql`. The new migration adds columns/indexes to the
+existing table; it does not create a new table. Configure the existing Supabase and Meta WhatsApp server credentials,
+plus `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, and `NEXT_PUBLIC_RAZORPAY_KEY_ID` in `.env` locally and in your deployment
+environment. The two key IDs must match. Never give the secret a `NEXT_PUBLIC_` prefix. `.env` is ignored by Git.
+Set `NEXT_PUBLIC_SITE_URL` to the publicly reachable deployment origin so the customer can open links from WhatsApp.
+
+For testing, use Razorpay test keys and run `npm run dev`. Sign in at `/admin/login`, open a WhatsApp conversation
+with an active reply window, save/send an order of at least ₹1, open the received link, and click **Pay**. Follow
+[Razorpay's Standard Checkout testing instructions](https://razorpay.com/docs/payments/payment-gateway/web-integration/standard/integration-steps/)
+to simulate success/failure. Also close the modal to test cancellation. Configure automatic capture in the Razorpay
+dashboard; authorized payments are not marked paid until captured. If verification fails after payment, use
+**Retry payment verification** without paying again. The browser keeps the response in session storage for refresh
+recovery. Verification accepts already-completed payments and payments made before link expiry, and is idempotent.
+
+`POST /api/create-order` accepts `{token}` and returns `{order_id, amount, currency}`; the server derives the price
+and receipt from the stored WhatsApp order and reuses its provider order ID. `POST /api/verify-payment` accepts
+`{token, razorpay_payment_id, razorpay_order_id, razorpay_signature}`. Customer endpoints require the unguessable
+payment-link token, not a CRM login. Invalid/missing signatures return 400 without changing payment status;
+Razorpay authentication errors return 401 and other Razorpay API failures return 500. CRM users cannot manually mark
+new checkout orders paid. This integration verifies through the Checkout callback; it does not add Razorpay webhooks.
+If the customer leaves before the callback runs or clears recovery storage, reconcile the payment in Razorpay before
+fulfilling the order. Switch to matching live keys in the deployment environment when ready for live payments.
 
 ## Vercel Blob recovery on 27 August 2026
 

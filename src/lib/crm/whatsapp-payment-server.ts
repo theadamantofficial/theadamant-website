@@ -1,9 +1,12 @@
 import type {SupabaseClient} from "@supabase/supabase-js";
+import {randomBytes} from "node:crypto";
 import {CrmApiError} from "@/lib/crm/errors";
 import {getCrmServiceClient} from "@/lib/crm/server-client";
+import {getSiteUrl} from "@/lib/site-url";
+import {getRazorpayClient, validateCheckoutAmount} from "@/lib/crm/razorpay";
+import {sendWhatsAppText} from "@/lib/crm/whatsapp-cloud";
 import {
     formatWhatsAppPaymentAmount,
-    sendWhatsAppOrderDetails,
     sendWhatsAppOrderStatus,
     type WhatsAppOrderStatus,
     type WhatsAppPaymentDraft,
@@ -24,6 +27,9 @@ export const PAYMENT_ORDER_SELECT = [
     "quick_pay",
     "expires_in_minutes",
     "status",
+    "checkout_token",
+    "razorpay_order_id",
+    "razorpay_payment_id",
     "whatsapp_message_id",
     "last_status_message_id",
     "last_status_description",
@@ -51,6 +57,9 @@ type StoredPaymentOrder = WhatsAppPaymentDraft & {
     conversation_id: string;
     reference_id: string;
     status: string;
+    checkout_token: string | null;
+    razorpay_order_id: string | null;
+    razorpay_payment_id: string | null;
 };
 
 export async function requireAccessiblePaymentConversation(client: SupabaseClient, conversationId: string) {
@@ -65,9 +74,12 @@ export async function requireAccessiblePaymentConversation(client: SupabaseClien
 
 export async function sendStoredPaymentOrder(conversation: AccessiblePaymentConversation, orderId: string, actorId: string) {
     requireOpenServiceWindow(conversation.customer_service_window_expires_at);
+    getRazorpayClient();
+    const checkoutToken = randomBytes(32).toString("hex");
+    const checkoutUrl = new URL(`/pay/${checkoutToken}`, getSiteUrl()).toString();
     const serviceClient = getCrmServiceClient();
     const claim = await serviceClient.from("whatsapp_payment_orders")
-        .update({status: "sending", updated_by: actorId, last_error: null})
+        .update({status: "sending", checkout_token: checkoutToken, updated_by: actorId, last_error: null})
         .eq("id", orderId)
         .eq("conversation_id", conversation.id)
         .eq("status", "draft")
@@ -76,14 +88,20 @@ export async function sendStoredPaymentOrder(conversation: AccessiblePaymentConv
     if (claim.error) throw new CrmApiError("The payment draft could not be prepared for sending.", 502);
     if (!claim.data) throw new CrmApiError("Only an unsent payment draft can be sent.", 409);
     const order = claim.data as StoredPaymentOrder;
+    if (!Number.isSafeInteger(Number(order.total_paise)) || Number(order.total_paise) < 100) {
+        await serviceClient.from("whatsapp_payment_orders").update({status: "draft"}).eq("id", order.id);
+        validateCheckoutAmount(Number(order.total_paise), "INR");
+    }
     const timestamp = new Date().toISOString();
     const summary = `Payment request · ${formatWhatsAppPaymentAmount(Number(order.total_paise))}`;
+    const messageBody = [order.body, `${summary} · ${order.reference_id}`, ...order.items.map((item) => `${item.quantity}× ${item.name}`),
+        `Pay securely: ${checkoutUrl}`, `Link expires in ${order.expires_in_minutes} minutes.`, order.footer].filter(Boolean).join("\n");
     const queued = await serviceClient.from("whatsapp_messages").insert({
         conversation_id: conversation.id,
         whatsapp_message_id: null,
         direction: "outbound",
-        message_type: "order_details",
-        body: `${summary}\n${order.body}`,
+        message_type: "text",
+        body: messageBody,
         status: "queued",
         sent_by: actorId,
         message_timestamp: timestamp,
@@ -97,7 +115,7 @@ export async function sendStoredPaymentOrder(conversation: AccessiblePaymentConv
     const localMessageId = String(queued.data.id);
     let providerMessageId = "";
     try {
-        const sent = await sendWhatsAppOrderDetails(conversation.wa_id, storedOrderToDraft(order), order.reference_id);
+        const sent = await sendWhatsAppText(conversation.wa_id, messageBody);
         providerMessageId = sent.messageId;
         const {error: messageError} = await serviceClient.from("whatsapp_messages").update({
             whatsapp_message_id: sent.messageId,
@@ -137,6 +155,9 @@ export async function sendStoredOrderStatus(
     actorId: string,
 ) {
     requireOpenServiceWindow(conversation.customer_service_window_expires_at);
+    if (order.checkout_token && targetStatus === "processing") {
+        throw new CrmApiError("Razorpay checkout payments are confirmed only by server-side payment verification.", 409);
+    }
     const allowed = order.status === "pending"
         ? ["processing", "canceled"]
         : order.status === "processing" ? ["completed"] : [];
@@ -158,7 +179,7 @@ export async function sendStoredOrderStatus(
         conversation_id: conversation.id,
         whatsapp_message_id: null,
         direction: "outbound",
-        message_type: "order_status",
+        message_type: order.checkout_token ? "text" : "order_status",
         body: description,
         status: "queued",
         sent_by: actorId,
@@ -173,7 +194,9 @@ export async function sendStoredOrderStatus(
     const localMessageId = String(queued.data.id);
     let providerMessageId = "";
     try {
-        const sent = await sendWhatsAppOrderStatus(conversation.wa_id, order.reference_id, targetStatus, description);
+        const sent = order.checkout_token
+            ? await sendWhatsAppText(conversation.wa_id, `${order.reference_id}\n${description}`)
+            : await sendWhatsAppOrderStatus(conversation.wa_id, order.reference_id, targetStatus, description);
         providerMessageId = sent.messageId;
         const {error: messageError} = await serviceClient.from("whatsapp_messages").update({
             whatsapp_message_id: sent.messageId,
@@ -225,20 +248,6 @@ export async function loadAccessiblePaymentOrder(client: SupabaseClient, orderId
     if (error) throw new CrmApiError("The payment order could not be loaded. Apply the latest Supabase migration.", 502);
     if (!data) throw new CrmApiError("Payment order not found or unavailable.", 404);
     return data as StoredPaymentOrder;
-}
-
-function storedOrderToDraft(order: StoredPaymentOrder): WhatsAppPaymentDraft {
-    return {
-        body: String(order.body),
-        footer: String(order.footer || ""),
-        items: Array.isArray(order.items) ? order.items : [],
-        subtotal_paise: Number(order.subtotal_paise),
-        tax_paise: Number(order.tax_paise),
-        discount_paise: Number(order.discount_paise),
-        total_paise: Number(order.total_paise),
-        quick_pay: Boolean(order.quick_pay),
-        expires_in_minutes: Number(order.expires_in_minutes),
-    };
 }
 
 function requireOpenServiceWindow(expiresAt: string | null) {

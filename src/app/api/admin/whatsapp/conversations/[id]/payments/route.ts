@@ -64,8 +64,10 @@ export async function POST(request: NextRequest, context: Context) {
             if (existing.error) throw new CrmApiError("The payment draft could not be loaded.", 502);
             if (!existing.data || existing.data.conversation_id !== id) throw new CrmApiError("Payment draft not found or unavailable.", 404);
             if (existing.data.status !== "draft") throw new CrmApiError("A sent payment request can no longer be edited.", 409);
-            const {error} = await serviceClient.from("whatsapp_payment_orders").update(values).eq("id", orderId);
+            const {data, error} = await serviceClient.from("whatsapp_payment_orders").update(values)
+                .eq("id", orderId).eq("status", "draft").select("id").maybeSingle();
             if (error) throw new CrmApiError("The payment draft could not be updated.", 502);
+            if (!data) throw new CrmApiError("The payment draft was sent or updated by someone else. Refresh and try again.", 409);
         } else {
             const inserted = await serviceClient.from("whatsapp_payment_orders").insert({
                 conversation_id: id,

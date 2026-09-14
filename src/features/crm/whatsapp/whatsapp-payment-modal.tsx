@@ -35,7 +35,6 @@ export function WhatsAppPaymentModal({conversation, onClose, onChanged}: {
     const [tax, setTax] = useState("0");
     const [discount, setDiscount] = useState("0");
     const [expiryMinutes, setExpiryMinutes] = useState("1440");
-    const [quickPay, setQuickPay] = useState(false);
 
     const loadOrders = useCallback(async () => {
         try {
@@ -65,7 +64,6 @@ export function WhatsAppPaymentModal({conversation, onClose, onChanged}: {
         setTax("0");
         setDiscount("0");
         setExpiryMinutes("1440");
-        setQuickPay(false);
     }
 
     function editOrder(order: WhatsAppPaymentOrder) {
@@ -76,7 +74,6 @@ export function WhatsAppPaymentModal({conversation, onClose, onChanged}: {
         setTax(paiseToInput(order.tax_paise));
         setDiscount(paiseToInput(order.discount_paise));
         setExpiryMinutes(String(order.expires_in_minutes));
-        setQuickPay(order.quick_pay);
     }
 
     async function submit(action: "save" | "send") {
@@ -92,7 +89,7 @@ export function WhatsAppPaymentModal({conversation, onClose, onChanged}: {
                     items,
                     tax,
                     discount,
-                    quickPay,
+                    quickPay: false,
                     expiresInMinutes: expiryMinutes,
                 }),
             });
@@ -127,10 +124,10 @@ export function WhatsAppPaymentModal({conversation, onClose, onChanged}: {
         void updateOrder(order, {status: "processing"}, "Payment confirmed and customer notified");
     }
 
-    return <Modal title="WhatsApp payment order" description="Draft a UPI payment request. Sent amounts cannot be edited; verify funds in Razorpay before confirming payment." onClose={onClose}>
+    return <Modal title="WhatsApp payment order" description="Send a secure Razorpay checkout link in WhatsApp. Payments are confirmed automatically after verification." onClose={onClose}>
         <form className="space-y-4" onSubmit={(event) => { event.preventDefault(); void submit("save"); }}>
             <div className="flex items-center justify-between gap-3 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-subtle)] px-3 py-2">
-                <div><p className="text-xs font-semibold text-[var(--crm-text)]">{editingId ? "Editing saved draft" : "New payment draft"}</p><p className="text-[10px] text-[var(--crm-muted)]">UPI · INR · {conversation.contact_name || `+${conversation.wa_id}`}</p></div>
+                <div><p className="text-xs font-semibold text-[var(--crm-text)]">{editingId ? "Editing saved draft" : "New payment draft"}</p><p className="text-[10px] text-[var(--crm-muted)]">Razorpay · INR · {conversation.contact_name || `+${conversation.wa_id}`}</p></div>
                 {editingId ? <button type="button" onClick={resetForm} className="crm-button-secondary"><Plus className="h-3.5 w-3.5"/>New</button> : null}
             </div>
 
@@ -153,8 +150,6 @@ export function WhatsAppPaymentModal({conversation, onClose, onChanged}: {
                 <FormField label="Footer"><input value={footer} onChange={(event) => setFooter(event.target.value)} maxLength={60} className="admin-input"/></FormField>
             </div>
 
-            <label className="flex items-start gap-2 rounded-lg border border-[var(--crm-border)] p-3"><input type="checkbox" checked={quickPay} onChange={(event) => setQuickPay(event.target.checked)} className="mt-0.5"/><span><span className="block text-xs font-medium">Quick Pay</span><span className="block text-[10px] leading-4 text-[var(--crm-muted)]">Show Pay now directly instead of Review and pay.</span></span></label>
-
             <div className="rounded-lg border border-[var(--crm-border)] bg-[var(--crm-subtle)] p-3 text-xs">
                 <div className="flex justify-between text-[var(--crm-muted)]"><span>Subtotal</span><span>{formatRupees(totals.subtotal)}</span></div>
                 <div className="mt-2 flex justify-between text-sm font-semibold text-[var(--crm-text)]"><span>Total</span><span>{formatRupees(totals.total)}</span></div>
@@ -164,7 +159,7 @@ export function WhatsAppPaymentModal({conversation, onClose, onChanged}: {
         </form>
 
         <div className="my-5 border-t border-[var(--crm-border)]"/>
-        <div className="space-y-2"><h3 className="text-xs font-semibold text-[var(--crm-text)]">Payment history</h3>
+        <div className="space-y-2"><div className="flex items-center justify-between"><h3 className="text-xs font-semibold text-[var(--crm-text)]">Payment history</h3><button type="button" onClick={() => void loadOrders()} className="crm-button-secondary">Refresh</button></div>
             {loading ? <div className="space-y-2"><Skeleton className="h-20"/><Skeleton className="h-20"/></div> : orders.length ? orders.map((order) => <PaymentOrderCard key={order.id} order={order} busy={updatingId === order.id} onEdit={() => editOrder(order)} onSend={() => void updateOrder(order, {action: "send"}, "Payment request sent")} onConfirm={() => confirmPayment(order)} onComplete={() => void updateOrder(order, {status: "completed"}, "Order completed and customer notified")} onCancel={() => void updateOrder(order, {status: "canceled"}, "Payment request canceled")}/>) : <p className="rounded-lg border border-dashed border-[var(--crm-border)] px-3 py-5 text-center text-[11px] text-[var(--crm-muted)]">No payment orders for this conversation yet.</p>}
         </div>
     </Modal>;
@@ -174,11 +169,12 @@ function PaymentOrderCard({order, busy, onEdit, onSend, onConfirm, onComplete, o
     return <article className="rounded-lg border border-[var(--crm-border)] p-3">
         <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold text-[var(--crm-text)]">{formatPaise(order.total_paise)}</p><p className="mt-0.5 text-[9px] text-[var(--crm-muted)]">{order.reference_id} · {formatCrmDate(order.created_at, true)}</p></div><span className={`rounded-full px-2 py-1 text-[9px] font-semibold ${statusClass(order.status)}`}>{STATUS_LABELS[order.status]}</span></div>
         <p className="mt-2 line-clamp-2 text-[10px] leading-4 text-[var(--crm-muted)]">{order.items.map((item) => `${item.quantity}× ${item.name}`).join(" · ")}</p>
+        {order.razorpay_payment_id ? <p className="mt-2 text-[10px] text-[var(--crm-muted)]">Payment: {order.razorpay_payment_id}</p> : null}
         {order.last_error ? <p className="mt-2 text-[10px] text-rose-600">{order.last_error}</p> : null}
         <div className="mt-3 flex flex-wrap gap-2">
             {busy ? <span className="flex items-center gap-1 text-[10px] text-[var(--crm-muted)]"><Loader2 className="h-3.5 w-3.5 animate-spin"/>Updating…</span> : <>
                 {order.status === "draft" ? <><button onClick={onEdit} className="crm-button-secondary"><Pencil className="h-3 w-3"/>Edit</button><button onClick={onSend} className="crm-button-primary"><Send className="h-3 w-3"/>Send</button></> : null}
-                {order.status === "pending" ? <><button onClick={onConfirm} className="crm-button-primary"><BadgeIndianRupee className="h-3.5 w-3.5"/>Confirm paid</button><button onClick={onCancel} className="crm-button-secondary text-rose-600"><XCircle className="h-3.5 w-3.5"/>Cancel</button></> : null}
+                {order.status === "pending" ? <>{order.checkout_token ? <a href={`/pay/${order.checkout_token}`} target="_blank" rel="noreferrer" className="crm-button-secondary">Open checkout</a> : <button onClick={onConfirm} className="crm-button-primary"><BadgeIndianRupee className="h-3.5 w-3.5"/>Confirm paid</button>}<button onClick={onCancel} className="crm-button-secondary text-rose-600"><XCircle className="h-3.5 w-3.5"/>Cancel</button></> : null}
                 {order.status === "processing" ? <button onClick={onComplete} className="crm-button-primary"><CheckCircle2 className="h-3.5 w-3.5"/>Mark complete</button> : null}
             </>}
         </div>
