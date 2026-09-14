@@ -3,13 +3,15 @@
 import {useEffect, useState} from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {ArrowRight, ArrowUpRight, ExternalLink, Layers3, LoaderCircle, Monitor, Smartphone} from "lucide-react";
+import {ArrowRight, ArrowUpRight, ExternalLink, ImageOff, Layers3, LoaderCircle, Monitor, Smartphone} from "lucide-react";
 import {Reveal} from "@/components/ui/reveal";
 import {type ClientWorkProject, type WorkCategory} from "@/content/client-work";
 import {getLocalizedPath, type SiteLocale} from "@/lib/site-locale";
 
 function ProjectPreview({project}: {project: ClientWorkProject}) {
     const isTeal = project.theme === "teal";
+    const [imageFailed, setImageFailed] = useState(false);
+    useEffect(() => setImageFailed(false), [project.image]);
     const Icon = project.category === "Mobile apps" ? Smartphone : Monitor;
     return <div className={`relative overflow-hidden rounded-[1.5rem] border border-black/10 p-4 sm:p-6 ${isTeal ? "bg-[#d6e7e1]" : "bg-[#ede0d2]"}`}>
         <div aria-hidden="true" className={`pointer-events-none absolute inset-0 ${isTeal ? "bg-[radial-gradient(circle_at_100%_0%,rgba(13,92,99,0.18),transparent_65%)]" : "bg-[radial-gradient(circle_at_100%_0%,rgba(181,88,53,0.16),transparent_65%)]"}`}/>
@@ -19,14 +21,12 @@ function ProjectPreview({project}: {project: ClientWorkProject}) {
                 <span className="ml-3 min-w-0 flex-1 truncate rounded-md bg-black/5 px-3 py-1 text-center text-[10px] text-[#1d2a28]/65">{project.href ? new URL(project.href).hostname : project.name}</span>
                 <Icon className="ml-2 h-3.5 w-3.5 text-[#1d2a28]/50"/>
             </div>
-            {project.image ? <div className="relative aspect-[16/10] bg-white">
-                <Image src={project.image} alt={project.imageAlt || `${project.name} project screenshot`} fill unoptimized={project.image.startsWith("https://")} sizes="(max-width: 767px) 85vw, 480px" className="object-cover object-top"/>
-            </div> : <div className={`relative flex aspect-[16/10] flex-col justify-between overflow-hidden p-6 text-white sm:p-8 ${isTeal ? "bg-[#0d363a]" : "bg-[#573a30]"}`}>
-                <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full border border-white/10"/>
-                <div aria-hidden="true" className="pointer-events-none absolute -bottom-20 -right-20 h-72 w-72 rounded-full border border-white/10"/>
-                <p className="relative flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-white/70"><Icon className="h-4 w-4" aria-hidden="true"/>{project.category}</p>
-                <div className="relative"><p className="break-words text-3xl font-semibold tracking-tight sm:text-4xl">{project.name}</p><p className="mt-3 text-xs text-white/70">{project.label}</p></div>
-                <div className="relative flex items-center justify-between border-t border-white/15 pt-4 text-xs text-white/75"><span>Project showcase</span><ArrowUpRight className="h-5 w-5" aria-hidden="true"/></div>
+            {project.image && !imageFailed ? <div className="relative aspect-[16/10] bg-white">
+                <Image src={project.image} alt={project.imageAlt || `${project.name} website screenshot`} fill unoptimized={project.image.startsWith("https://")} sizes="(max-width: 767px) 85vw, 480px" className="object-cover object-top" onError={() => setImageFailed(true)}/>
+            </div> : <div className="flex aspect-[16/10] flex-col items-center justify-center gap-3 bg-[#f6f0e5] px-6 text-center text-[#1d2a28]/65">
+                <ImageOff className="h-8 w-8" aria-hidden="true"/>
+                <p className="text-sm font-medium">Website preview {imageFailed ? "unavailable" : "coming soon"}</p>
+                {project.href && <p className="text-xs">Open the project to explore the live website.</p>}
             </div>}
         </div>
     </div>;

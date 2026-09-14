@@ -26,6 +26,7 @@ export function parseProject(payload: Record<string, unknown>) {
     const description = text("description", 20, 1500);
     if (!WORK_CATEGORIES.includes(payload.category as WorkCategory)) throw new CrmApiError("Choose a valid project category.");
     if (payload.theme !== "teal" && payload.theme !== "clay") throw new CrmApiError("Choose a valid project theme.");
+    const status = parseProjectStatus(payload.status);
     const href = text("href", 0, 2000);
     const image = text("image", 0, 2000);
     const image_alt = text("imageAlt", 0, 200);
@@ -35,11 +36,12 @@ export function parseProject(payload: Record<string, unknown>) {
     if (href && !httpsUrl(href)) throw new CrmApiError("Project link must be a valid HTTPS URL.");
     if (image && !httpsUrl(image) && !/^\/images\/[a-zA-Z0-9_./-]+$/.test(image)) throw new CrmApiError("Screenshot must be an HTTPS URL or a local image path.");
     if (image && !image_alt) throw new CrmApiError("Add a description for the screenshot.");
+    if (status === "published" && !image) throw new CrmApiError("Add a real project screenshot before publishing.");
     if (!Array.isArray(payload.highlights) || payload.highlights.length > 8 || payload.highlights.some((item) => typeof item !== "string" || item.trim().length < 1 || item.trim().length > 60)) throw new CrmApiError("Add up to 8 project highlights of 1–60 characters each.");
     if (!Number.isInteger(payload.sort_order) || Number(payload.sort_order) < 0 || Number(payload.sort_order) > 9999) throw new CrmApiError("Display order must be a whole number from 0 to 9999.");
     return {
         name, category: payload.category as WorkCategory, label, description, href, image, image_alt,
         highlights: [...new Set((payload.highlights as string[]).map((item) => item.trim()))],
-        theme: payload.theme, status: parseProjectStatus(payload.status), sort_order: Number(payload.sort_order),
+        theme: payload.theme, status, sort_order: Number(payload.sort_order),
     };
 }

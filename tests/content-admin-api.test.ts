@@ -97,6 +97,15 @@ describe("content management APIs", () => {
         expect((await testimonials.POST(request("POST", {...testimonial, consent: false}))).status).toBe(400);
         expect(mocks.insert).not.toHaveBeenCalled();
     });
+    it("blocks quick project publishing until a screenshot exists", async () => {
+        expect((await projects.PATCH(request("PATCH", {id, status: "published"}))).status).toBe(400);
+        expect(mocks.update).not.toHaveBeenCalled();
+    });
+    it("publishes projects with existing screenshots through quick moderation", async () => {
+        mocks.maybeSingle.mockResolvedValue({data: {id, ...project, image: "/images/work/bakery-shop.png", image_alt: "Bakery homepage"}, error: null});
+        expect((await projects.PATCH(request("PATCH", {id, status: "published"}))).status).toBe(200);
+        expect(mocks.update).toHaveBeenCalledWith(expect.objectContaining({status: "published"}));
+    });
     it("reads published projects only, without exposing admin fields or substituting deleted static entries", async () => {
         const response = await publicGET();
         expect(response.status).toBe(200);

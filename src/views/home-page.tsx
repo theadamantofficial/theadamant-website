@@ -89,7 +89,7 @@ export default function HomePage({
 
         <AdamantSystemSection services={copy.services}/>
 
-        <PartnerProofStrip copy={copy.services.proofStrip} items={proofItems}/>
+        <ClientWorkSection locale={locale}/>
 
         <CompanyCredentialsSection copy={copy.credentials}/>
 
@@ -97,7 +97,7 @@ export default function HomePage({
 
         <ServicesSection copy={servicesCopy} locale={locale}/>
 
-        <ClientWorkSection locale={locale}/>
+        <PartnerProofStrip copy={copy.services.proofStrip} items={proofItems}/>
 
         <ProcessSection copy={copy.process}/>
 

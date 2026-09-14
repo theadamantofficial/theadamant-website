@@ -10,11 +10,16 @@ Apply these migrations in order to the site's Supabase project:
 
 1. `supabase/migrations/20260915120000_create_testimonials.sql`
 2. `supabase/migrations/20260915140000_manage_projects_and_testimonials.sql`
+3. `supabase/migrations/20260915160000_add_bakery_shop_project.sql`
+4. `supabase/migrations/20260915163000_add_project_website_previews.sql`
 
 Use the existing Supabase migration workflow or execute the migrations in the SQL
 editor. The second migration creates the projects table, seeds the existing
 PrepVista and AetherSEO entries, adds testimonial delete permission, and creates
 the public `project_images` storage bucket. AetherSEO remains an in-house product.
+The third migration adds Bakery Shop using its confirmed public URL,
+`https://bakery-shop-beta.vercel.app/`. The fourth adds actual screenshots for
+Bakery Shop, PrepVista, and AetherSEO while preserving custom admin screenshots.
 
 Server configuration uses `SUPABASE_URL` (or `NEXT_PUBLIC_SUPABASE_URL`) and
 `SUPABASE_SECRET_KEY` (or `SUPABASE_SERVICE_ROLE_KEY`), as in the CRM. Never expose
@@ -26,7 +31,9 @@ existing Supabase public key configuration.
 Add a project name, category, label, description, optional HTTPS live link, and
 optional screenshot. Upload JPG, PNG, WebP, or AVIF screenshots up to 4 MB, or
 provide an HTTPS image URL or local `/images/` path. Screenshots require an
-alternative description. Without a screenshot, a branded project cover appears.
+alternative description. Projects require an actual screenshot before publishing.
+Drafts can be saved without screenshots. A missing or failed preview shows an
+explicit unavailable message rather than a simulated website.
 
 Add up to eight highlights, one per line. Choose a cover theme and display order;
 lower order numbers appear first. Save as **Draft** to prepare a project, then
@@ -45,3 +52,13 @@ Run `npm test -- tests/projects.test.ts tests/content-admin-api.test.ts tests/pr
 After applying the migrations, add a draft project with a screenshot, publish it,
 and reload the homepage. Check the screenshot, link, and category filter. Edit its
 display order, hide it, then delete it and confirm it stays absent on reload.
+
+## Refreshing screenshots
+
+The preview images in `public/images/work/` are actual 1440 × 900 browser captures.
+Run `node scripts/capture-project-previews.mjs` with Google Chrome installed to
+refresh the three initial projects. Set `PROJECT_PREVIEW_CHROME` to use another
+Chrome executable path. Captures use isolated profiles, decline the cookie banner
+when available, and wait for fonts and the page to render before saving.
+
+For other projects, upload a current website screenshot through the admin editor.

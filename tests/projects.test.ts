@@ -19,6 +19,11 @@ describe("project validation", () => {
     it("accepts screenshots with alternative descriptions", () => {
         expect(parseProject({...project, image: "https://cdn.example.com/image.png", imageAlt: "Website homepage"}).image_alt).toBe("Website homepage");
     });
+    it("requires a real screenshot when publishing while allowing image-free drafts", () => {
+        expect(() => parseProject({...project, status: "published"})).toThrow("Add a real project screenshot before publishing.");
+        expect(parseProject(project).status).toBe("draft");
+        expect(parseProject({...project, status: "published", image: "/images/work/bakery-shop.png", imageAlt: "Bakery homepage"}).status).toBe("published");
+    });
     it.each([
         {href: "javascript:alert(1)"}, {href: "http://example.com"}, {href: "https://user:secret@example.com"},
         {image: "//example.com/image.png"}, {image: "https://example.com/image.png", imageAlt: ""},
