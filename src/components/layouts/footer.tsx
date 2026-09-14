@@ -109,7 +109,7 @@ export default function Footer({
         index === 0
             ? {
                 ...section,
-                links: [...section.links, {name: BLOG_LABELS[locale], anchor: "__blog__"}],
+                links: [...section.links, {name: "Our work", anchor: "work"}, {name: "Testimonials", anchor: "testimonials"}, {name: BLOG_LABELS[locale], anchor: "__blog__"}],
             }
             : section
     ));

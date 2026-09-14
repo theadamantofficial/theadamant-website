@@ -11,7 +11,9 @@ const CompanyCredentialsSection = dynamic(() => import("@/components/sections/co
 const PartnerProofStrip = dynamic(() => import("@/components/sections/partner-proof-strip"));
 const ValuePropsSection = dynamic(() => import("@/components/sections/value-props-section"));
 const ServicesSection = dynamic(() => import("@/components/sections/services-section"));
+const ClientWorkSection = dynamic(() => import("@/components/sections/client-work-section"));
 const ProcessSection = dynamic(() => import("@/components/sections/process-section"));
+const TestimonialsSection = dynamic(() => import("@/components/sections/testimonials-section"));
 const FaqSection = dynamic(() => import("@/components/sections/faq-section"));
 const ContactUsSection = dynamic(() => import("@/components/sections/contact-us-section"));
 const CursorHalo = dynamic(() => import("@/components/visuals/cursor-halo"));
@@ -95,7 +97,11 @@ export default function HomePage({
 
         <ServicesSection copy={servicesCopy} locale={locale}/>
 
+        <ClientWorkSection locale={locale}/>
+
         <ProcessSection copy={copy.process}/>
+
+        <TestimonialsSection/>
 
         <FaqSection copy={copy.faq}/>
 

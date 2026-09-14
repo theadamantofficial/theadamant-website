@@ -61,7 +61,15 @@ main > .section-shell:target {content-visibility:visible}
 .mascot-heading-copy {min-width:0}
 .contact-form-mascot {position:relative!important;inset:auto!important;width:220px;height:235px;align-self:center;display:block!important;opacity:1;animation:mascotFloat 5s ease-in-out infinite;filter:none!important;transform:none!important;isolation:isolate;pointer-events:auto!important;cursor:grab;touch-action:none}
 .contact-form-mascot[data-dragging="true"] {cursor:grabbing}
-.contact-form-mascot .mascot-image {position:relative;z-index:2;width:100%;height:100%;object-fit:contain;transform-style:preserve-3d;backface-visibility:visible;transform:rotateY(var(--mascot-rotate-y,0deg))}
+.contact-form-mascot .mascot-image {position:relative;z-index:2;width:100%;height:100%;object-fit:contain;transform:none}
+.contact-form-mascot[data-ready="true"] .mascot-model-fallback {visibility:hidden}
+.mascot-model-canvas {position:absolute;inset:0;z-index:3;outline-offset:5px;border-radius:1rem}
+.mascot-model-canvas canvas {display:block;width:100%;height:100%;touch-action:none}
+.contact-form-mascot-hint {display:flex!important;align-items:center;gap:1rem}
+.contact-form-mascot-hint button {cursor:pointer;color:var(--primary);font:inherit;letter-spacing:.06em}
+.contact-form-mascot-hint button:hover {text-decoration:underline}
+.contact-form-mascot[data-ready="false"] {cursor:default;touch-action:pan-y}
+@media(prefers-reduced-motion:reduce) {.contact-form-mascot,.contact-form-mascot::before,.contact-form-mascot::after {animation:none!important}}
 .contact-form-mascot::before {content:"";position:absolute;z-index:0;left:50%;top:50%;width:205px;height:78px;border:1px solid color-mix(in srgb,var(--primary) 42%,transparent);border-radius:50%;transform:translate(-50%,-50%) rotate(-18deg) perspective(500px) rotateX(58deg);box-shadow:0 0 25px color-mix(in srgb,var(--primary) 18%,transparent),inset 0 0 16px color-mix(in srgb,var(--primary) 10%,transparent);animation:mascotOrbit 7s linear infinite}
 .contact-form-mascot::after {content:"◆   ·   ◆";position:absolute;z-index:1;left:50%;top:50%;width:270px;height:270px;display:grid;place-items:center;color:var(--accent);font:11px monospace;letter-spacing:2.6rem;white-space:nowrap;transform:translate(-50%,-50%) rotate(22deg);text-shadow:0 0 12px color-mix(in srgb,var(--accent) 60%,transparent);animation:mascotOrbitReverse 12s linear infinite}
 .contact-form-mascot-hint {display:block;align-self:center;margin-top:-.75rem;color:color-mix(in srgb,var(--foreground) 52%,transparent);font:9px monospace;letter-spacing:.14em;text-transform:uppercase}

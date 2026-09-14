@@ -189,7 +189,6 @@ export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["c
                             </LabelInputContainer>
 
                             <SectionCharacter mood="phone-wave" side="left" className="contact-form-mascot" interactive />
-                            <span className="contact-form-mascot-hint">Drag to rotate 360°</span>
 
                             <div className="mt-auto rounded-[1.5rem] border border-black/8 bg-black/[0.03] p-5 dark:border-white/10 dark:bg-white/[0.03]">
                                 <div className="flex items-start gap-3">

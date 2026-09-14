@@ -4,7 +4,7 @@ import {createContext, FormEvent, ReactNode, useContext, useEffect, useRef, useS
 import Image from "next/image";
 import Link from "next/link";
 import {usePathname, useRouter} from "next/navigation";
-import {BarChart3, Bell, BriefcaseBusiness, Building2, CheckSquare2, ChevronRight, Database, LayoutDashboard, LogOut, Menu, MessageCircle, Moon, PanelLeftClose, PanelLeftOpen, Plus, Search, Settings, Sun, Users, Workflow, X} from "lucide-react";
+import {BarChart3, Bell, BriefcaseBusiness, Building2, CheckSquare2, ChevronRight, Database, LayoutDashboard, LogOut, Menu, MessageCircle, Monitor, Moon, PanelLeftClose, PanelLeftOpen, Plus, Search, Settings, Sun, Users, Workflow, X} from "lucide-react";
 import type {CrmActor} from "@/features/crm/types";
 import {ROLE_LABELS} from "@/features/crm/constants";
 import {canAccessDevelopment, canAccessSales, canManageLeads, canViewProspectDatabase, canViewWebsiteAnalytics} from "@/features/crm/permissions";
@@ -21,6 +21,8 @@ const NAV_ITEMS = [
     {href: "/admin/development", label: "Development", icon: Workflow},
     {href: "/admin/tasks", label: "Tasks", icon: CheckSquare2},
     {href: "/admin/customers", label: "Customers", icon: Building2},
+    {href: "/admin/testimonials", label: "Testimonials", icon: MessageCircle},
+    {href: "/admin/projects", label: "Our projects", icon: Monitor},
     {href: "/admin/team", label: "Team", icon: Users},
 ] as const;
 
@@ -46,6 +48,7 @@ function AdminShellInner({actor, children}: {actor: CrmActor; children: ReactNod
     const {theme, setTheme} = useAdminTheme();
     const canCreate = canManageLeads(actor.role);
     const visibleNavItems = NAV_ITEMS.filter((item) => {
+        if (item.href === "/admin/testimonials" || item.href === "/admin/projects") return canManageLeads(actor.role);
         if (item.href === "/admin/analytics") return canViewWebsiteAnalytics(actor.role);
         if (item.href === "/admin/development") return canAccessDevelopment(actor.role);
         if (!canAccessSales(actor.role)) return item.href === "/admin/pipeline";
@@ -100,7 +103,7 @@ function AdminShellInner({actor, children}: {actor: CrmActor; children: ReactNod
                     {!collapsed ? <button aria-label="Close navigation" onClick={() => setMobileOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-white/50 hover:bg-white/8 hover:text-white lg:hidden"><X className="h-4 w-4"/></button> : null}
                 </div>
 
-                <nav className="mt-5 space-y-1">
+                <nav className="mt-5 min-h-0 flex-1 space-y-1 overflow-y-auto">
                     {visibleNavItems.map((item) => {
                         const Icon = item.icon;
                         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
