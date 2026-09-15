@@ -15,6 +15,20 @@ import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPagePath, getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 import {BLOG_LABELS} from "@/lib/blog-config";
 
+const HOME_SECTION_ORDER = [
+    "work",
+    "credentials",
+    "services",
+    "process",
+    "testimonials",
+    "faq",
+    "contact",
+] as const;
+
+const HOME_SECTION_POSITION = new Map<string, number>(
+    HOME_SECTION_ORDER.map((anchor, index) => [anchor, index]),
+);
+
 
 export function Navbar({
     copy,
@@ -23,15 +37,22 @@ export function Navbar({
     copy: SiteCopy["navbar"];
     locale: SiteLocale;
 }) {
+    const homepageNavItems = [
+        {
+            name: "Our work",
+            anchor: "work",
+        },
+        ...copy.navItems,
+    ].sort((left, right) => (
+        (HOME_SECTION_POSITION.get(left.anchor) ?? Number.MAX_SAFE_INTEGER)
+        - (HOME_SECTION_POSITION.get(right.anchor) ?? Number.MAX_SAFE_INTEGER)
+    ));
+
     const navItems: Array<{ name: string; link: string; external?: boolean }> = [
-        ...copy.navItems.map((item) => ({
+        ...homepageNavItems.map((item) => ({
             name: item.name,
             link: getLocalizedPath(locale, item.anchor),
         })),
-        {
-            name: "Our work",
-            link: getLocalizedPath(locale, "work"),
-        },
         {
             name: BLOG_LABELS[locale],
             link: getLocalizedPagePath(locale, "blog"),
