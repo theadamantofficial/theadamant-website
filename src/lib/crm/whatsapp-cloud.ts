@@ -2,6 +2,7 @@ import {createHmac, timingSafeEqual} from "node:crypto";
 import type {SupabaseClient} from "@supabase/supabase-js";
 import {CrmApiError} from "@/lib/crm/errors";
 import {getCrmServiceClient} from "@/lib/crm/server-client";
+import type {WhatsAppAttachment} from "@/lib/crm/whatsapp-attachments";
 
 export type WhatsAppInboundEvent = {
     kind: "message";
@@ -225,6 +226,18 @@ export async function sendWhatsAppText(to: string, body: string) {
     });
 }
 
+export async function sendWhatsAppMedia(to: string, attachment: WhatsAppAttachment, caption = "") {
+    const media = {
+        id: attachment.mediaId,
+        ...(caption ? {caption} : {}),
+        ...(attachment.kind === "document" ? {filename: attachment.filename} : {}),
+    };
+    return sendWhatsAppMessage(to, {
+        type: attachment.kind,
+        [attachment.kind]: media,
+    });
+}
+
 export async function sendWhatsAppInteractive(to: string, interactive: JsonRecord) {
     return sendWhatsAppMessage(to, {type: "interactive", interactive});
 }
@@ -236,14 +249,14 @@ export async function sendWhatsAppReaction(to: string, messageId: string, emoji:
 export type WhatsAppTemplateParameter = {name?: string; value: string};
 export type WhatsAppTemplateDocument = {mediaId: string; filename: string};
 
-export async function uploadWhatsAppDocument(file: File) {
+export async function uploadWhatsAppMedia(file: File) {
     const accessToken = env("WHATSAPP_ACCESS_TOKEN");
     const phoneNumberId = env("WHATSAPP_PHONE_NUMBER_ID");
     const version = env("WHATSAPP_GRAPH_API_VERSION") || "v25.0";
     if (!accessToken || !phoneNumberId) throw new CrmApiError("WhatsApp media upload is not configured.", 503);
     const form = new FormData();
     form.set("messaging_product", "whatsapp");
-    form.set("type", "application/pdf");
+    form.set("type", file.type);
     form.set("file", file, file.name);
     const response = await fetch(`https://graph.facebook.com/${version}/${encodeURIComponent(phoneNumberId)}/media`, {
         method: "POST",
@@ -254,9 +267,14 @@ export async function uploadWhatsAppDocument(file: File) {
     const payload = await response.json().catch(() => ({})) as JsonRecord;
     if (!response.ok || typeof payload.id !== "string") {
         const providerError = isRecord(payload.error) ? payload.error : {};
-        throw new CrmApiError(truncate(text(providerError.message), 400) || "Meta could not upload this PDF.", 502);
+        throw new CrmApiError(truncate(text(providerError.message), 400) || "Meta could not upload this WhatsApp attachment.", 502);
     }
     return payload.id;
+}
+
+export async function uploadWhatsAppDocument(file: File) {
+    if (file.type !== "application/pdf") throw new CrmApiError("Choose a PDF file.");
+    return uploadWhatsAppMedia(file);
 }
 
 export async function sendWhatsAppTemplate(to: string, name: string, language: string, parameters: WhatsAppTemplateParameter[] = [], document?: WhatsAppTemplateDocument) {

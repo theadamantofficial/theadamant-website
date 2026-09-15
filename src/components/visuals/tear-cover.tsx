@@ -5,9 +5,10 @@ import * as THREE from "three";
 import {TearableCloth} from "./tearable-cloth";
 import {useWebGLSlot} from "@/hooks/use-webgl-slot";
 import IntroCoverArt from "./intro-cover-art";
+import {recordIntroCompletion} from "@/lib/intro-frequency";
 
 /** Transparent holes are missing cloth faces, not a progress-based wipe. */
-export default function TearCover() {
+export default function TearCover({rememberCompletion = true}: {rememberCompletion?: boolean}) {
     const {available, claim} = useWebGLSlot();
     const hostRef = useRef<HTMLDivElement>(null);
     const disposeRef = useRef<(() => void) | null>(null);
@@ -18,9 +19,9 @@ export default function TearCover() {
         disposeRef.current = null;
         document.documentElement.dataset.introComplete = "true";
         window.dispatchEvent(new Event("adamant:intro-complete"));
-        try { sessionStorage.setItem("adamant:peel-reveal-seen", "1"); } catch { /* Storage may be disabled. */ }
+        if (rememberCompletion) recordIntroCompletion(window.localStorage);
         setVisible(false);
-    }, []);
+    }, [rememberCompletion]);
 
     useEffect(() => {
         if (!visible) return;

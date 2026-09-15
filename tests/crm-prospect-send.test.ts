@@ -2,7 +2,7 @@ import {NextRequest} from "next/server";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 
 const mocks = vi.hoisted(() => ({
-    context: vi.fn(), service: vi.fn(), prospect: vi.fn(), text: vi.fn(), template: vi.fn(),
+    context: vi.fn(), service: vi.fn(), prospect: vi.fn(), text: vi.fn(), media: vi.fn(), template: vi.fn(),
 }));
 vi.mock("@/lib/crm/auth", async () => ({
     ...await import("@/lib/crm/errors"), getCrmRequestContext: mocks.context,
@@ -10,7 +10,7 @@ vi.mock("@/lib/crm/auth", async () => ({
 vi.mock("@/lib/crm/server-client", () => ({getCrmServiceClient: mocks.service}));
 vi.mock("@/lib/crm/prospect-database", () => ({getProspectById: mocks.prospect}));
 vi.mock("@/lib/crm/whatsapp-cloud", () => ({
-    sendWhatsAppText: mocks.text, sendWhatsAppTemplate: mocks.template, sendWhatsAppReaction: vi.fn(),
+    sendWhatsAppText: mocks.text, sendWhatsAppMedia: mocks.media, sendWhatsAppTemplate: mocks.template, sendWhatsAppReaction: vi.fn(),
 }));
 import {POST as prepare} from "@/app/api/admin/prospects/whatsapp/route";
 import {POST as send} from "@/app/api/admin/whatsapp/conversations/[id]/messages/route";
@@ -61,6 +61,7 @@ beforeEach(() => {
     mocks.service.mockImplementation(client);
     mocks.prospect.mockResolvedValue({record_id: 7, phone: "(312) 555-0123", country: "USA", name: "Test contact"});
     mocks.text.mockResolvedValue({messageId: "wamid.test"});
+    mocks.media.mockResolvedValue({messageId: "wamid.media"});
     mocks.template.mockResolvedValue({messageId: "wamid.test"});
 });
 afterEach(() => vi.unstubAllEnvs());
@@ -126,6 +127,20 @@ describe("sending purchased lead messages through the CRM", () => {
         expect((await send(request({body: "Hello", prospectRecordId: 7}), context)).status).toBe(201);
         expect(mocks.text).toHaveBeenCalledWith(conversation.wa_id, "Hello");
         expect(mocks.template).not.toHaveBeenCalled();
+    });
+
+    it("sends an uploaded image with an optional caption during an open reply window", async () => {
+        accessible!.customer_service_window_expires_at = new Date(Date.now() + 60000).toISOString();
+        const attachment = {mediaId: "123456789", kind: "image", filename: "website-reference.jpg", mimeType: "image/jpeg"};
+
+        expect((await send(request({body: "Reference image", attachment}), context)).status).toBe(201);
+
+        expect(mocks.media).toHaveBeenCalledWith(conversation.wa_id, attachment, "Reference image");
+        expect(inserts).toHaveBeenCalledWith("whatsapp_messages", expect.objectContaining({
+            message_type: "image",
+            media_id: attachment.mediaId,
+            metadata: {filename: attachment.filename, mime_type: attachment.mimeType},
+        }));
     });
 
     it("rejects a source record whose phone differs from the accessible conversation", async () => {

@@ -23,6 +23,10 @@ conversion action. It fires after a successful contact-form submission and on pu
 or WhatsApp contact links. Same-window contact navigation waits for the event callback for up to
 two seconds; new-tab contact links report without changing their normal browser behavior.
 
+After a visitor completes or skips the homepage tear intro, the completion time is stored in that
+browser and the intro remains hidden for 25 days. It becomes eligible to appear again after that
+period. Direct section links bypass it, and `/tear-preview` always shows it for testing.
+
 Telemetry is enabled by default in production. Set `NEXT_PUBLIC_TELEMETRY_ENABLED=true` to
 verify locally or `false` to disable analytics, Tag Manager, and crash alerts. Public environment
 changes require rebuilding the application.
@@ -199,6 +203,11 @@ The protected `/admin/whatsapp` screen stores inbound Meta WhatsApp messages, li
 lead, lets administrators assign the linked lead and conversation, and lets the assigned employee reply during Meta's
 24-hour customer-service window. Delivery, read, and failure webhooks update the message status in the inbox. Existing
 website email, Firebase, n8n, and Discord notification flows are unchanged.
+
+While that reply window is open, the composer can also upload and send one JPG/PNG image (up to 5 MB) or PDF, text,
+Word, Excel, or PowerPoint document (up to 10 MB), with an optional translated caption. Files larger than the direct
+request limit are staged temporarily in the private `whatsapp-outbound-media` Supabase bucket, uploaded to Meta using
+the server-only access token, and then removed from temporary storage. Apply the tracked migrations before using this.
 
 1. Apply the WhatsApp tables and role-aware RLS policies:
 

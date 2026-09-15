@@ -4,7 +4,7 @@ import {useCallback, useEffect, useMemo, useState} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import {ArrowLeft, AudioLines, BadgeIndianRupee, CalendarPlus, ChevronDown, Clock3, Download, FileText, Languages, Loader2, MapPin, Phone, PhoneIncoming, RefreshCw, Search, Send, SmilePlus, UserRound} from "lucide-react";
+import {ArrowLeft, AudioLines, BadgeIndianRupee, CalendarPlus, ChevronDown, Clock3, Download, FileImage, FileText, Languages, Loader2, MapPin, Paperclip, Phone, PhoneIncoming, RefreshCw, Search, Send, SmilePlus, UserRound, X} from "lucide-react";
 import {useAdminActor} from "@/components/admin/admin-shell";
 import {DataError, EmptyState, PageHeader, Skeleton, UserAvatar} from "@/components/admin/admin-ui";
 import {crmFetch} from "@/features/crm/api";
@@ -15,6 +15,8 @@ import {WhatsAppPaymentModal} from "@/features/crm/whatsapp/whatsapp-payment-mod
 import {CLIENT_PROPOSAL_LINKS, isClientProposalTemplate} from "@/lib/crm/whatsapp-proposal";
 import {uploadProposalPdf} from "@/features/crm/whatsapp/upload-proposal-pdf";
 import {WhatsAppMessageStatus} from "@/features/crm/whatsapp/message-status";
+import {uploadWhatsAppAttachment} from "@/features/crm/whatsapp/upload-attachment";
+import {type WhatsAppAttachment, WHATSAPP_ATTACHMENT_ACCEPT} from "@/lib/crm/whatsapp-attachments";
 
 type TeamMember = {id: string; full_name: string; email: string; active: boolean};
 type WhatsAppTemplate = {
@@ -26,7 +28,7 @@ type WhatsAppTemplate = {
 };
 type TranslationDirection = {targetLanguage: string; targetLanguageCode: string};
 type WhatsAppDocument = {mediaId: string; filename: string};
-export type OutgoingMessage = {body: string; template?: {name: string; language: string; parameters: Array<{name?: string; value: string}>; document?: {mediaId: string; filename: string}}; translation?: TranslationDirection};
+export type OutgoingMessage = {body: string; attachment?: WhatsAppAttachment; template?: {name: string; language: string; parameters: Array<{name?: string; value: string}>; document?: {mediaId: string; filename: string}}; translation?: TranslationDirection};
 
 export function WhatsAppInboxScreen({initialLeadId = ""}: {initialLeadId?: string}) {
     const actor = useAdminActor();
@@ -369,13 +371,7 @@ export function WhatsAppComposer({conversation, translation, sending, onSend, in
             .catch(() => undefined);
     }, [windowOpen]);
 
-    if (windowOpen) return <div className="border-t border-[var(--crm-border)] bg-[var(--crm-surface)] p-3 sm:p-4"><form onSubmit={(event) => {
-        event.preventDefault();
-        const form = event.currentTarget;
-        const body = String(new FormData(form).get("body") || "").trim();
-        if (!body || sending) return;
-        void onSend({body}).then((sent) => {if (sent) form.reset();});
-    }} className="mx-auto max-w-3xl"><div className="flex items-end gap-2"><textarea name="body" aria-label="WhatsApp message" defaultValue={initialBody} required maxLength={4096} rows={2} className="admin-input h-auto min-h-12 flex-1 resize-none py-3 sm:resize-y" placeholder={translation ? `Type in English — sends in ${translation.targetLanguage}…` : "Write a WhatsApp reply…"}/><button disabled={sending} className="crm-button-primary h-12 px-4">{sending ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>}<span className="hidden sm:inline">Send</span></button></div>{translation ? <p className="mt-1.5 flex items-center gap-1 text-[9px] text-[var(--crm-muted)]"><Languages className="h-3 w-3"/>Only your team sees English; the customer receives {translation.targetLanguage}.</p> : null}</form></div>;
+    if (windowOpen) return <OpenWindowComposer translation={translation} sending={sending} onSend={onSend} initialBody={initialBody}/>;
 
     const selectedTemplate = templates.find((template) => `${template.name}:${template.language}` === templateKey) || null;
     const templateText = getTemplateBody(selectedTemplate);
@@ -417,6 +413,53 @@ export function WhatsAppComposer({conversation, translation, sending, onSend, in
             className="crm-button-secondary mt-2"
         ><CalendarPlus className="h-3.5 w-3.5"/> Add meeting to Google Calendar</a> : null}
         </div> : null}
+    </form></div>;
+}
+
+function OpenWindowComposer({translation, sending, onSend, initialBody}: {translation: TranslationDirection | null; sending: boolean; onSend: (payload: OutgoingMessage) => Promise<boolean>; initialBody: string}) {
+    const [attachment, setAttachment] = useState<WhatsAppAttachment | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const [body, setBody] = useState(initialBody);
+    return <div className="border-t border-[var(--crm-border)] bg-[var(--crm-surface)] p-3 sm:p-4"><form onSubmit={(event) => {
+        event.preventDefault();
+        const message = body.trim();
+        if ((!message && !attachment) || sending || uploading) return;
+        void onSend({body: message, ...(attachment ? {attachment} : {})}).then((sent) => {
+            if (!sent) return;
+            setBody("");
+            setAttachment(null);
+        });
+    }} className="mx-auto max-w-3xl space-y-2">
+        {attachment ? <div className="flex items-center gap-2 rounded-lg border border-[var(--crm-border)] bg-[var(--crm-subtle)] px-3 py-2 text-xs">
+            {attachment.kind === "image" ? <FileImage className="h-4 w-4 shrink-0 text-[#0d5c63]"/> : <FileText className="h-4 w-4 shrink-0 text-[#0d5c63]"/>}
+            <span className="min-w-0 flex-1 truncate">{attachment.filename}</span>
+            <button type="button" onClick={() => setAttachment(null)} disabled={sending || uploading} className="crm-icon-button h-7 w-7" aria-label={`Remove ${attachment.filename}`}><X className="h-3.5 w-3.5"/></button>
+        </div> : null}
+        <div className="flex items-end gap-2">
+            <label className={`crm-icon-button h-12 w-12 shrink-0 ${sending || uploading ? "cursor-wait opacity-60" : "cursor-pointer"}`} title="Attach an image or document">
+                {uploading ? <Loader2 className="h-4 w-4 animate-spin"/> : <Paperclip className="h-4 w-4"/>}
+                <span className="sr-only">Attach an image or document</span>
+                <input type="file" accept={WHATSAPP_ATTACHMENT_ACCEPT} className="sr-only" disabled={sending || uploading} onChange={async (event) => {
+                    const file = event.target.files?.[0];
+                    event.target.value = "";
+                    if (!file) return;
+                    setUploading(true);
+                    try {
+                        setAttachment(await uploadWhatsAppAttachment(file));
+                    } catch (error) {
+                        toast.error(error instanceof Error ? error.message : "Attachment upload failed.");
+                    } finally {
+                        setUploading(false);
+                    }
+                }}/>
+            </label>
+            <textarea name="body" aria-label="WhatsApp message" value={body} onChange={(event) => setBody(event.target.value)} maxLength={4096} rows={2} className="admin-input h-auto min-h-12 flex-1 resize-none py-3 sm:resize-y" placeholder={attachment ? "Add an optional caption…" : translation ? `Type in English — sends in ${translation.targetLanguage}…` : "Write a WhatsApp reply…"}/>
+            <button disabled={sending || uploading || (!body.trim() && !attachment)} className="crm-button-primary h-12 px-4">{sending ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>}<span className="hidden sm:inline">Send</span></button>
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-1 text-[9px] text-[var(--crm-muted)]">
+            <span>JPG/PNG up to 5 MB · PDF/Office/text up to 10 MB</span>
+            {translation ? <span className="flex items-center gap-1"><Languages className="h-3 w-3"/>Captions send in {translation.targetLanguage}.</span> : null}
+        </div>
     </form></div>;
 }
 

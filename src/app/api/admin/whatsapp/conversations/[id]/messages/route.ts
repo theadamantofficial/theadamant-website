@@ -1,9 +1,10 @@
 import {NextRequest, NextResponse} from "next/server";
 import {crmErrorResponse, CrmApiError, getCrmRequestContext} from "@/lib/crm/auth";
 import {getCrmServiceClient} from "@/lib/crm/server-client";
-import {sendWhatsAppReaction, sendWhatsAppTemplate, sendWhatsAppText, type WhatsAppTemplateParameter} from "@/lib/crm/whatsapp-cloud";
+import {sendWhatsAppMedia, sendWhatsAppReaction, sendWhatsAppTemplate, sendWhatsAppText, type WhatsAppTemplateParameter} from "@/lib/crm/whatsapp-cloud";
 import {translateEnglishForWhatsApp, translateWhatsAppMessagesToEnglish} from "@/lib/crm/whatsapp-translation";
 import {getProspectOutreach} from "@/lib/crm/prospect-outreach";
+import {parseWhatsAppAttachment} from "@/lib/crm/whatsapp-attachments";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest, context: Context) {
         const {client, actor} = await getCrmRequestContext(request);
         const {id} = await context.params;
         const conversation = await requireAccessibleConversation(client, id);
-        const payload = await request.json() as {body?: unknown; template?: unknown; reaction?: unknown; translation?: unknown; prospectRecordId?: unknown};
+        const payload = await request.json() as {body?: unknown; template?: unknown; attachment?: unknown; reaction?: unknown; translation?: unknown; prospectRecordId?: unknown};
         const reaction = parseReaction(payload.reaction);
         if (reaction) {
             const target = await client.from("whatsapp_messages").select("id,whatsapp_message_id").eq("id", reaction.messageId).eq("conversation_id", id).maybeSingle();
@@ -81,7 +82,9 @@ export async function POST(request: NextRequest, context: Context) {
         }
         const body = typeof payload.body === "string" ? payload.body.trim() : "";
         const template = parseTemplate(payload.template);
-        if (!body && !template) throw new CrmApiError("Write a message or choose an approved template before sending.");
+        const attachment = parseAttachment(payload.attachment);
+        if (!body && !template && !attachment) throw new CrmApiError("Write a message or choose an attachment or approved template before sending.");
+        if (template && attachment) throw new CrmApiError("Send a free-form attachment or an approved template, not both.");
         if (body.length > 4096) throw new CrmApiError("WhatsApp messages must be 4,096 characters or fewer.");
         const windowOpen = Boolean(conversation.customer_service_window_expires_at && new Date(conversation.customer_service_window_expires_at).getTime() > Date.now());
         if (!windowOpen && !template) {
@@ -89,17 +92,21 @@ export async function POST(request: NextRequest, context: Context) {
         }
         const storedBody = template ? (body || `Template: ${template.name}`) : body;
         const outreach = await getProspectOutreach(client, actor, payload.prospectRecordId, conversation, storedBody);
-        const translation = template ? null : parseTranslation(payload.translation);
+        const translation = template || !body ? null : parseTranslation(payload.translation);
         const sentBody = translation ? await translateEnglishForWhatsApp(body, translation.targetLanguage, translation.targetLanguageCode) : body;
 
         const serviceClient = getCrmServiceClient();
-        const messageMetadata = translation ? {translation: {englishText: body, translatedText: sentBody, detectedLanguage: "English", detectedLanguageCode: "en", targetLanguage: translation.targetLanguage, targetLanguageCode: translation.targetLanguageCode}} : {};
+        const messageMetadata = {
+            ...(translation ? {translation: {englishText: body, translatedText: sentBody, detectedLanguage: "English", detectedLanguageCode: "en", targetLanguage: translation.targetLanguage, targetLanguageCode: translation.targetLanguageCode}} : {}),
+            ...(attachment ? {filename: attachment.filename, mime_type: attachment.mimeType} : {}),
+        };
         const queued = await serviceClient.from("whatsapp_messages").insert({
             conversation_id: id,
             whatsapp_message_id: null,
             direction: "outbound",
-            message_type: template ? "template" : "text",
+            message_type: template ? "template" : attachment?.kind || "text",
             body: storedBody,
+            media_id: attachment?.mediaId || null,
             status: "queued",
             sent_by: actor.id,
             message_timestamp: new Date().toISOString(),
@@ -124,7 +131,9 @@ export async function POST(request: NextRequest, context: Context) {
         try {
             sent = template
                 ? await sendWhatsAppTemplate(conversation.wa_id, template.name, template.language, template.parameters, template.document)
-                : await sendWhatsAppText(conversation.wa_id, sentBody);
+                : attachment
+                    ? await sendWhatsAppMedia(conversation.wa_id, attachment, sentBody)
+                    : await sendWhatsAppText(conversation.wa_id, sentBody);
             providerAccepted = true;
         } catch (sendError) {
             const message = sendError instanceof Error ? sendError.message.slice(0, 500) : "Meta could not send this message.";
@@ -147,7 +156,7 @@ export async function POST(request: NextRequest, context: Context) {
         }
         const {error: conversationError} = await serviceClient.from("whatsapp_conversations").update({
             last_message_at: timestamp,
-            last_message_preview: storedBody.slice(0, 180),
+            last_message_preview: (storedBody || (attachment?.kind === "image" ? `Photo: ${attachment.filename}` : `Document: ${attachment?.filename || "attachment"}`)).slice(0, 180),
             last_message_direction: "outbound",
         }).eq("id", id);
         if (conversationError) console.error("WhatsApp conversation summary update failed.", {conversationId: id});
@@ -191,6 +200,14 @@ function parseTranslation(value: unknown) {
 
 function asRecord(value: unknown): Record<string, unknown> {
     return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function parseAttachment(value: unknown) {
+    try {
+        return parseWhatsAppAttachment(value);
+    } catch (error) {
+        throw new CrmApiError(error instanceof Error ? error.message : "Choose a valid WhatsApp attachment.");
+    }
 }
 
 function parseTemplate(value: unknown): {name: string; language: string; parameters: WhatsAppTemplateParameter[]; document?: {mediaId: string; filename: string}} | null {

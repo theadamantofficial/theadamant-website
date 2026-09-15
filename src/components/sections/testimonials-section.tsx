@@ -1,9 +1,16 @@
 "use client";
 
 import {useEffect, useState, type FormEvent} from "react";
+import dynamic from "next/dynamic";
 import {ArrowUpRight, CheckCircle2, LoaderCircle, MessageSquareQuote, Quote, Star} from "lucide-react";
 import {Reveal} from "@/components/ui/reveal";
 import {GOOGLE_REVIEW_URL, type Testimonial} from "@/lib/testimonials";
+import {useMotionCapability} from "@/hooks/use-motion-capability";
+
+const DotLottieReact = dynamic(
+    () => import("@lottiefiles/dotlottie-react").then((module) => module.DotLottieReact),
+    {ssr: false},
+);
 
 function GoogleReviewLink({className = "button-secondary"}: {className?: string}) {
     return <a href={GOOGLE_REVIEW_URL} target="_blank" rel="noopener noreferrer" className={className}>
@@ -13,6 +20,7 @@ function GoogleReviewLink({className = "button-secondary"}: {className?: string}
 }
 
 export default function TestimonialsSection() {
+    const {capability} = useMotionCapability();
     const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(false);
@@ -108,6 +116,14 @@ export default function TestimonialsSection() {
                         <Quote className="relative h-12 w-12 text-white/25" aria-hidden="true"/>
                         <h3 className="relative mt-8 text-3xl font-semibold tracking-tight">Every project has a story.<br/>We’d love to hear yours.</h3>
                         <p className="relative mt-5 max-w-md text-sm leading-7 text-white/75">{loadError ? "We couldn’t load testimonials right now. You can still share your experience or visit our Google profile." : "Worked with us? Share what we built together, what stood out, and how it helped your business. Your words could help someone take their next step."}</p>
+                        <div className="relative flex min-h-64 flex-1 items-center justify-center py-6 sm:min-h-80" aria-hidden="true">
+                            <DotLottieReact
+                                src="/animations/testimonial-story.lottie"
+                                autoplay={capability !== "reduced"}
+                                loop={capability !== "reduced"}
+                                className="h-auto w-full max-w-[30rem]"
+                            />
+                        </div>
                         <a href="#write-testimonial" className="relative mt-auto inline-flex w-fit items-center gap-2 pt-8 text-sm font-semibold text-white underline underline-offset-4">Share your experience <ArrowUpRight className="h-4 w-4" aria-hidden="true"/></a>
                     </div>}
             </div>

@@ -11,13 +11,16 @@ import {
     getWhatsAppWebhookChallenge,
     isWhatsAppAutoReplyEnabled,
     parseWhatsAppWebhook,
+    sendWhatsAppMedia,
     shouldSendWhatsAppAutoReply,
     verifyWhatsAppWebhookSignature,
 } from "@/lib/crm/whatsapp-cloud";
 
 afterEach(() => {
+    vi.unstubAllGlobals();
     delete process.env.WHATSAPP_ACCESS_TOKEN;
     delete process.env.WHATSAPP_BUSINESS_ACCOUNT_ID;
+    delete process.env.WHATSAPP_PHONE_NUMBER_ID;
     delete process.env.WHATSAPP_GRAPH_API_VERSION;
 });
 
@@ -143,6 +146,28 @@ describe("WhatsApp Cloud API webhook", () => {
         expect(media.fileSize).toBe(4);
         expect((await media.response.arrayBuffer()).byteLength).toBe(4);
         expect(fetcher).toHaveBeenCalledTimes(2);
+    });
+
+    it("sends an uploaded image ID and caption through the messages endpoint", async () => {
+        process.env.WHATSAPP_ACCESS_TOKEN = "media-token";
+        process.env.WHATSAPP_PHONE_NUMBER_ID = "phone-1";
+        const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.json({messages: [{id: "wamid.image"}]}));
+        vi.stubGlobal("fetch", fetcher);
+
+        await sendWhatsAppMedia("919876543210", {
+            mediaId: "123456789",
+            kind: "image",
+            filename: "reference.jpg",
+            mimeType: "image/jpeg",
+        }, "Design reference");
+
+        const [, init] = fetcher.mock.calls[0];
+        expect(JSON.parse(String(init?.body))).toMatchObject({
+            messaging_product: "whatsapp",
+            to: "919876543210",
+            type: "image",
+            image: {id: "123456789", caption: "Design reference"},
+        });
     });
 
     it("acknowledges the first message and returning customers after a two-day gap", () => {
