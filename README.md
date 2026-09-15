@@ -18,6 +18,11 @@ The application sends `page_view`, `section_view`, `contact_click`, and successf
 events exclude `/admin` and `/tear-preview`. Content blockers and unsupported browsers are
 handled without affecting the website.
 
+Google Ads contact conversions use the `conversion_event_contact` event supplied by the CONTACT
+conversion action. It fires after a successful contact-form submission and on public email, phone,
+or WhatsApp contact links. Same-window contact navigation waits for the event callback for up to
+two seconds; new-tab contact links report without changing their normal browser behavior.
+
 Telemetry is enabled by default in production. Set `NEXT_PUBLIC_TELEMETRY_ENABLED=true` to
 verify locally or `false` to disable analytics, Tag Manager, and crash alerts. Public environment
 changes require rebuilding the application.

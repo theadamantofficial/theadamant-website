@@ -3,6 +3,7 @@
 import {useEffect} from "react";
 import {usePathname} from "next/navigation";
 import {getAnalyticsReferrer, isPublicAnalyticsPath, trackSiteEvent} from "@/lib/firebase-analytics";
+import {gtagSendEvent} from "@/lib/google-tag-manager";
 
 const sections = new Set(["services", "contact", "faq", "process", "credentials", "adamant-system", "path-to-success"]);
 let lastPage = "";
@@ -31,7 +32,25 @@ export default function SiteAnalytics() {
             const href = link.getAttribute("href") || "";
             const method = /^https:\/\/(?:wa\.me|api\.whatsapp\.com)(?:\/|$)/i.test(href) ? "whatsapp"
                 : href.startsWith("mailto:") ? "email" : href.startsWith("tel:") ? "phone" : "";
-            if (method) void trackSiteEvent("contact_click", {method, page_path: pathname});
+            if (!method) return;
+
+            void trackSiteEvent("contact_click", {method, page_path: pathname});
+
+            const shouldDelayNavigation = !event.defaultPrevented
+                && event.button === 0
+                && !event.metaKey
+                && !event.ctrlKey
+                && !event.shiftKey
+                && !event.altKey
+                && !link.hasAttribute("download")
+                && (!link.target || link.target === "_self");
+
+            if (shouldDelayNavigation) {
+                event.preventDefault();
+                gtagSendEvent(link.href);
+            } else {
+                gtagSendEvent();
+            }
         };
         trackSection();
         window.addEventListener("hashchange", trackSection);
