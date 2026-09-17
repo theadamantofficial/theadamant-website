@@ -19,7 +19,7 @@ const SeoChatFab = dynamic(
     () => import("@/components/ui/seo-chat-fab").then((module) => module.SeoChatFab),
 );
 
-const BLOG_COPY: Record<SiteLocale, {
+const BLOG_COPY: Partial<Record<SiteLocale, {
     kicker: string;
     title: string;
     description: string;
@@ -29,7 +29,7 @@ const BLOG_COPY: Record<SiteLocale, {
     visitMedium: string;
     startProject: string;
     freshness: string;
-}> = {
+}>> = {
     en: {
         kicker: "Blog hub",
         title: "Insights from Adamant, published on-site and distributed through Medium.",
@@ -181,7 +181,7 @@ export default function BlogPage({
     internalPosts: InternalBlogPost[];
 }) {
     const siteUrl = getSiteUrl();
-    const blogCopy = BLOG_COPY[locale];
+    const blogCopy = BLOG_COPY[locale] ?? BLOG_COPY.en!;
     const formattedLocale = localeToHtmlLang(locale);
     const pathname = getLocalizedPagePath(locale, "blog");
 

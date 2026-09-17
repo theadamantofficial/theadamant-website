@@ -54,7 +54,7 @@ export function Navbar({
             link: getLocalizedPath(locale, item.anchor),
         })),
         {
-            name: BLOG_LABELS[locale],
+            name: BLOG_LABELS[locale] ?? BLOG_LABELS.en!,
             link: getLocalizedPagePath(locale, "blog"),
         },
     ];

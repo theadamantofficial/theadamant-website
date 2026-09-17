@@ -1,5 +1,5 @@
 export const DEFAULT_SITE_LOCALE = "en";
-export const SEO_SITE_LOCALES = ["en", "hi", "gu", "mr", "bn", "ta", "es", "fr", "de", "pt", "ja"] as const;
+export const SEO_SITE_LOCALES = ["en", "en-us", "hi", "gu", "mr", "bn", "ta", "es", "fr", "de", "de-ch", "fr-ch", "it-ch", "pt", "ja", "ko", "ar"] as const;
 export const INDEXABLE_SITE_LOCALES = SEO_SITE_LOCALES.filter((locale) => locale !== DEFAULT_SITE_LOCALE);
 export const SITE_LOCALE_COOKIE = "site-locale";
 
@@ -13,6 +13,7 @@ export interface SiteLocaleOption {
 
 export const SITE_LOCALE_OPTIONS: SiteLocaleOption[] = [
     {code: "en", label: "English", nativeLabel: "English"},
+    {code: "en-us", label: "English (United States)", nativeLabel: "English (US)"},
     {code: "hi", label: "Hindi", nativeLabel: "हिन्दी"},
     {code: "gu", label: "Gujarati", nativeLabel: "ગુજરાતી"},
     {code: "mr", label: "Marathi", nativeLabel: "मराठी"},
@@ -23,6 +24,11 @@ export const SITE_LOCALE_OPTIONS: SiteLocaleOption[] = [
     {code: "de", label: "German", nativeLabel: "Deutsch"},
     {code: "pt", label: "Portuguese", nativeLabel: "Português"},
     {code: "ja", label: "Japanese", nativeLabel: "日本語"},
+    {code: "ko", label: "Korean", nativeLabel: "한국어"},
+    {code: "ar", label: "Arabic", nativeLabel: "العربية"},
+    {code: "de-ch", label: "Swiss German", nativeLabel: "Schweizerdeutsch"},
+    {code: "fr-ch", label: "Swiss French", nativeLabel: "Français suisse"},
+    {code: "it-ch", label: "Swiss Italian", nativeLabel: "Italiano svizzero"},
 ];
 
 const COUNTRY_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
@@ -31,7 +37,6 @@ const COUNTRY_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
     BD: "bn",
     BO: "es",
     BR: "pt",
-    CH: "de",
     CL: "es",
     CO: "es",
     CR: "es",
@@ -43,7 +48,11 @@ const COUNTRY_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
     GT: "es",
     HN: "es",
     IN: "en",
+    KR: "ko",
     JP: "ja",
+    AE: "ar",
+    US: "en-us",
+    CH: "de-ch",
     MX: "es",
     NI: "es",
     PA: "es",
@@ -59,11 +68,15 @@ const LANGUAGE_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
     bn: "bn",
     de: "de",
     en: "en",
+    "en-us": "en-us",
     es: "es",
     fr: "fr",
     gu: "gu",
     hi: "hi",
     ja: "ja",
+    ko: "ko",
+    ar: "ar",
+    it: "it-ch",
     mr: "mr",
     pt: "pt",
     ta: "ta",
@@ -95,6 +108,18 @@ export function localeToHtmlLang(locale: SiteLocale) {
             return "pt";
         case "ja":
             return "ja";
+        case "ko":
+            return "ko";
+        case "ar":
+            return "ar";
+        case "de-ch":
+            return "de-CH";
+        case "fr-ch":
+            return "fr-CH";
+        case "it-ch":
+            return "it-CH";
+        case "en-us":
+            return "en-US";
         default:
             return "en";
     }
@@ -136,6 +161,12 @@ export function getLanguageAlternates(pathname = "") {
         de: getLocalizedPagePath("de", normalizedPath),
         pt: getLocalizedPagePath("pt", normalizedPath),
         ja: getLocalizedPagePath("ja", normalizedPath),
+        "en-US": getLocalizedPagePath("en-us", normalizedPath),
+        ko: getLocalizedPagePath("ko", normalizedPath),
+        ar: getLocalizedPagePath("ar", normalizedPath),
+        "de-CH": getLocalizedPagePath("de-ch", normalizedPath),
+        "fr-CH": getLocalizedPagePath("fr-ch", normalizedPath),
+        "it-CH": getLocalizedPagePath("it-ch", normalizedPath),
         "x-default": getLocalizedPagePath("en", normalizedPath),
     };
 }

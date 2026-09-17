@@ -19,7 +19,7 @@ export default function ServicesSection({copy, locale}: {copy: SiteCopy["service
             <Reveal className="max-w-3xl">
                 <p className="section-kicker">{copy.kicker}</p>
                 <h2 id="services-heading" className="section-title">{locale === "en" ? <>Different challenges.<br/>Purpose-built answers.</> : copy.title}</h2>
-                <p className="section-copy">{locale === "en" ? "Choose the part you need today. Each engagement has its own deliverables, a clear scope and a next step." : copy.description}</p>
+                <p className="section-copy">{locale === "en" ? "Adamant Technologies provides UI/UX design, website development, mobile app development, SaaS product support, technical SEO, and digital marketing services for startups, professional service firms, local businesses, and growing brands in India and global markets. Choose the capability you need today; each engagement has a clear scope, practical deliverables, and a measurable next step." : copy.description}</p>
             </Reveal>
         </MascotHeading>
         <div className="service-prism-grid mt-12">

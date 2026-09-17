@@ -16,15 +16,17 @@ import {GOOGLE_TAG_MANAGER_ID, googleTagManagerEnabled, googleTagManagerScript} 
 
 export const metadata: Metadata = {
     title: {
-        default: "Adamant | Web, App, SaaS and Digital Marketing",
+        default: "Adamant Technologies | Web, App, SaaS and Digital Marketing",
         template: "%s | Adamant",
     },
-    description: "Adamant designs SEO-friendly websites, product interfaces, mobile experiences, and digital marketing campaigns for brands in India, the USA, UK, Japan, and global markets.",
+    description: "JSSS Adamant Technologies Private Limited builds SEO-friendly websites, mobile apps, SaaS products, and digital marketing campaigns for businesses in India and global markets.",
     applicationName: "Adamant",
     authors: [{name: "Adamant"}],
     creator: "Adamant",
     publisher: "Adamant",
     keywords: [
+        "JSSS Adamant Technologies Private Limited",
+        "Adamant Technologies",
         "web design",
         "website development",
         "global website development company",
@@ -46,14 +48,14 @@ export const metadata: Metadata = {
     },
     openGraph: {
         ...buildOpenGraphMetadata({
-            title: "Adamant | Web, App, SaaS and Digital Marketing",
-            description: "Design-forward websites, UX systems, mobile experiences, and digital marketing campaigns with clear messaging, fast performance, and SEO-ready structure.",
+            title: "Adamant Technologies | Web, App, SaaS and Digital Marketing",
+            description: "Websites, mobile apps, SaaS products, and digital marketing from JSSS Adamant Technologies Private Limited.",
             pagePath: "/",
         }),
     },
     twitter: buildTwitterMetadata({
-        title: "Adamant | Web, App, SaaS and Digital Marketing",
-        description: "Design-forward websites, UX systems, mobile experiences, and digital marketing campaigns with clear messaging, fast performance, and SEO-ready structure.",
+        title: "Adamant Technologies | Web, App, SaaS and Digital Marketing",
+        description: "Websites, mobile apps, SaaS products, and digital marketing from JSSS Adamant Technologies Private Limited.",
     }),
     metadataBase: getSiteMetadataBase(),
 };

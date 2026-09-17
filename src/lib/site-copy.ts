@@ -170,6 +170,7 @@ export interface SiteCopy {
 
 const siteCopyMap: Record<SiteLocale, SiteCopy> = {
     en: enCopy as SiteCopy,
+    "en-us": {...enCopy, locale: "en-us"} as SiteCopy,
     hi: hiCopy as SiteCopy,
     gu: guCopy as SiteCopy,
     mr: mrCopy as SiteCopy,
@@ -180,6 +181,11 @@ const siteCopyMap: Record<SiteLocale, SiteCopy> = {
     de: deCopy as SiteCopy,
     pt: ptCopy as SiteCopy,
     ja: jaCopy as SiteCopy,
+    ko: {...enCopy, locale: "ko"} as SiteCopy,
+    ar: {...enCopy, locale: "ar", dir: "rtl"} as SiteCopy,
+    "de-ch": {...deCopy, locale: "de-ch"} as SiteCopy,
+    "fr-ch": {...frCopy, locale: "fr-ch"} as SiteCopy,
+    "it-ch": {...enCopy, locale: "it-ch"} as SiteCopy,
 };
 
 export function getSiteCopy(locale: SiteLocale): SiteCopy {

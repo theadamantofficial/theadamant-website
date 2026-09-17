@@ -11,13 +11,13 @@ import {getLocalizedPagePath, getLocalizedPath, SiteLocale} from "@/lib/site-loc
 import {BLOG_LABELS, MEDIUM_URL} from "@/lib/blog-config";
 import {SectionDepth} from "@/components/visuals/section-depth";
 import {MascotHeading} from "@/components/visuals/section-character";
-const MEDIUM_COPY: Record<SiteLocale, {
+const MEDIUM_COPY: Partial<Record<SiteLocale, {
     kicker: string;
     title: string;
     description: string;
     button: string;
     hubButton: string;
-}> = {
+}>> = {
     en: {
         kicker: "Insights",
         title: "Read our web design and SEO articles on Medium.",
@@ -104,12 +104,18 @@ export default function Footer({
     copy: SiteCopy["footer"];
     locale: SiteLocale;
 }) {
-    const mediumCopy = MEDIUM_COPY[locale];
+    const mediumCopy = MEDIUM_COPY[locale] ?? MEDIUM_COPY.en!;
     const footerSections = copy.sections.map((section, index) => (
         index === 0
             ? {
                 ...section,
-                links: [...section.links, {name: "Our work", anchor: "work"}, {name: "Testimonials", anchor: "testimonials"}, {name: BLOG_LABELS[locale], anchor: "__blog__"}],
+                links: [
+                    ...section.links,
+                    {name: "About us", anchor: "__about__"},
+                    {name: "Our work", anchor: "work"},
+                    {name: "Testimonials", anchor: "testimonials"},
+                    {name: BLOG_LABELS[locale] ?? BLOG_LABELS.en!, anchor: "__blog__"},
+                ],
             }
             : section
     ));
@@ -183,7 +189,13 @@ export default function Footer({
                             {section.links.map((link) => (
                                 <li key={link.name}>
                                     <Link
-                                        href={link.anchor === "__blog__" ? getLocalizedPagePath(locale, "blog") : getLocalizedPath(locale, link.anchor)}
+                                        href={
+                                            link.anchor === "__blog__"
+                                                ? getLocalizedPagePath(locale, "blog")
+                                                : link.anchor === "__about__"
+                                                    ? getLocalizedPagePath(locale, "about")
+                                                    : getLocalizedPath(locale, link.anchor)
+                                        }
                                         className="text-sm text-foreground/70 transition hover:text-foreground hover:underline"
                                     >
                                         {link.name}

@@ -2,7 +2,7 @@ import {SiteLocale} from "@/lib/site-locale";
 
 export const MEDIUM_URL = "https://medium.com/@theadamant";
 
-export const BLOG_LABELS: Record<SiteLocale, string> = {
+export const BLOG_LABELS: Partial<Record<SiteLocale, string>> = {
     en: "Blog",
     hi: "ब्लॉग",
     gu: "બ્લોગ",

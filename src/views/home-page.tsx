@@ -3,6 +3,9 @@ import Footer from "@/components/layouts/footer";
 import dynamic from "next/dynamic";
 import {SiteCopy} from "@/lib/site-copy";
 import {SiteLocale} from "@/lib/site-locale";
+import {getSiteUrl} from "@/lib/site-url";
+import HomeSeoContentSection from "@/components/sections/home-seo-content-section";
+import InternationalMarketSection from "@/components/sections/international-market-section";
 import AdamantSystemSection from "@/components/experience/adamant-system-section";
 import HeroSection from "@/components/sections/hero-section";
 import PeelReveal from "@/components/visuals/peel-reveal";
@@ -36,10 +39,14 @@ export default function HomePage({
         {
             "@context": "https://schema.org",
             "@type": "Organization",
-            name: "Adamant",
+            "@id": `${getSiteUrl()}/#organization`,
+            name: "JSSS Adamant Technologies Private Limited",
+            alternateName: ["Adamant Technologies", "Adamant"],
+            url: getSiteUrl(),
             legalName: "JSSS Adamant Technologies Private Limited",
             foundingDate: "2026-04-27",
             description: copy.schema.organizationDescription,
+            logo: `${getSiteUrl()}/opengraph-image`,
             inLanguage: locale,
             identifier: {
                 "@type": "PropertyValue",
@@ -53,6 +60,19 @@ export default function HomePage({
                 "https://x.com/theadamantofc",
                 "https://medium.com/@theadamant",
             ],
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "@id": `${getSiteUrl()}/#website`,
+            name: "Adamant Technologies",
+            url: getSiteUrl(),
+            publisher: {"@id": `${getSiteUrl()}/#organization`},
+            potentialAction: {
+                "@type": "SearchAction",
+                target: `${getSiteUrl()}/blog?query={search_term_string}`,
+                "query-input": "required name=search_term_string",
+            },
         },
         {
             "@context": "https://schema.org",
@@ -87,6 +107,8 @@ export default function HomePage({
 
         <HeroSection copy={copy.hero} locale={locale}/>
 
+        <InternationalMarketSection locale={locale}/>
+
         <AdamantSystemSection services={copy.services}/>
 
         <ClientWorkSection locale={locale}/>
@@ -102,6 +124,8 @@ export default function HomePage({
         <ProcessSection copy={copy.process}/>
 
         <TestimonialsSection/>
+
+        <HomeSeoContentSection locale={locale}/>
 
         <FaqSection copy={copy.faq}/>
 

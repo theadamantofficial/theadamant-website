@@ -7,7 +7,7 @@ const copy = getSiteCopy(DEFAULT_SITE_LOCALE);
 
 export const metadata: Metadata = {
     title: {
-        absolute: copy.metadata.title,
+        absolute: "Adamant Technologies | Web, App, SaaS and Digital Marketing",
     },
     description: copy.metadata.description,
     openGraph: buildOpenGraphMetadata({
