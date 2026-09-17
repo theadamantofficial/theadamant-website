@@ -12,6 +12,7 @@ import {MotionProvider} from "@/components/providers/motion-provider";
 import SiteBackgroundMusic from "@/components/ui/site-background-music";
 import Script from "next/script";
 import SiteAnalytics from "@/components/providers/site-analytics";
+import LocationLocaleDetector from "@/components/providers/location-locale-detector";
 import {GOOGLE_TAG_MANAGER_ID, googleTagManagerEnabled, googleTagManagerScript} from "@/lib/google-tag-manager";
 
 export const metadata: Metadata = {
@@ -41,6 +42,10 @@ export const metadata: Metadata = {
         "brand boosting",
         "paid ads management",
         "digital product studio",
+        "China website development",
+        "Chinese SEO",
+        "中国网站开发",
+        "中国数字营销",
     ],
     robots: {
         index: true,
@@ -81,6 +86,7 @@ export default async function RootLayout({children}: Readonly<{
             <style>{`.motion-reveal{opacity:1!important;transform:none!important;filter:none!important}.animated-faq-panel{height:auto!important;opacity:1!important;transform:none!important}`}</style>
         </noscript>
         <MotionProvider>
+            <LocationLocaleDetector/>
             <SiteAnalytics/>
             <Toaster
                 position="top-right"

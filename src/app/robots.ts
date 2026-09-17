@@ -5,12 +5,19 @@ export default function robots(): MetadataRoute.Robots {
     const siteUrl = getSiteUrl();
 
     return {
-        rules: {
-            userAgent: "*",
-            allow: "/",
-            disallow: ["/admin/", "/api/"],
-        },
-        sitemap: `${siteUrl}/sitemap.xml`,
         host: siteUrl,
+        rules: [
+            {
+                userAgent: "Baiduspider",
+                allow: "/",
+                disallow: ["/admin/", "/api/"],
+            },
+            {
+                userAgent: "*",
+                allow: "/",
+                disallow: ["/admin/", "/api/"],
+            },
+        ],
+        sitemap: `${siteUrl}/sitemap.xml`,
     };
 }

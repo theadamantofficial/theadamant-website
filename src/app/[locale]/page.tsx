@@ -30,6 +30,10 @@ const INTERNATIONAL_METADATA: Partial<Record<SiteLocale, {title: string; descrip
         title: "Adamant Technologies | تطوير المواقع والتطبيقات والتسويق الرقمي في دبي",
         description: "تصميم وتطوير المواقع والتطبيقات ومنتجات SaaS وتحسين محركات البحث والتسويق الرقمي للشركات في دبي والإمارات.",
     },
+    "zh-cn": {
+        title: "Adamant Technologies | 中国企业网站、应用与数字营销",
+        description: "Adamant Technologies 为中国及全球企业提供网站开发、移动应用、SaaS 产品、技术 SEO 和数字营销服务，帮助品牌提升线上可见度。",
+    },
     "de-ch": {
         title: "Adamant Technologies | Webentwicklung und SEO in der Schweiz",
         description: "Webentwicklung, UI/UX, Mobile Apps, SaaS, technische Suchmaschinenoptimierung und digitales Marketing für Schweizer Unternehmen.",
@@ -69,6 +73,9 @@ export async function generateMetadata({
             absolute: localizedMetadata.title,
         },
         description: localizedMetadata.description,
+        keywords: locale === "zh-cn"
+            ? ["中国网站开发", "中国企业数字营销", "中文SEO", "网站建设", "移动应用开发", "SaaS开发", "技术SEO"]
+            : undefined,
         openGraph: buildOpenGraphMetadata({
             title: localizedMetadata.title,
             description: localizedMetadata.description,

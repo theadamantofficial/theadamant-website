@@ -1,5 +1,5 @@
 export const DEFAULT_SITE_LOCALE = "en";
-export const SEO_SITE_LOCALES = ["en", "en-us", "hi", "gu", "mr", "bn", "ta", "es", "fr", "de", "de-ch", "fr-ch", "it-ch", "pt", "ja", "ko", "ar"] as const;
+export const SEO_SITE_LOCALES = ["en", "en-us", "hi", "gu", "mr", "bn", "ta", "es", "fr", "de", "de-ch", "fr-ch", "it-ch", "pt", "ja", "ko", "ar", "zh-cn"] as const;
 export const INDEXABLE_SITE_LOCALES = SEO_SITE_LOCALES.filter((locale) => locale !== DEFAULT_SITE_LOCALE);
 export const SITE_LOCALE_COOKIE = "site-locale";
 
@@ -26,6 +26,7 @@ export const SITE_LOCALE_OPTIONS: SiteLocaleOption[] = [
     {code: "ja", label: "Japanese", nativeLabel: "日本語"},
     {code: "ko", label: "Korean", nativeLabel: "한국어"},
     {code: "ar", label: "Arabic", nativeLabel: "العربية"},
+    {code: "zh-cn", label: "Chinese (Simplified)", nativeLabel: "简体中文"},
     {code: "de-ch", label: "Swiss German", nativeLabel: "Schweizerdeutsch"},
     {code: "fr-ch", label: "Swiss French", nativeLabel: "Français suisse"},
     {code: "it-ch", label: "Swiss Italian", nativeLabel: "Italiano svizzero"},
@@ -51,6 +52,7 @@ const COUNTRY_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
     KR: "ko",
     JP: "ja",
     AE: "ar",
+    CN: "zh-cn",
     US: "en-us",
     CH: "de-ch",
     MX: "es",
@@ -80,6 +82,7 @@ const LANGUAGE_LOCALE_MAP: Partial<Record<string, SiteLocale>> = {
     mr: "mr",
     pt: "pt",
     ta: "ta",
+    zh: "zh-cn",
 };
 
 export function isSiteLocale(value: string): value is SiteLocale {
@@ -112,6 +115,8 @@ export function localeToHtmlLang(locale: SiteLocale) {
             return "ko";
         case "ar":
             return "ar";
+        case "zh-cn":
+            return "zh-CN";
         case "de-ch":
             return "de-CH";
         case "fr-ch":
@@ -167,6 +172,7 @@ export function getLanguageAlternates(pathname = "") {
         "de-CH": getLocalizedPagePath("de-ch", normalizedPath),
         "fr-CH": getLocalizedPagePath("fr-ch", normalizedPath),
         "it-CH": getLocalizedPagePath("it-ch", normalizedPath),
+        "zh-CN": getLocalizedPagePath("zh-cn", normalizedPath),
         "x-default": getLocalizedPagePath("en", normalizedPath),
     };
 }
@@ -205,6 +211,18 @@ export function detectSiteLocaleFromAcceptLanguage(headerValue?: string | null):
     }
 
     return null;
+}
+
+export function detectPreferredSiteLocale({
+    countryCode,
+    acceptLanguage,
+}: {
+    countryCode?: string | null;
+    acceptLanguage?: string | null;
+}): SiteLocale {
+    return detectSiteLocaleFromAcceptLanguage(acceptLanguage)
+        ?? detectSiteLocaleFromCountry(countryCode)
+        ?? DEFAULT_SITE_LOCALE;
 }
 
 export function getLocaleLabel(locale: SiteLocale) {
