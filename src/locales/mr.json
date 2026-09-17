@@ -10,10 +10,22 @@
   },
   "navbar": {
     "navItems": [
-      {"name": "सेवा", "anchor": "services"},
-      {"name": "प्रक्रिया", "anchor": "process"},
-      {"name": "FAQ", "anchor": "faq"},
-      {"name": "संपर्क", "anchor": "contact"}
+      {
+        "name": "सेवा",
+        "anchor": "services"
+      },
+      {
+        "name": "प्रक्रिया",
+        "anchor": "process"
+      },
+      {
+        "name": "FAQ",
+        "anchor": "faq"
+      },
+      {
+        "name": "संपर्क",
+        "anchor": "contact"
+      }
     ],
     "startProject": "प्रोजेक्ट सुरू करा",
     "lightMode": "लाइट मोड",
@@ -33,7 +45,11 @@
     ],
     "previewEyebrowLeft": "लॉन्चसाठी तयार डिजिटल प्रेझेन्स",
     "previewEyebrowRight": "स्ट्रॅटेजीपासून डिलिव्हरीपर्यंत",
-    "floatingBadges": ["आधुनिक मोशन", "सर्च-तयार", "कन्वर्जन-केंद्रित"],
+    "floatingBadges": [
+      "आधुनिक मोशन",
+      "सर्च-तयार",
+      "कन्वर्जन-केंद्रित"
+    ],
     "featureCards": [
       {
         "title": "लक्ष वेधून घेणारे डिझाइन",
@@ -47,7 +63,8 @@
         "title": "जलद अंमलबजावणी",
         "description": "जड लेआउट किंवा अस्पष्ट मेसेजिंगशिवाय लॉन्चचा वेग."
       }
-    ]
+    ],
+    "tagline": "Firm in Vision. Bold in Action"
   },
   "valueProps": {
     "kicker": "हे का काम करते",
@@ -72,7 +89,12 @@
     "kicker": "सेवा",
     "title": "इंटरेस्टला अॅक्शनमध्ये बदलण्यासाठी तयार केलेल्या डिझाइन आणि डेव्हलपमेंट सेवा.",
     "description": "UI/UX डिझाइनपासून SEO-फ्रेंडली वेबसाइट डेव्हलपमेंट आणि मोबाइल अॅप डिलिव्हरीपर्यंत, प्रत्येक सेवा तुमच्या ब्रँडला पटकन विश्वासार्ह दिसण्यासाठी घडवली जाते.",
-    "chips": ["लँडिंग पेजेस", "मार्केटिंग वेबसाइट्स", "प्रॉडक्ट इंटरफेसेस", "क्रॉस-प्लॅटफॉर्म मोबाइल अॅप्स"],
+    "chips": [
+      "लँडिंग पेजेस",
+      "मार्केटिंग वेबसाइट्स",
+      "प्रॉडक्ट इंटरफेसेस",
+      "क्रॉस-प्लॅटफॉर्म मोबाइल अॅप्स"
+    ],
     "items": [
       {
         "title": "UI/UX डिझाइन",
@@ -92,7 +114,12 @@
         "detail": "क्रॉस-प्लॅटफॉर्म मोबाइल अॅप डेव्हलपमेंट, मोबाइल UI डिझाइन, स्मूथ ऑनबोर्डिंग फ्लोज, स्केलेबल प्रॉडक्ट अनुभव आणि Android व iOS साठी यूजर-फ्रेंडली इंटरफेसेस.",
         "image": "/images/img-app-dev.png"
       }
-    ]
+    ],
+    "proofStrip": {
+      "kicker": "Selected work",
+      "title": "Products and partner systems already delivered with us.",
+      "description": "AetherSEO shows how Adamant builds practical SEO, publishing, and workflow systems that support real content operations, not just polished mockups."
+    }
   },
   "process": {
     "kicker": "प्रक्रिया",
@@ -188,16 +215,46 @@
       "descriptionLabel": "वर्णन",
       "descriptionPlaceholder": "लोकांनी लक्षात ठेवावा असा पेज, प्रॉडक्ट किंवा अनुभव याबद्दल सांगा.",
       "purposeOptions": [
-        {"value": "general", "label": "सामान्य चौकशी"},
-        {"value": "demo", "label": "डेमोची विनंती"},
-        {"value": "quote", "label": "कोट / प्राइसिंग"},
-        {"value": "website-development", "label": "वेबसाइट डेव्हलपमेंट"},
-        {"value": "app-development", "label": "अ‍ॅप डेव्हलपमेंट"},
-        {"value": "support", "label": "तांत्रिक सहाय्य"},
-        {"value": "partnership", "label": "भागीदारी / सहकार्य"},
-        {"value": "careers", "label": "करिअर संधी"},
-        {"value": "feedback", "label": "फीडबॅक / सूचना"},
-        {"value": "other", "label": "इतर"}
+        {
+          "value": "general",
+          "label": "सामान्य चौकशी"
+        },
+        {
+          "value": "demo",
+          "label": "डेमोची विनंती"
+        },
+        {
+          "value": "quote",
+          "label": "कोट / प्राइसिंग"
+        },
+        {
+          "value": "website-development",
+          "label": "वेबसाइट डेव्हलपमेंट"
+        },
+        {
+          "value": "app-development",
+          "label": "अ‍ॅप डेव्हलपमेंट"
+        },
+        {
+          "value": "support",
+          "label": "तांत्रिक सहाय्य"
+        },
+        {
+          "value": "partnership",
+          "label": "भागीदारी / सहकार्य"
+        },
+        {
+          "value": "careers",
+          "label": "करिअर संधी"
+        },
+        {
+          "value": "feedback",
+          "label": "फीडबॅक / सूचना"
+        },
+        {
+          "value": "other",
+          "label": "इतर"
+        }
       ],
       "submitLabel": "प्रोजेक्टची माहिती पाठवा",
       "submittingLabel": "प्रोजेक्टची माहिती पाठवली जात आहे...",
@@ -213,23 +270,71 @@
       {
         "title": "नेव्हिगेट करा",
         "links": [
-          {"name": "होम", "anchor": ""},
-          {"name": "सेवा", "anchor": "services"},
-          {"name": "प्रक्रिया", "anchor": "process"},
-          {"name": "FAQ", "anchor": "faq"},
-          {"name": "संपर्क", "anchor": "contact"}
+          {
+            "name": "होम",
+            "anchor": ""
+          },
+          {
+            "name": "सेवा",
+            "anchor": "services"
+          },
+          {
+            "name": "प्रक्रिया",
+            "anchor": "process"
+          },
+          {
+            "name": "FAQ",
+            "anchor": "faq"
+          },
+          {
+            "name": "संपर्क",
+            "anchor": "contact"
+          }
         ]
       },
       {
         "title": "फोकस क्षेत्रे",
         "links": [
-          {"name": "UI/UX डिझाइन", "anchor": "services"},
-          {"name": "वेबसाइट डेव्हलपमेंट", "anchor": "services"},
-          {"name": "मोबाइल अॅप्स", "anchor": "services"}
+          {
+            "name": "UI/UX डिझाइन",
+            "anchor": "services"
+          },
+          {
+            "name": "वेबसाइट डेव्हलपमेंट",
+            "anchor": "services"
+          },
+          {
+            "name": "मोबाइल अॅप्स",
+            "anchor": "services"
+          }
         ]
       }
     ],
     "copyright": "Adamant. सर्व हक्क राखीव.",
     "tagline": "स्पष्टता, वेग आणि मजबूत पहिल्या छापांसाठी डिझाइन केलेले."
+  },
+  "credentials": {
+    "kicker": "Company credentials",
+    "title": "Registered in India. Recognized by Startup India.",
+    "description": "JSSS Adamant Technologies Private Limited is an incorporated Indian company recognized as a startup by DPIIT under the Government of India's Startup India initiative, with independent certifications for quality and information security management.",
+    "startupEyebrow": "Government recognition",
+    "startupTitle": "DPIIT-recognized startup",
+    "startupDescription": "Recognized by the Department for Promotion of Industry and Internal Trade, Ministry of Commerce & Industry, Government of India.",
+    "recognitionNumberLabel": "Recognition no.",
+    "issuedLabel": "Issued",
+    "validLabel": "Valid up to",
+    "incorporatedLabel": "Incorporated",
+    "viewCertificate": "View certificate",
+    "verifyCertificate": "Verify on Startup India",
+    "isoEyebrow": "Quality management",
+    "isoTitle": "ISO 9001:2015 certified",
+    "isoDescription": "Our quality management system has been independently assessed for our software, web, mobile, design, marketing, automation, publishing, and technology consulting activities.",
+    "securityEyebrow": "Information security",
+    "securityTitle": "ISO/IEC 27001:2022 certified",
+    "securityDescription": "Our information security management system has been independently assessed for the same software, digital, automation, publishing, and technology consulting scope.",
+    "certificationNumberLabel": "Certificate no.",
+    "initialRegistrationLabel": "Initial registration",
+    "recertificationLabel": "Re-certification due",
+    "disclaimer": "DPIIT recognition remains subject to the eligibility and turnover conditions printed on the certificate. ISO certifications are independently issued and are separate from Government of India recognition."
   }
 }

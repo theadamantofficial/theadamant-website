@@ -1,0 +1,406 @@
+{
+  "locale": "zh-cn",
+  "dir": "ltr",
+  "metadata": {
+    "title": "Adamant Technologies | 中国企业网站、应用与数字营销",
+    "description": "Adamant Technologies 为中国及全球企业提供网站开发、移动应用、SaaS 产品、技术 SEO 和数字营销服务。"
+  },
+  "schema": {
+    "organizationDescription": "Adamant Technologies 为中国及全球企业设计和开发高性能网站、产品界面、移动应用、SaaS 产品及数字营销体验。"
+  },
+  "navbar": {
+    "navItems": [
+      {
+        "name": "Services",
+        "anchor": "services"
+      },
+      {
+        "name": "Credentials",
+        "anchor": "credentials"
+      },
+      {
+        "name": "Process",
+        "anchor": "process"
+      },
+      {
+        "name": "FAQ",
+        "anchor": "faq"
+      },
+      {
+        "name": "Contact",
+        "anchor": "contact"
+      }
+    ],
+    "startProject": "Start a project",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode",
+    "languageAriaLabel": "Change website language"
+  },
+  "hero": {
+    "kicker": "Independent digital studio · Built for a global stage",
+    "tagline": "Firm in Vision. Bold in Action",
+    "title": "Bold ideas.\nBeautifully built.",
+    "description": "JSSS Adamant Technologies Private Limited is a digital product and growth partner for startups, professional service firms, local businesses, and ambitious brands. We design and develop SEO-friendly websites, high-converting landing pages, mobile apps, SaaS products, and connected digital experiences, then support them with technical SEO, content strategy, social media, paid advertising, and measurable digital marketing. From India to the USA, UK, Japan, South Korea, Dubai, and Switzerland, we help businesses become easier to find, understand, trust, and choose.",
+    "primaryCta": "Let’s build something",
+    "secondaryCta": "Explore services",
+    "positioningPoints": [
+      "Design with purpose",
+      "Development built to last",
+      "Marketing that moves you forward"
+    ],
+    "previewEyebrowLeft": "Ideas, brought into dimension",
+    "previewEyebrowRight": "From first spark to what’s next",
+    "floatingBadges": [
+      "Landing pages",
+      "Search-ready",
+      "Paid ads"
+    ],
+    "featureCards": [
+      {
+        "title": "Conversion-focused design",
+        "description": "Content hierarchy, layout, and motion tailored to hold attention and guide action."
+      },
+      {
+        "title": "Search-ready development",
+        "description": "Semantic markup, metadata, and keyword-aware copy built into launch."
+      },
+      {
+        "title": "Growth campaigns for global brands",
+        "description": "Social media, brand visibility, and paid ads aligned with the website and conversion path."
+      }
+    ]
+  },
+  "credentials": {
+    "kicker": "Company credentials",
+    "title": "Registered in India. Recognized by Startup India.",
+    "description": "JSSS Adamant Technologies Private Limited is an incorporated Indian company recognized as a startup by DPIIT under the Government of India's Startup India initiative, with independent certifications for quality and information security management.",
+    "startupEyebrow": "Government recognition",
+    "startupTitle": "DPIIT-recognized startup",
+    "startupDescription": "Recognized by the Department for Promotion of Industry and Internal Trade, Ministry of Commerce & Industry, Government of India.",
+    "recognitionNumberLabel": "Recognition no.",
+    "issuedLabel": "Issued",
+    "validLabel": "Valid up to",
+    "incorporatedLabel": "Incorporated",
+    "viewCertificate": "View certificate",
+    "verifyCertificate": "Verify on Startup India",
+    "isoEyebrow": "Quality management",
+    "isoTitle": "ISO 9001:2015 certified",
+    "isoDescription": "Our quality management system has been independently assessed for our software, web, mobile, design, marketing, automation, publishing, and technology consulting activities.",
+    "securityEyebrow": "Information security",
+    "securityTitle": "ISO/IEC 27001:2022 certified",
+    "securityDescription": "Our information security management system has been independently assessed for the same software, digital, automation, publishing, and technology consulting scope.",
+    "certificationNumberLabel": "Certificate no.",
+    "initialRegistrationLabel": "Initial registration",
+    "recertificationLabel": "Re-certification due",
+    "disclaimer": "DPIIT recognition remains subject to the eligibility and turnover conditions printed on the certificate. ISO certifications are independently issued and are separate from Government of India recognition."
+  },
+  "valueProps": {
+    "kicker": "Why this works",
+    "title": "A growth website should rank, explain, build trust, and convert.",
+    "description": "A strong homepage is more than an attractive first impression. It is the central SEO, content, and conversion asset for your company. Adamant combines keyword-aware content strategy, user experience design, technical performance, structured data, credible proof, and measurable growth into one connected digital experience.",
+    "items": [
+      {
+        "title": "Match high-intent search queries early",
+        "description": "Use clear service language, relevant keywords, descriptive headings, internal links, and useful supporting copy so Google and potential customers understand what your company offers. The homepage introduces the business while focused service and location pages capture more specific searches."
+      },
+      {
+        "title": "Explain the offer with useful content",
+        "description": "Guide visitors with sharper positioning, a logical information architecture, scannable sections, service details, industry context, FAQs, and clear calls to action. Good content helps a visitor understand what you do, who you serve, how the process works, and why the next step is worth taking."
+      },
+      {
+        "title": "Build trust and improve conversion",
+        "description": "Combine credible company information, certifications, project proof, testimonials, transparent process details, accessible design, fast performance, and visible next steps. These signals reduce uncertainty and make it easier for a qualified visitor to enquire, book a consultation, or start a project."
+      }
+    ]
+  },
+  "services": {
+    "kicker": "Services",
+    "title": "Website, UI/UX, app development, and digital marketing services built for growth.",
+    "description": "From website strategy and SEO-friendly landing pages to UI/UX design, SaaS product development, mobile apps, social media management, brand positioning, and paid ads, Adamant helps brands launch digital experiences that are easier to find, understand, trust, and scale across India and global markets.",
+    "chips": [
+      "SEO websites",
+      "Landing pages",
+      "UI/UX design",
+      "Mobile apps",
+      "Digital marketing",
+      "Social media",
+      "Paid ads",
+      "USA, UK & Japan"
+    ],
+    "proofStrip": {
+      "kicker": "Selected work",
+      "title": "Products and partner systems already delivered with us.",
+      "description": "AetherSEO shows how Adamant builds practical SEO, publishing, and workflow systems that support real content operations, not just polished mockups."
+    },
+    "items": [
+      {
+        "title": "UI/UX Design",
+        "description": "Create clear, accessible, and conversion-focused interfaces for websites, SaaS platforms, and mobile applications.",
+        "detail": "Our UI/UX design process combines user research, information architecture, wireframes, visual design, clickable prototypes, responsive design systems, and usability thinking. We map the decision path, test the message in a clickable prototype, and give engineering a consistent interface with fewer ambiguities and stronger calls to action.",
+        "imageAlt": "Visual representation of a software design workflow",
+        "image": "/images/img-ui-ux-design.webp"
+      },
+      {
+        "title": "Website Development",
+        "description": "Build a fast, responsive, and SEO-friendly business website that turns search traffic into qualified enquiries.",
+        "detail": "From content model and page architecture to deployment, we build durable websites for startups, professional services, local businesses, and growing brands. Our website development includes responsive front-end engineering, semantic HTML, technical SEO, metadata, structured content, internal links, analytics readiness, and an editing workflow your team can extend.",
+        "imageAlt": "Infographic-style preview of an SEO-focused website structure",
+        "image": "/images/img-web-dev.webp"
+      },
+      {
+        "title": "Mobile App Development",
+        "description": "Design and develop dependable mobile applications for iOS and Android users from idea to launch.",
+        "detail": "We define the smallest useful release, design onboarding and core user journeys, plan the important product states, and support a maintainable cross-platform mobile app with a measured release path. The website, app-store messaging, product analytics, and launch campaign can be shaped as one connected experience.",
+        "imageAlt": "Showcase of a mobile app user interface design",
+        "image": "/images/img-app-dev.webp"
+      },
+      {
+        "title": "Digital Marketing",
+        "description": "Grow brand visibility with SEO, social media, content, paid advertising, and conversion-focused campaigns.",
+        "detail": "We connect search intent, creative, social media management, content planning, brand positioning, paid media, and landing-page iteration so each channel has a defined job. Measurement and reporting show which campaigns attract the right audience, generate qualified leads, and deserve the next investment.",
+        "imageAlt": "Digital marketing dashboard showing social media, paid ads, and brand growth signals",
+        "image": "/images/img-digital-marketing.svg"
+      },
+      {
+        "title": "AetherSEO",
+        "description": "Adamant's in-house SEO workspace for multilingual publishing, audits, and structured content operations.",
+        "detail": "AetherSEO helps startups and lean teams plan content, run audits, track SEO work, and keep publishing workflows organized inside one product instead of spreading operations across disconnected tools.",
+        "imageAlt": "AetherSEO logo",
+        "image": "/images/img-aetherseo.svg",
+        "badge": "In-house product",
+        "proofHighlights": [
+          "Multilingual publishing",
+          "SEO audits",
+          "Content operations",
+          "Workflow tracking"
+        ],
+        "href": "https://aetherseo.com/en",
+        "ctaLabel": "Visit AetherSEO"
+      }
+    ]
+  },
+  "process": {
+    "kicker": "Process",
+    "title": "A strategic website development process built for SEO, UX, and measurable growth.",
+    "description": "From the first discovery workshop to launch and ongoing optimization, Adamant connects business strategy, keyword research, content planning, UI/UX design, web development, technical SEO, analytics, and conversion optimization. Every step is designed to help your website attract the right audience, explain your services clearly, and turn qualified visitors into enquiries.",
+    "steps": [
+      {
+        "number": "01",
+        "title": "Research the audience, market, and search intent",
+        "description": "We study your business goals, ideal customers, competitors, locations, and high-intent search terms such as website development company, app development, SaaS, digital marketing, and industry-specific services. This creates a practical SEO and content strategy before design begins."
+      },
+      {
+        "number": "02",
+        "title": "Plan the content architecture and user experience",
+        "description": "We organize the homepage, service pages, location pages, industry content, calls to action, internal links, and FAQs into a clear information architecture. Then we shape the UI/UX, page hierarchy, and conversion journey so visitors can understand the offer and take action."
+      },
+      {
+        "number": "03",
+        "title": "Develop a fast, responsive, and search-ready website",
+        "description": "We build responsive websites with semantic HTML, meaningful headings, descriptive metadata, canonical URLs, structured data, accessible components, optimized images, clean internal linking, and performance-focused front-end code. The result is a stronger technical foundation for Google discovery and a better experience on mobile."
+      },
+      {
+        "number": "04",
+        "title": "Launch, measure, and improve organic visibility",
+        "description": "After launch, we connect analytics and Search Console, submit the sitemap, monitor impressions, clicks, rankings, enquiries, and conversion paths, and use the data to improve pages. Content updates, new landing pages, digital PR, reviews, and ethical link building support sustainable SEO growth over time."
+      }
+    ]
+  },
+  "faq": {
+    "kicker": "FAQ",
+    "title": "Questions brands ask before hiring a website development partner.",
+    "description": "These answers give potential clients and search engines clearer context around Adamant's services, process, and SEO-focused approach.",
+    "items": [
+      {
+        "question": "What services does Adamant offer?",
+        "answer": "Adamant offers UI/UX design, website development, landing page design, technical SEO foundations, mobile app development, and digital marketing services including social media management, brand boosting, and paid ad campaign support for startups and expanding teams."
+      },
+      {
+        "question": "Is Adamant a registered company and a DPIIT-recognized startup?",
+        "answer": "Yes. JSSS Adamant Technologies Private Limited was incorporated in India on 27 April 2026 and is recognized as a startup by the Department for Promotion of Industry and Internal Trade under certificate number DIPP260656. The certificate can be viewed on this website and verified through the official Startup India portal."
+      },
+      {
+        "question": "Can you build an SEO-friendly website from day one?",
+        "answer": "Yes. Metadata, semantic structure, internal linking, keyword-aware copy, responsive performance, and technical SEO foundations can all be built into the website before launch instead of being added later as cleanup."
+      },
+      {
+        "question": "Do you help with landing page copy and UI/UX as well?",
+        "answer": "Yes. Adamant works on copy direction, content hierarchy, layout, and interface design together so the landing page reads clearly, looks credible, and supports conversion."
+      },
+      {
+        "question": "When should a business choose custom website development over a template?",
+        "answer": "Custom website development is a stronger fit when the business needs sharper branding, better SEO structure, faster performance, or a website that has to support specific user journeys, integrations, or conversion goals."
+      },
+      {
+        "question": "Can you also handle digital marketing after the website is live?",
+        "answer": "Yes. Adamant can support social media handling, content planning, brand visibility, paid ads, and campaign direction so the website, SEO structure, and marketing channels work together."
+      },
+      {
+        "question": "Which industries and business types do you work with?",
+        "answer": "Adamant works with technology startups, professional services, agencies, education businesses, real estate and construction teams, healthcare and wellness brands, ecommerce companies, local businesses, and organizations launching a new digital product. The scope is adapted to the audience, compliance needs, and buying journey of each business."
+      },
+      {
+        "question": "Do you provide website development in Noida and across India?",
+        "answer": "Yes. Adamant is an Indian technology company serving businesses in Noida, Delhi NCR, across India, and international markets. Projects can be delivered remotely with structured communication, shared milestones, and clear documentation."
+      },
+      {
+        "question": "How do you measure whether a website project is successful?",
+        "answer": "Success depends on the goal, but useful signals include qualified enquiries, organic impressions and clicks, engagement with important pages, page speed, conversion rate, activation, and the quality of conversations generated by the website. We define the relevant baseline and measurement plan before launch."
+      }
+    ]
+  },
+  "contact": {
+    "kicker": "Contact",
+    "title": "Tell us what you want your website, landing page, app, or marketing campaign to achieve.",
+    "description": "If you need a global website and digital marketing partner for India, the USA, UK, Japan, or another market, share your scope, timeline, search goals, and business goal here.",
+    "highlights": [
+      {
+        "title": "Share the business goal",
+        "description": "Tell us what you want users to understand, feel, search for, or do when they land on the page."
+      },
+      {
+        "title": "Expect a focused reply",
+        "description": "We can shape the right mix of UI/UX, website development, app work, SEO foundations, social media, and paid ads around your scope."
+      },
+      {
+        "title": "Move at launch speed",
+        "description": "The process is built to keep momentum high, especially for early-stage launches, redesigns, and product ideas."
+      }
+    ],
+    "briefTitle": "A stronger brief leads to a faster, sharper proposal.",
+    "briefDescription": "If you already know these details, include them so the first response can be more specific and more useful.",
+    "briefItems": [
+      {
+        "title": "Business goal",
+        "description": "What should this website, landing page, product, campaign, or launch help you achieve?"
+      },
+      {
+        "title": "Launch timing",
+        "description": "Share the target window so the scope, SEO work, and design decisions can match the pace."
+      },
+      {
+        "title": "References",
+        "description": "Links, examples, keywords, or competitor references help us understand the direction quickly."
+      }
+    ],
+    "form": {
+      "fullNameLabel": "Full name",
+      "fullNamePlaceholder": "Rahul Patel",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "rahulpatel@example.com",
+      "purposeLabel": "Select purpose",
+      "purposePlaceholder": "Select purpose...",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Tell us about the website, landing page, app, product experience, or digital marketing campaign you want to build.",
+      "purposeOptions": [
+        {
+          "value": "general",
+          "label": "General Inquiry"
+        },
+        {
+          "value": "demo",
+          "label": "Request a Demo"
+        },
+        {
+          "value": "quote",
+          "label": "Get a Quote / Pricing"
+        },
+        {
+          "value": "website-development",
+          "label": "Website Development"
+        },
+        {
+          "value": "app-development",
+          "label": "App Development"
+        },
+        {
+          "value": "digital-marketing",
+          "label": "Digital Marketing Services"
+        },
+        {
+          "value": "support",
+          "label": "Technical Support"
+        },
+        {
+          "value": "partnership",
+          "label": "Partnership / Collaboration"
+        },
+        {
+          "value": "careers",
+          "label": "Career Opportunities"
+        },
+        {
+          "value": "feedback",
+          "label": "Feedback / Suggestions"
+        },
+        {
+          "value": "other",
+          "label": "Other"
+        }
+      ],
+      "submitLabel": "Send project details",
+      "submittingLabel": "Sending project details...",
+      "successLabel": "Message captured. The button will return in a few seconds.",
+      "configError": "EmailJS is not fully configured yet. Add the template ID and public key to continue.",
+      "sendError": "Could not send the message right now. Please try again.",
+      "successToast": "Project details sent."
+    }
+  },
+  "footer": {
+    "description": "Adamant creates SEO-friendly websites, landing pages, product interfaces, mobile apps, social media systems, and paid ad campaigns for brands that need clearer messaging, stronger visibility, and faster execution.",
+    "sections": [
+      {
+        "title": "Navigate",
+        "links": [
+          {
+            "name": "Home",
+            "anchor": ""
+          },
+          {
+            "name": "Services",
+            "anchor": "services"
+          },
+          {
+            "name": "Credentials",
+            "anchor": "credentials"
+          },
+          {
+            "name": "Process",
+            "anchor": "process"
+          },
+          {
+            "name": "FAQ",
+            "anchor": "faq"
+          },
+          {
+            "name": "Contact",
+            "anchor": "contact"
+          }
+        ]
+      },
+      {
+        "title": "Focus Areas",
+        "links": [
+          {
+            "name": "UI/UX Design",
+            "anchor": "services"
+          },
+          {
+            "name": "Website Development",
+            "anchor": "services"
+          },
+          {
+            "name": "Mobile Apps",
+            "anchor": "services"
+          },
+          {
+            "name": "Digital Marketing",
+            "anchor": "services"
+          }
+        ]
+      }
+    ],
+    "copyright": "Adamant. All rights reserved.",
+    "tagline": "Firm in Vision. Bold in Action"
+  }
+}

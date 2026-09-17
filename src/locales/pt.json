@@ -10,10 +10,22 @@
   },
   "navbar": {
     "navItems": [
-      {"name": "Serviços", "anchor": "services"},
-      {"name": "Processo", "anchor": "process"},
-      {"name": "FAQ", "anchor": "faq"},
-      {"name": "Contato", "anchor": "contact"}
+      {
+        "name": "Serviços",
+        "anchor": "services"
+      },
+      {
+        "name": "Processo",
+        "anchor": "process"
+      },
+      {
+        "name": "FAQ",
+        "anchor": "faq"
+      },
+      {
+        "name": "Contato",
+        "anchor": "contact"
+      }
     ],
     "startProject": "Iniciar projeto",
     "lightMode": "Modo claro",
@@ -33,7 +45,11 @@
     ],
     "previewEyebrowLeft": "Presença digital pronta para lançar",
     "previewEyebrowRight": "Da estratégia à entrega",
-    "floatingBadges": ["Motion moderna", "Pronto para busca", "Focado em conversão"],
+    "floatingBadges": [
+      "Motion moderna",
+      "Pronto para busca",
+      "Focado em conversão"
+    ],
     "featureCards": [
       {
         "title": "Design que prende atenção",
@@ -47,7 +63,8 @@
         "title": "Execução rápida",
         "description": "Ritmo de lançamento sem layouts pesados nem mensagens vagas."
       }
-    ]
+    ],
+    "tagline": "Firm in Vision. Bold in Action"
   },
   "valueProps": {
     "kicker": "Por que isso funciona",
@@ -72,7 +89,12 @@
     "kicker": "Serviços",
     "title": "Serviços de design e desenvolvimento feitos para transformar interesse em ação.",
     "description": "De UI/UX a desenvolvimento web preparado para SEO e apps mobile, cada serviço é definido para aumentar sua credibilidade e manter o ritmo após o lançamento.",
-    "chips": ["Landing pages", "Sites de marketing", "Interfaces de produto", "Apps mobile multiplataforma"],
+    "chips": [
+      "Landing pages",
+      "Sites de marketing",
+      "Interfaces de produto",
+      "Apps mobile multiplataforma"
+    ],
     "items": [
       {
         "title": "Design UI/UX",
@@ -92,7 +114,12 @@
         "detail": "Desenvolvimento mobile multiplataforma, design de UI para apps, fluxos de onboarding suaves, experiências escaláveis e interfaces amigáveis para Android e iOS.",
         "image": "/images/img-app-dev.png"
       }
-    ]
+    ],
+    "proofStrip": {
+      "kicker": "Selected work",
+      "title": "Products and partner systems already delivered with us.",
+      "description": "AetherSEO shows how Adamant builds practical SEO, publishing, and workflow systems that support real content operations, not just polished mockups."
+    }
   },
   "process": {
     "kicker": "Processo",
@@ -188,16 +215,46 @@
       "descriptionLabel": "Descrição",
       "descriptionPlaceholder": "Conte sobre a página, produto ou experiência que você quer que as pessoas lembrem.",
       "purposeOptions": [
-        {"value": "general", "label": "Consulta geral"},
-        {"value": "demo", "label": "Solicitar demonstração"},
-        {"value": "quote", "label": "Orçamento / preços"},
-        {"value": "website-development", "label": "Desenvolvimento web"},
-        {"value": "app-development", "label": "Desenvolvimento de app"},
-        {"value": "support", "label": "Suporte técnico"},
-        {"value": "partnership", "label": "Parceria / colaboração"},
-        {"value": "careers", "label": "Oportunidades de carreira"},
-        {"value": "feedback", "label": "Feedback / sugestões"},
-        {"value": "other", "label": "Outro"}
+        {
+          "value": "general",
+          "label": "Consulta geral"
+        },
+        {
+          "value": "demo",
+          "label": "Solicitar demonstração"
+        },
+        {
+          "value": "quote",
+          "label": "Orçamento / preços"
+        },
+        {
+          "value": "website-development",
+          "label": "Desenvolvimento web"
+        },
+        {
+          "value": "app-development",
+          "label": "Desenvolvimento de app"
+        },
+        {
+          "value": "support",
+          "label": "Suporte técnico"
+        },
+        {
+          "value": "partnership",
+          "label": "Parceria / colaboração"
+        },
+        {
+          "value": "careers",
+          "label": "Oportunidades de carreira"
+        },
+        {
+          "value": "feedback",
+          "label": "Feedback / sugestões"
+        },
+        {
+          "value": "other",
+          "label": "Outro"
+        }
       ],
       "submitLabel": "Enviar detalhes do projeto",
       "submittingLabel": "Enviando detalhes do projeto...",
@@ -213,23 +270,71 @@
       {
         "title": "Navegação",
         "links": [
-          {"name": "Início", "anchor": ""},
-          {"name": "Serviços", "anchor": "services"},
-          {"name": "Processo", "anchor": "process"},
-          {"name": "FAQ", "anchor": "faq"},
-          {"name": "Contato", "anchor": "contact"}
+          {
+            "name": "Início",
+            "anchor": ""
+          },
+          {
+            "name": "Serviços",
+            "anchor": "services"
+          },
+          {
+            "name": "Processo",
+            "anchor": "process"
+          },
+          {
+            "name": "FAQ",
+            "anchor": "faq"
+          },
+          {
+            "name": "Contato",
+            "anchor": "contact"
+          }
         ]
       },
       {
         "title": "Focos",
         "links": [
-          {"name": "Design UI/UX", "anchor": "services"},
-          {"name": "Desenvolvimento web", "anchor": "services"},
-          {"name": "Apps mobile", "anchor": "services"}
+          {
+            "name": "Design UI/UX",
+            "anchor": "services"
+          },
+          {
+            "name": "Desenvolvimento web",
+            "anchor": "services"
+          },
+          {
+            "name": "Apps mobile",
+            "anchor": "services"
+          }
         ]
       }
     ],
     "copyright": "Adamant. Todos os direitos reservados.",
     "tagline": "Pensado para clareza, velocidade e primeiras impressões mais fortes."
+  },
+  "credentials": {
+    "kicker": "Company credentials",
+    "title": "Registered in India. Recognized by Startup India.",
+    "description": "JSSS Adamant Technologies Private Limited is an incorporated Indian company recognized as a startup by DPIIT under the Government of India's Startup India initiative, with independent certifications for quality and information security management.",
+    "startupEyebrow": "Government recognition",
+    "startupTitle": "DPIIT-recognized startup",
+    "startupDescription": "Recognized by the Department for Promotion of Industry and Internal Trade, Ministry of Commerce & Industry, Government of India.",
+    "recognitionNumberLabel": "Recognition no.",
+    "issuedLabel": "Issued",
+    "validLabel": "Valid up to",
+    "incorporatedLabel": "Incorporated",
+    "viewCertificate": "View certificate",
+    "verifyCertificate": "Verify on Startup India",
+    "isoEyebrow": "Quality management",
+    "isoTitle": "ISO 9001:2015 certified",
+    "isoDescription": "Our quality management system has been independently assessed for our software, web, mobile, design, marketing, automation, publishing, and technology consulting activities.",
+    "securityEyebrow": "Information security",
+    "securityTitle": "ISO/IEC 27001:2022 certified",
+    "securityDescription": "Our information security management system has been independently assessed for the same software, digital, automation, publishing, and technology consulting scope.",
+    "certificationNumberLabel": "Certificate no.",
+    "initialRegistrationLabel": "Initial registration",
+    "recertificationLabel": "Re-certification due",
+    "disclaimer": "DPIIT recognition remains subject to the eligibility and turnover conditions printed on the certificate. ISO certifications are independently issued and are separate from Government of India recognition."
   }
 }

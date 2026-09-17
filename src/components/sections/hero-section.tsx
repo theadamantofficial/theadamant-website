@@ -61,8 +61,8 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
         <section ref={sectionRef} className="workspace-scroll-track" data-motion={capability} data-motion-active={isHeroVisible && introComplete && capability !== "reduced"} aria-labelledby="hero-heading">
             <div ref={heroRef} className={`workspace-hero ${introComplete ? "workspace-intro-complete" : ""}`}>
                 <div className="workspace-heading">
-                    <p className="workspace-label"><span/> INDEPENDENT DIGITAL STUDIO</p>
-                    <h1 id="hero-heading">{locale === "en" ? <>Serious about<br/><em>the unexpected.</em></> : copy.title}</h1>
+                    <p className="workspace-label"><span/> {copy.kicker}</p>
+                    <h1 id="hero-heading">{copy.title}</h1>
                     <p className="workspace-intro">{copy.description}</p>
                 </div>
                 <div className="workspace-scene">
@@ -75,10 +75,10 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
                 <div className="workspace-bottom">
                     <span />
                     <div className="workspace-controls">
-                        <Link href={getLocalizedPath(locale,"services")} className="workspace-scroll">Explore services <ArrowDown size={14}/></Link>
+                        <Link href={getLocalizedPath(locale,"services")} className="workspace-scroll">{copy.secondaryCta} <ArrowDown size={14}/></Link>
                     </div>
                 </div>
-                <div className="workspace-footer"><span>FIRM IN VISION. BOLD IN ACTION.</span><span>BUILT IN INDIA. CONNECTED TO THE WORLD.</span></div>
+                <div className="workspace-footer"><span>{copy.tagline}</span><span>{copy.previewEyebrowRight}</span></div>
             </div>
         </section>
     );

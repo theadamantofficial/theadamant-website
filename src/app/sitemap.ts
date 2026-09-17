@@ -32,11 +32,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     );
 
     return [...new Set([...STATIC_PATHS, ...servicePaths, ...blogPaths, ...localizedPaths])].map((path) => {
+        const isLocalizedHomepage = INDEXABLE_SITE_LOCALES.some((locale) => path === getLocalizedPagePath(locale));
+        const isLocalizedBlog = INDEXABLE_SITE_LOCALES.some((locale) => path === getLocalizedPagePath(locale, "blog"));
         return {
             url: `${siteUrl}${path}`,
             ...(blogPostDates.has(path) ? {lastModified: blogPostDates.get(path)} : {}),
             changeFrequency: path === "/" || path.endsWith("/blog") ? "weekly" : "monthly",
-            priority: path === "/" ? 1 : path === "/about" ? 0.8 : 0.7,
+            priority: path === "/" || isLocalizedHomepage ? 1 : path === "/about" || isLocalizedBlog ? 0.8 : 0.7,
         };
     });
 }

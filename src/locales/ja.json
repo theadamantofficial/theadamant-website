@@ -10,10 +10,22 @@
   },
   "navbar": {
     "navItems": [
-      {"name": "サービス", "anchor": "services"},
-      {"name": "進め方", "anchor": "process"},
-      {"name": "FAQ", "anchor": "faq"},
-      {"name": "お問い合わせ", "anchor": "contact"}
+      {
+        "name": "サービス",
+        "anchor": "services"
+      },
+      {
+        "name": "進め方",
+        "anchor": "process"
+      },
+      {
+        "name": "FAQ",
+        "anchor": "faq"
+      },
+      {
+        "name": "お問い合わせ",
+        "anchor": "contact"
+      }
     ],
     "startProject": "プロジェクトを始める",
     "lightMode": "ライトモード",
@@ -33,7 +45,11 @@
     ],
     "previewEyebrowLeft": "公開準備が整ったデジタルプレゼンス",
     "previewEyebrowRight": "戦略から実装まで",
-    "floatingBadges": ["モダンなモーション", "検索対応", "コンバージョン重視"],
+    "floatingBadges": [
+      "モダンなモーション",
+      "検索対応",
+      "コンバージョン重視"
+    ],
     "featureCards": [
       {
         "title": "視線をつかむデザイン",
@@ -47,7 +63,8 @@
         "title": "素早い実行",
         "description": "重いレイアウトや曖昧なメッセージなしでローンチの勢いを作ります。"
       }
-    ]
+    ],
+    "tagline": "Firm in Vision. Bold in Action"
   },
   "valueProps": {
     "kicker": "なぜ効果があるのか",
@@ -72,7 +89,12 @@
     "kicker": "サービス",
     "title": "関心を行動に変えるためのデザイン・開発サービス。",
     "description": "UI/UXデザインからSEOを意識したWeb開発、モバイルアプリ開発まで、各サービスは信頼性を高め、公開後の勢いを作るために設計されています。",
-    "chips": ["ランディングページ", "マーケティングサイト", "プロダクトUI", "クロスプラットフォームアプリ"],
+    "chips": [
+      "ランディングページ",
+      "マーケティングサイト",
+      "プロダクトUI",
+      "クロスプラットフォームアプリ"
+    ],
     "items": [
       {
         "title": "UI/UXデザイン",
@@ -92,7 +114,12 @@
         "detail": "クロスプラットフォーム開発、モバイルUI設計、スムーズなオンボーディング、拡張可能な体験設計により、AndroidとiOSの成長を支えます。",
         "image": "/images/img-app-dev.png"
       }
-    ]
+    ],
+    "proofStrip": {
+      "kicker": "Selected work",
+      "title": "Products and partner systems already delivered with us.",
+      "description": "AetherSEO shows how Adamant builds practical SEO, publishing, and workflow systems that support real content operations, not just polished mockups."
+    }
   },
   "process": {
     "kicker": "進め方",
@@ -188,16 +215,46 @@
       "descriptionLabel": "説明",
       "descriptionPlaceholder": "記憶に残るページ、プロダクト、体験について教えてください。",
       "purposeOptions": [
-        {"value": "general", "label": "一般的なお問い合わせ"},
-        {"value": "demo", "label": "デモを依頼"},
-        {"value": "quote", "label": "見積もり / 料金"},
-        {"value": "website-development", "label": "Webサイト開発"},
-        {"value": "app-development", "label": "アプリ開発"},
-        {"value": "support", "label": "技術サポート"},
-        {"value": "partnership", "label": "提携 / コラボレーション"},
-        {"value": "careers", "label": "採用情報"},
-        {"value": "feedback", "label": "フィードバック / 提案"},
-        {"value": "other", "label": "その他"}
+        {
+          "value": "general",
+          "label": "一般的なお問い合わせ"
+        },
+        {
+          "value": "demo",
+          "label": "デモを依頼"
+        },
+        {
+          "value": "quote",
+          "label": "見積もり / 料金"
+        },
+        {
+          "value": "website-development",
+          "label": "Webサイト開発"
+        },
+        {
+          "value": "app-development",
+          "label": "アプリ開発"
+        },
+        {
+          "value": "support",
+          "label": "技術サポート"
+        },
+        {
+          "value": "partnership",
+          "label": "提携 / コラボレーション"
+        },
+        {
+          "value": "careers",
+          "label": "採用情報"
+        },
+        {
+          "value": "feedback",
+          "label": "フィードバック / 提案"
+        },
+        {
+          "value": "other",
+          "label": "その他"
+        }
       ],
       "submitLabel": "プロジェクト詳細を送信",
       "submittingLabel": "プロジェクト詳細を送信中...",
@@ -213,23 +270,71 @@
       {
         "title": "ナビゲーション",
         "links": [
-          {"name": "ホーム", "anchor": ""},
-          {"name": "サービス", "anchor": "services"},
-          {"name": "進め方", "anchor": "process"},
-          {"name": "FAQ", "anchor": "faq"},
-          {"name": "お問い合わせ", "anchor": "contact"}
+          {
+            "name": "ホーム",
+            "anchor": ""
+          },
+          {
+            "name": "サービス",
+            "anchor": "services"
+          },
+          {
+            "name": "進め方",
+            "anchor": "process"
+          },
+          {
+            "name": "FAQ",
+            "anchor": "faq"
+          },
+          {
+            "name": "お問い合わせ",
+            "anchor": "contact"
+          }
         ]
       },
       {
         "title": "重点領域",
         "links": [
-          {"name": "UI/UXデザイン", "anchor": "services"},
-          {"name": "Web開発", "anchor": "services"},
-          {"name": "モバイルアプリ", "anchor": "services"}
+          {
+            "name": "UI/UXデザイン",
+            "anchor": "services"
+          },
+          {
+            "name": "Web開発",
+            "anchor": "services"
+          },
+          {
+            "name": "モバイルアプリ",
+            "anchor": "services"
+          }
         ]
       }
     ],
     "copyright": "Adamant. All rights reserved.",
     "tagline": "明確さ、速さ、そして強い第一印象のために設計。"
+  },
+  "credentials": {
+    "kicker": "Company credentials",
+    "title": "Registered in India. Recognized by Startup India.",
+    "description": "JSSS Adamant Technologies Private Limited is an incorporated Indian company recognized as a startup by DPIIT under the Government of India's Startup India initiative, with independent certifications for quality and information security management.",
+    "startupEyebrow": "Government recognition",
+    "startupTitle": "DPIIT-recognized startup",
+    "startupDescription": "Recognized by the Department for Promotion of Industry and Internal Trade, Ministry of Commerce & Industry, Government of India.",
+    "recognitionNumberLabel": "Recognition no.",
+    "issuedLabel": "Issued",
+    "validLabel": "Valid up to",
+    "incorporatedLabel": "Incorporated",
+    "viewCertificate": "View certificate",
+    "verifyCertificate": "Verify on Startup India",
+    "isoEyebrow": "Quality management",
+    "isoTitle": "ISO 9001:2015 certified",
+    "isoDescription": "Our quality management system has been independently assessed for our software, web, mobile, design, marketing, automation, publishing, and technology consulting activities.",
+    "securityEyebrow": "Information security",
+    "securityTitle": "ISO/IEC 27001:2022 certified",
+    "securityDescription": "Our information security management system has been independently assessed for the same software, digital, automation, publishing, and technology consulting scope.",
+    "certificationNumberLabel": "Certificate no.",
+    "initialRegistrationLabel": "Initial registration",
+    "recertificationLabel": "Re-certification due",
+    "disclaimer": "DPIIT recognition remains subject to the eligibility and turnover conditions printed on the certificate. ISO certifications are independently issued and are separate from Government of India recognition."
   }
 }

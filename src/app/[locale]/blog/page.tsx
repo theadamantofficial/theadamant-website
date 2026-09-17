@@ -12,6 +12,7 @@ import {
     SiteLocale,
 } from "@/lib/site-locale";
 import {buildOpenGraphMetadata, buildTwitterMetadata} from "@/lib/social-metadata";
+import {getRegionalSeo} from "@/lib/regional-seo";
 
 export const dynamicParams = false;
 export const runtime = "nodejs";
@@ -34,21 +35,23 @@ export async function generateMetadata({
 
     const locale = localeParam as SiteLocale;
     const localizedPath = getLocalizedPagePath(locale, "blog");
+    const regionalSeo = getRegionalSeo(locale);
 
     return {
         title: {
-            absolute: "Adamant Blog",
+            absolute: regionalSeo.blogTitle,
         },
-        description: "Read Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
+        description: regionalSeo.blogDescription,
+        keywords: regionalSeo.keywords,
         openGraph: buildOpenGraphMetadata({
-            title: "Adamant Blog",
-            description: "Read Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
+            title: regionalSeo.blogTitle,
+            description: regionalSeo.blogDescription,
             pagePath: localizedPath,
-            locale,
+            locale: regionalSeo.ogLocale,
         }),
         twitter: buildTwitterMetadata({
-            title: "Adamant Blog",
-            description: "Read Adamant's internal blog posts and Medium articles on web design, UX, SEO, website strategy, and digital product thinking from one hub on theadamant.com.",
+            title: regionalSeo.blogTitle,
+            description: regionalSeo.blogDescription,
         }),
         alternates: {
             canonical: localizedPath,

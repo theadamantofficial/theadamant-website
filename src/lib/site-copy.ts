@@ -6,9 +6,12 @@ import frCopy from "@/locales/fr.json";
 import guCopy from "@/locales/gu.json";
 import hiCopy from "@/locales/hi.json";
 import jaCopy from "@/locales/ja.json";
+import koCopy from "@/locales/ko.json";
 import mrCopy from "@/locales/mr.json";
 import ptCopy from "@/locales/pt.json";
 import taCopy from "@/locales/ta.json";
+import arCopy from "@/locales/ar.json";
+import zhCnCopy from "@/locales/zh-cn.json";
 import {
     DEFAULT_SITE_LOCALE,
     SiteLocale,
@@ -181,19 +184,9 @@ const siteCopyMap: Record<SiteLocale, SiteCopy> = {
     de: deCopy as SiteCopy,
     pt: ptCopy as SiteCopy,
     ja: jaCopy as SiteCopy,
-    ko: {...enCopy, locale: "ko"} as SiteCopy,
-    ar: {...enCopy, locale: "ar", dir: "rtl"} as SiteCopy,
-    "zh-cn": {
-        ...enCopy,
-        locale: "zh-cn",
-        metadata: {
-            title: "Adamant Technologies | 中国企业网站、应用与数字营销",
-            description: "Adamant Technologies 为中国及全球企业提供网站开发、移动应用、SaaS 产品、技术 SEO 和数字营销服务。",
-        },
-        schema: {
-            organizationDescription: "Adamant Technologies 为中国及全球企业设计和开发高性能网站、产品界面、移动应用、SaaS 产品及数字营销体验。",
-        },
-    } as SiteCopy,
+    ko: koCopy as SiteCopy,
+    ar: arCopy as SiteCopy,
+    "zh-cn": zhCnCopy as SiteCopy,
     "de-ch": {...deCopy, locale: "de-ch"} as SiteCopy,
     "fr-ch": {...frCopy, locale: "fr-ch"} as SiteCopy,
     "it-ch": {...enCopy, locale: "it-ch"} as SiteCopy,

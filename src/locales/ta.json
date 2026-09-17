@@ -10,10 +10,22 @@
   },
   "navbar": {
     "navItems": [
-      {"name": "சேவைகள்", "anchor": "services"},
-      {"name": "செயல்முறை", "anchor": "process"},
-      {"name": "FAQ", "anchor": "faq"},
-      {"name": "தொடர்பு", "anchor": "contact"}
+      {
+        "name": "சேவைகள்",
+        "anchor": "services"
+      },
+      {
+        "name": "செயல்முறை",
+        "anchor": "process"
+      },
+      {
+        "name": "FAQ",
+        "anchor": "faq"
+      },
+      {
+        "name": "தொடர்பு",
+        "anchor": "contact"
+      }
     ],
     "startProject": "ப்ராஜெக்டை தொடங்குங்கள்",
     "lightMode": "லைட் மோடு",
@@ -33,7 +45,11 @@
     ],
     "previewEyebrowLeft": "லாஞ்ச்-ரெடி டிஜிட்டல் பிரசென்ஸ்",
     "previewEyebrowRight": "ஸ்ட்ராட்டஜியிலிருந்து டெலிவரிவரை",
-    "floatingBadges": ["மாடர்ன் மோஷன்", "சர்ச்-ரெடி", "கன்வர்ஷன்-மையம்"],
+    "floatingBadges": [
+      "மாடர்ன் மோஷன்",
+      "சர்ச்-ரெடி",
+      "கன்வர்ஷன்-மையம்"
+    ],
     "featureCards": [
       {
         "title": "கவனத்தை ஈர்க்கும் டிசைன்",
@@ -47,7 +63,8 @@
         "title": "வேகமான செயலாக்கம்",
         "description": "கனமான லேயவுட்களும் குழப்பமான மெசேஜிங்கும் இல்லாமல் லாஞ்ச் வேகம்."
       }
-    ]
+    ],
+    "tagline": "Firm in Vision. Bold in Action"
   },
   "valueProps": {
     "kicker": "இது ஏன் வேலை செய்கிறது",
@@ -72,7 +89,12 @@
     "kicker": "சேவைகள்",
     "title": "ஆர்வத்தை செயலாக மாற்ற உருவாக்கப்பட்ட டிசைன் மற்றும் டெவலப்மெண்ட் சேவைகள்.",
     "description": "UI/UX டிசைனிலிருந்து SEO-ஃப்ரெண்ட்லி வலைத்தள டெவலப்மெண்ட் மற்றும் மொபைல் அப் டெலிவரிவரை, ஒவ்வொரு சேவையும் உங்கள் பிராண்டை வேகமாக நம்பத்தகுந்ததாக காட்ட உருவாக்கப்பட்டுள்ளது.",
-    "chips": ["லாண்டிங் பக்கங்கள்", "மார்கெட்டிங் வலைத்தளங்கள்", "ப்ரொடக்ட் இன்டர்ஃபேஸ்கள்", "கிராஸ்-பிளாட்ஃபார்ம் மொபைல் அப்புகள்"],
+    "chips": [
+      "லாண்டிங் பக்கங்கள்",
+      "மார்கெட்டிங் வலைத்தளங்கள்",
+      "ப்ரொடக்ட் இன்டர்ஃபேஸ்கள்",
+      "கிராஸ்-பிளாட்ஃபார்ம் மொபைல் அப்புகள்"
+    ],
     "items": [
       {
         "title": "UI/UX டிசைன்",
@@ -92,7 +114,12 @@
         "detail": "கிராஸ்-பிளாட்ஃபார்ம் மொபைல் அப் டெவலப்மெண்ட், மொபைல் UI டிசைன், ஸ்மூத் ஆன்போர்டிங் ஃப்ளோக்கள், ஸ்கேலபிள் ப்ரொடக்ட் அனுபவங்கள் மற்றும் Android, iOS க்கான பயனருக்கு எளிதான இன்டர்ஃபேஸ்கள்.",
         "image": "/images/img-app-dev.png"
       }
-    ]
+    ],
+    "proofStrip": {
+      "kicker": "Selected work",
+      "title": "Products and partner systems already delivered with us.",
+      "description": "AetherSEO shows how Adamant builds practical SEO, publishing, and workflow systems that support real content operations, not just polished mockups."
+    }
   },
   "process": {
     "kicker": "செயல்முறை",
@@ -188,16 +215,46 @@
       "descriptionLabel": "விளக்கம்",
       "descriptionPlaceholder": "மக்கள் நினைவில் வைத்துக் கொள்ள வேண்டிய பக்கம், ப்ரொடக்ட் அல்லது அனுபவம் பற்றி சொல்லுங்கள்.",
       "purposeOptions": [
-        {"value": "general", "label": "பொது கேள்வி"},
-        {"value": "demo", "label": "டெமோ கோரிக்கை"},
-        {"value": "quote", "label": "கோட் / விலை"},
-        {"value": "website-development", "label": "வலைத்தள டெவலப்மெண்ட்"},
-        {"value": "app-development", "label": "ஆப் டெவலப்மெண்ட்"},
-        {"value": "support", "label": "தொழில்நுட்ப உதவி"},
-        {"value": "partnership", "label": "பார்ட்னர்ஷிப் / கூட்டணி"},
-        {"value": "careers", "label": "வேலை வாய்ப்புகள்"},
-        {"value": "feedback", "label": "ஃபீட்பேக் / பரிந்துரைகள்"},
-        {"value": "other", "label": "மற்றவை"}
+        {
+          "value": "general",
+          "label": "பொது கேள்வி"
+        },
+        {
+          "value": "demo",
+          "label": "டெமோ கோரிக்கை"
+        },
+        {
+          "value": "quote",
+          "label": "கோட் / விலை"
+        },
+        {
+          "value": "website-development",
+          "label": "வலைத்தள டெவலப்மெண்ட்"
+        },
+        {
+          "value": "app-development",
+          "label": "ஆப் டெவலப்மெண்ட்"
+        },
+        {
+          "value": "support",
+          "label": "தொழில்நுட்ப உதவி"
+        },
+        {
+          "value": "partnership",
+          "label": "பார்ட்னர்ஷிப் / கூட்டணி"
+        },
+        {
+          "value": "careers",
+          "label": "வேலை வாய்ப்புகள்"
+        },
+        {
+          "value": "feedback",
+          "label": "ஃபீட்பேக் / பரிந்துரைகள்"
+        },
+        {
+          "value": "other",
+          "label": "மற்றவை"
+        }
       ],
       "submitLabel": "ப்ராஜெக்ட் விவரங்களை அனுப்புங்கள்",
       "submittingLabel": "ப்ராஜெக்ட் விவரங்கள் அனுப்பப்படுகின்றன...",
@@ -213,23 +270,71 @@
       {
         "title": "நெவிகேட் செய்யுங்கள்",
         "links": [
-          {"name": "ஹோம்", "anchor": ""},
-          {"name": "சேவைகள்", "anchor": "services"},
-          {"name": "செயல்முறை", "anchor": "process"},
-          {"name": "FAQ", "anchor": "faq"},
-          {"name": "தொடர்பு", "anchor": "contact"}
+          {
+            "name": "ஹோம்",
+            "anchor": ""
+          },
+          {
+            "name": "சேவைகள்",
+            "anchor": "services"
+          },
+          {
+            "name": "செயல்முறை",
+            "anchor": "process"
+          },
+          {
+            "name": "FAQ",
+            "anchor": "faq"
+          },
+          {
+            "name": "தொடர்பு",
+            "anchor": "contact"
+          }
         ]
       },
       {
         "title": "முக்கிய பகுதிகள்",
         "links": [
-          {"name": "UI/UX டிசைன்", "anchor": "services"},
-          {"name": "வலைத்தள டெவலப்மெண்ட்", "anchor": "services"},
-          {"name": "மொபைல் அப்புகள்", "anchor": "services"}
+          {
+            "name": "UI/UX டிசைன்",
+            "anchor": "services"
+          },
+          {
+            "name": "வலைத்தள டெவலப்மெண்ட்",
+            "anchor": "services"
+          },
+          {
+            "name": "மொபைல் அப்புகள்",
+            "anchor": "services"
+          }
         ]
       }
     ],
     "copyright": "Adamant. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.",
     "tagline": "தெளிவு, வேகம் மற்றும் வலுவான முதல் தோற்றத்திற்காக வடிவமைக்கப்பட்டது."
+  },
+  "credentials": {
+    "kicker": "Company credentials",
+    "title": "Registered in India. Recognized by Startup India.",
+    "description": "JSSS Adamant Technologies Private Limited is an incorporated Indian company recognized as a startup by DPIIT under the Government of India's Startup India initiative, with independent certifications for quality and information security management.",
+    "startupEyebrow": "Government recognition",
+    "startupTitle": "DPIIT-recognized startup",
+    "startupDescription": "Recognized by the Department for Promotion of Industry and Internal Trade, Ministry of Commerce & Industry, Government of India.",
+    "recognitionNumberLabel": "Recognition no.",
+    "issuedLabel": "Issued",
+    "validLabel": "Valid up to",
+    "incorporatedLabel": "Incorporated",
+    "viewCertificate": "View certificate",
+    "verifyCertificate": "Verify on Startup India",
+    "isoEyebrow": "Quality management",
+    "isoTitle": "ISO 9001:2015 certified",
+    "isoDescription": "Our quality management system has been independently assessed for our software, web, mobile, design, marketing, automation, publishing, and technology consulting activities.",
+    "securityEyebrow": "Information security",
+    "securityTitle": "ISO/IEC 27001:2022 certified",
+    "securityDescription": "Our information security management system has been independently assessed for the same software, digital, automation, publishing, and technology consulting scope.",
+    "certificationNumberLabel": "Certificate no.",
+    "initialRegistrationLabel": "Initial registration",
+    "recertificationLabel": "Re-certification due",
+    "disclaimer": "DPIIT recognition remains subject to the eligibility and turnover conditions printed on the certificate. ISO certifications are independently issued and are separate from Government of India recognition."
   }
 }

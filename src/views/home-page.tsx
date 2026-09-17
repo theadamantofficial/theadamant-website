@@ -9,6 +9,7 @@ import InternationalMarketSection from "@/components/sections/international-mark
 import AdamantSystemSection from "@/components/experience/adamant-system-section";
 import HeroSection from "@/components/sections/hero-section";
 import PeelReveal from "@/components/visuals/peel-reveal";
+import {getRegionalSeo} from "@/lib/regional-seo";
 
 const CompanyCredentialsSection = dynamic(() => import("@/components/sections/company-credentials-section"));
 const PartnerProofStrip = dynamic(() => import("@/components/sections/partner-proof-strip"));
@@ -35,6 +36,7 @@ export default function HomePage({
         ...copy.services,
         items: copy.services.items.filter((item) => (item.proofHighlights?.length ?? 0) === 0),
     };
+    const regionalSeo = getRegionalSeo(locale);
     const schemas = [
         {
             "@context": "https://schema.org",
@@ -46,6 +48,11 @@ export default function HomePage({
             legalName: "JSSS Adamant Technologies Private Limited",
             foundingDate: "2026-04-27",
             description: copy.schema.organizationDescription,
+            areaServed: {
+                "@type": "Country",
+                name: regionalSeo.region,
+                identifier: regionalSeo.countryCode,
+            },
             logo: `${getSiteUrl()}/opengraph-image`,
             inLanguage: locale,
             identifier: {

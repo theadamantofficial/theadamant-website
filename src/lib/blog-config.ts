@@ -14,4 +14,7 @@ export const BLOG_LABELS: Partial<Record<SiteLocale, string>> = {
     de: "Blog",
     pt: "Blog",
     ja: "ブログ",
+    ko: "블로그",
+    ar: "المدونة",
+    "zh-cn": "博客",
 };

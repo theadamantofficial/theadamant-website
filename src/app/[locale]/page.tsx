@@ -10,6 +10,7 @@ import {
     SiteLocale,
 } from "@/lib/site-locale";
 import {buildOpenGraphMetadata, buildTwitterMetadata} from "@/lib/social-metadata";
+import {getRegionalSeo} from "@/lib/regional-seo";
 
 export const dynamicParams = false;
 
@@ -67,20 +68,19 @@ export async function generateMetadata({
     const copy = getSiteCopy(locale);
     const localizedPath = getLocalizedPath(locale);
     const localizedMetadata = INTERNATIONAL_METADATA[locale] ?? copy.metadata;
+    const regionalSeo = getRegionalSeo(locale);
 
     return {
         title: {
             absolute: localizedMetadata.title,
         },
         description: localizedMetadata.description,
-        keywords: locale === "zh-cn"
-            ? ["中国网站开发", "中国企业数字营销", "中文SEO", "网站建设", "移动应用开发", "SaaS开发", "技术SEO"]
-            : undefined,
+        keywords: regionalSeo.keywords,
         openGraph: buildOpenGraphMetadata({
             title: localizedMetadata.title,
             description: localizedMetadata.description,
             pagePath: localizedPath,
-            locale,
+            locale: regionalSeo.ogLocale,
         }),
         twitter: buildTwitterMetadata({
             title: copy.metadata.title,
