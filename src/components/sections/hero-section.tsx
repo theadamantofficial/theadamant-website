@@ -63,7 +63,7 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
                 <div className="workspace-heading">
                     <p className="workspace-label"><span/> INDEPENDENT DIGITAL STUDIO</p>
                     <h1 id="hero-heading">{locale === "en" ? <>Serious about<br/><em>the unexpected.</em></> : copy.title}</h1>
-                    <p className="workspace-intro">We design. We build. We make a little noise.<br/>Scroll through a world of bold digital ideas.</p>
+                    <p className="workspace-intro">{copy.description}</p>
                 </div>
                 <div className="workspace-scene">
                     {!sceneReady && <div className="workspace-mascot-loader" role={enhanced && introComplete ? "status" : undefined}>
