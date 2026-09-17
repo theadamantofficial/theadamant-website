@@ -36,6 +36,7 @@ export default function InternalBlogPostPage({
     const siteUrl = getSiteUrl();
     const articleUrl = `${siteUrl}${getLocalizedPagePath(locale, `blog/${post.slug}`)}`;
     const authorName = getBlogAuthorDisplayName(post.authorName);
+    const relatedServices = getRelatedServices(post);
     const articleSchema = {
         "@context": "https://schema.org",
         "@type": "Article",
@@ -123,6 +124,24 @@ export default function InternalBlogPostPage({
                             {renderArticleBlocks(post.content)}
                         </div>
 
+                        <section className="mt-12 border-y border-black/8 py-8 dark:border-white/10" aria-labelledby="related-services-title">
+                            <p id="related-services-title" className="text-sm font-semibold uppercase tracking-[0.16em] text-foreground/58">
+                                Explore related services
+                            </p>
+                            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                                {relatedServices.map((service) => (
+                                    <Link
+                                        key={service.href}
+                                        href={`/${service.href}`}
+                                        className="rounded-2xl border border-black/8 bg-black/[0.02] p-4 transition-colors hover:border-foreground/30 dark:border-white/10 dark:bg-white/[0.03]"
+                                    >
+                                        <span className="text-sm font-semibold text-foreground">{service.label}</span>
+                                        <span className="mt-1 block text-sm leading-6 text-foreground/62">{service.description}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        </section>
+
                         <div className="mt-10 rounded-[1.7rem] border border-black/8 bg-black/[0.03] p-6 dark:border-white/10 dark:bg-white/[0.03]">
                             <p className="text-sm font-semibold text-foreground">
                                 Need help applying these ideas to your own website?
@@ -150,6 +169,38 @@ export default function InternalBlogPostPage({
             <Footer copy={copy.footer} locale={locale}/>
         </main>
     );
+}
+
+const RELATED_SERVICES = [
+    {
+        href: "website-development",
+        label: "Website development",
+        description: "Build a faster, clearer business website.",
+        terms: ["website", "web development", "technical seo", "core web vitals", "seo"],
+    },
+    {
+        href: "app-development-noida",
+        label: "App development in Noida",
+        description: "Plan and ship a focused mobile product.",
+        terms: ["app", "mobile", "android", "ios", "saas", "product"],
+    },
+    {
+        href: "digital-marketing-services",
+        label: "Digital marketing services",
+        description: "Connect content, campaigns, and growth.",
+        terms: ["marketing", "social", "content", "paid ads", "brand", "growth"],
+    },
+] as const;
+
+function getRelatedServices(post: InternalBlogPost) {
+    const searchableText = `${post.title} ${post.excerpt} ${post.tags.join(" ")} ${post.content}`.toLowerCase();
+    const rankedServices = RELATED_SERVICES.map((service, index) => ({
+        service,
+        score: service.terms.reduce((score, term) => score + (searchableText.includes(term) ? 1 : 0), 0),
+        index,
+    })).sort((left, right) => right.score - left.score || left.index - right.index);
+
+    return rankedServices.slice(0, 3).map(({service}) => service);
 }
 
 function renderArticleBlocks(content: string) {
