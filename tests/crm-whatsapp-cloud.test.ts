@@ -110,6 +110,15 @@ describe("WhatsApp Cloud API webhook", () => {
         expect(extractWhatsAppMessageContent({type: "future_type", future_type: {body: "New provider content"}}).body).toBe("New provider content");
     });
 
+    it("does not expose provider diagnostics as the customer message for unsupported types", () => {
+        const content = extractWhatsAppMessageContent({
+            type: "unsupported",
+            errors: [{title: "Message type currently not supported."}],
+        });
+        expect(content.body).toBe("This WhatsApp message type is not supported in the CRM yet.");
+        expect(content.metadata).toMatchObject({provider_message_type: "unsupported", provider_error: "Message type currently not supported."});
+    });
+
     it("loads only approved message templates", async () => {
         process.env.WHATSAPP_ACCESS_TOKEN = "template-token";
         process.env.WHATSAPP_BUSINESS_ACCOUNT_ID = "waba-1";

@@ -627,7 +627,7 @@ export function extractWhatsAppMessageContent(message: JsonRecord) {
         || text(message.body) || fallbackText || fallbackButton || text(referral.headline) || text(referral.body);
     const detail = text(errorData.details) || text(firstError.message) || text(firstError.title);
     return {
-        body: truncate(recovered || detail || "This message type is not available through WhatsApp Cloud API.", 4096),
+        body: truncate(recovered || "This WhatsApp message type is not supported in the CRM yet.", 4096),
         mediaId: text(value.id) || null,
         metadata: {...referralMetadata, provider_message_type: type, ...(detail ? {provider_error: detail} : {})},
     };

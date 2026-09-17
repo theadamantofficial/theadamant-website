@@ -314,6 +314,7 @@ function MessageContent({message}: {message: WhatsAppMessage}) {
     const location = record(message.metadata?.location);
     const translation = record(message.metadata?.translation);
     const visibleBody = message.direction === "inbound" && translation?.englishText ? String(translation.englishText) : message.body;
+    const unsupported = isUnsupportedMessage(message);
     return <div className="space-y-2">
         {referral && (referral.headline || referral.body) ? <a href={safeExternalUrl(referral.source_url) || undefined} target="_blank" rel="noreferrer" className="block rounded-lg border border-current/15 bg-black/5 px-3 py-2 text-[10px] leading-4 hover:bg-black/10"><span className="block font-semibold">{String(referral.headline || "WhatsApp referral")}</span>{referral.body ? <span className="block opacity-70">{String(referral.body)}</span> : null}</a> : null}
         {message.message_type === "image" && message.media_id ? <a href={mediaUrl} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-xl"><Image unoptimized src={mediaUrl} alt={message.body || "WhatsApp image"} width={640} height={480} className="max-h-80 w-full object-cover"/></a> : null}
@@ -331,8 +332,20 @@ function MessageContent({message}: {message: WhatsAppMessage}) {
         </div> : null}
         {message.message_type === "document" && message.media_id ? <a href={mediaUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-lg border border-current/15 px-3 py-2 text-[11px] font-semibold"><FileText className="h-4 w-4"/><span className="min-w-0 flex-1 truncate">{String(message.metadata?.filename || message.body || "Document")}</span><Download className="h-3.5 w-3.5"/></a> : null}
         {location && location.latitude && location.longitude ? <a href={`https://www.google.com/maps?q=${encodeURIComponent(`${location.latitude},${location.longitude}`)}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-lg border border-current/15 px-3 py-2 text-[11px] font-semibold"><MapPin className="h-4 w-4"/>Open shared location</a> : null}
-        {visibleBody ? <p className="whitespace-pre-wrap break-words text-[13px] leading-5">{visibleBody === "[Unsupported message]" ? "WhatsApp did not provide the content of this older message." : visibleBody}</p> : null}
+        {unsupported ? <div className="rounded-lg border border-current/15 bg-black/5 px-3 py-2 text-[11px] leading-4">
+            <p className="font-semibold">This WhatsApp message type is not supported yet.</p>
+            <p className="mt-1 opacity-70">Ask the customer to resend it as text, an image, a document, or a voice message.</p>
+        </div> : visibleBody ? <p className="whitespace-pre-wrap break-words text-[13px] leading-5">{visibleBody}</p> : null}
     </div>;
+}
+
+function isUnsupportedMessage(message: WhatsAppMessage) {
+    const body = message.body.trim().toLowerCase();
+    return body === "[unsupported message]"
+        || body === "message type currently not supported."
+        || body === "this message type is not available through whatsapp cloud api."
+        || body === "this whatsapp message type is not supported in the crm yet."
+        || Boolean(message.metadata?.provider_error && !message.media_id && !message.body.trim());
 }
 
 export function WhatsAppComposer({conversation, translation, sending, onSend, initialBody = "", preferClientProposal = false}: {conversation: WhatsAppConversation; translation: TranslationDirection | null; sending: boolean; onSend: (payload: OutgoingMessage) => Promise<boolean>; initialBody?: string; preferClientProposal?: boolean}) {
