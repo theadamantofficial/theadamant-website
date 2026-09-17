@@ -4,13 +4,15 @@ import {SiteLocale} from "@/lib/site-locale";
 const serviceDetails = [
     {
         title: "Website development and redesign",
-        body: "We plan and build business websites, service websites, campaign landing pages, and marketing sites that communicate the offer quickly. The work includes information architecture, responsive UI, accessible components, technical SEO, content hierarchy, analytics readiness, and a practical editing workflow. The result is not just a visual redesign; it is a faster and clearer path from search result to qualified enquiry.",
+        body: "We plan and build SEO-friendly business websites, service websites, campaign landing pages, and marketing sites that communicate the offer quickly. The work includes information architecture, responsive UI, accessible components, technical SEO, content hierarchy, analytics readiness, and a practical editing workflow. The result is not just a visual redesign; it is a faster and clearer path from search result to qualified enquiry.",
         href: "/website-development",
         label: "Explore website development",
     },
     {
         title: "UI/UX and digital product design",
-        body: "For SaaS companies, mobile products, and complex services, Adamant turns difficult journeys into understandable interfaces. We map user goals, content, screens, states, and calls to action before development. This helps teams reduce ambiguity, improve onboarding, and launch a product experience that feels consistent across desktop, tablet, and mobile.",
+        body: "For SaaS companies, mobile products, and complex services, Adamant turns difficult journeys into understandable interfaces. We map user goals, content, screens, states, and calls to action before development. This helps teams reduce ambiguity, improve onboarding, and launch a product experience that feels consistent across desktop, tablet, and mobile while supporting conversion-focused search traffic.",
+        href: "/website-development",
+        label: "See UX and website strategy",
     },
     {
         title: "Mobile and SaaS product development",
@@ -40,10 +42,10 @@ export default function HomeSeoContentSection({locale}: {locale: SiteLocale}) {
                         Website, app, SaaS, and digital marketing services from Adamant Technologies
                     </h2>
                     <p className="mt-6 text-base leading-8 text-foreground/72">
-                        JSSS Adamant Technologies Private Limited is an Indian technology company helping startups, professional service firms, local businesses, and growing brands build a stronger digital presence. We combine strategy, copy direction, user experience, development, search foundations, and marketing execution so the website is connected to the business it is meant to grow.
+                        JSSS Adamant Technologies Private Limited is an Indian web design and digital growth company helping startups, professional service firms, local businesses, and growing brands build a stronger online presence. We combine strategy, copy direction, user experience, development, technical SEO, and measurable marketing so a website is easier to find on Google, easier to trust, and more likely to convert the right enquiries.
                     </p>
                     <p className="mt-5 text-base leading-8 text-foreground/72">
-                        A visitor may discover a company through Google, a social post, a recommendation, an advertisement, or a product launch. In each case, the experience needs to answer the same essential questions: what does this company do, who is it for, why should someone trust it, and what should happen next? Our work is structured around those questions, with clear page hierarchy and useful content instead of vague claims or unnecessary complexity.
+                        A visitor may discover a company through Google, a social post, a recommendation, an advertisement, or a product launch. In each case, the experience needs to answer the same essential questions: what does this company do, who is it for, why should someone trust it, and what should happen next? Our work is structured around those questions with clear page hierarchy, useful content, internal links, and conversion-focused messaging instead of vague claims or unnecessary complexity.
                     </p>
                 </div>
 

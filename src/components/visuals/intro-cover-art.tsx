@@ -33,6 +33,6 @@ export default function IntroCoverArt() {
             <text x="50%" y="59%" textAnchor="middle" fill="#bd613c" style={{font: "italic 5.3vmin Georgia, serif"}}>Firm in vision. Bold in action.</text>
             <text x="50%" y="77%" textAnchor="middle" fill="#274541" style={{font: "500 1.9vmin monospace"}}>GRAB ANYWHERE. PULL TO TEAR.</text>
         </svg>
-        <Image className="peel-reveal-logo" src="/vectors/logo-the-adamant.svg" width={80} height={80} alt="" priority/>
+        <Image className="peel-reveal-logo" src="/vectors/logo-the-adamant.svg" width={80} height={80} alt="Adamant logo" priority/>
     </div>;
 }

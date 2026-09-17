@@ -14,7 +14,7 @@ export function SectionCharacter({mood, side = "right", className = "", interact
     const classes = "section-character section-character-" + side + " mascot-pose-" + pose + " " + className;
     if (interactive) return <ContactMascot className={classes} source={source}/>;
     return <div className={classes} aria-hidden="true">
-        <Image src={source} alt="" width={studioPose ? 1184 : 1122} height={studioPose ? 1328 : 1402} quality={90}
+        <Image src={source} alt={`Adamant ${mood} mascot illustration`} width={studioPose ? 1184 : 1122} height={studioPose ? 1328 : 1402} quality={90}
             sizes={interactive ? "(max-width: 600px) 175px, 220px" : "(max-width: 600px) 74px, (max-width: 1000px) 110px, 156px"} className="mascot-image"/>
     </div>;
 }

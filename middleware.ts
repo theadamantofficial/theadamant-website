@@ -10,11 +10,16 @@ import {
     SiteLocale,
 } from "@/lib/site-locale";
 import {CRM_ACCESS_COOKIE, CRM_REFRESH_COOKIE} from "@/lib/crm/auth-cookies";
+import {isWhatsAppCrmEnabled} from "@/lib/whatsapp-feature";
 
 export function middleware(request: NextRequest) {
     const {pathname} = request.nextUrl;
     const host = request.headers.get("host");
     const forwardedProto = request.headers.get("x-forwarded-proto");
+
+    if (!isWhatsAppCrmEnabled() && isDisabledWhatsAppPath(pathname)) {
+        return new NextResponse("Not found", {status: 404});
+    }
 
     if (host === "www.theadamant.com" || (host === "theadamant.com" && forwardedProto === "http")) {
         const redirectUrl = request.nextUrl.clone();
@@ -111,8 +116,28 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/((?!api|_next|favicon.ico|images|vectors|animations).*)"],
+    matcher: [
+        "/((?!api|_next|favicon.ico|images|vectors|animations).*)",
+        "/api/webhooks/whatsapp",
+        "/api/create-order",
+        "/api/verify-payment",
+        "/api/admin/whatsapp/:path*",
+        "/api/admin/prospects/whatsapp",
+        "/pay/:path*",
+    ],
 };
+
+function isDisabledWhatsAppPath(pathname: string) {
+    return pathname === "/admin/whatsapp"
+        || pathname.startsWith("/admin/whatsapp/")
+        || pathname === "/api/webhooks/whatsapp"
+        || pathname === "/api/create-order"
+        || pathname === "/api/verify-payment"
+        || pathname.startsWith("/api/admin/whatsapp/")
+        || pathname === "/api/admin/prospects/whatsapp"
+        || pathname === "/pay"
+        || pathname.startsWith("/pay/");
+}
 
 function isJwtExpired(token: string) {
     try {

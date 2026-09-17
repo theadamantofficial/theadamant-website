@@ -8,6 +8,35 @@
 
 The internal blog uses the repository JSON file when `BLOG_STORAGE_MODE=filesystem`.
 
+## Development and production deployments
+
+The repository deploys through Vercel using the following branch environments:
+
+- `dev`: deploys to the Vercel Preview environment.
+- `master`: deploys to the Vercel Production environment.
+
+The GitHub Actions workflow requires these repository secrets:
+
+- `VERCEL_TOKEN`: a Vercel access token.
+- `VERCEL_ORG_ID`: the Vercel team or account ID.
+- `VERCEL_PROJECT_ID`: the Vercel project ID.
+
+Create matching GitHub Environments named `development` and `production`, then add
+environment-specific secrets and variables in Vercel. Keep test services and test
+payment keys in the `development`/Preview environment, and live services and live
+payment keys in the `production` environment. Never commit `.env`, `.env.local`, or
+server-only credentials.
+
+To create the development branch locally:
+
+```bash
+git branch dev
+git push -u origin dev
+```
+
+After the branch is pushed, every subsequent push to `dev` deploys a Preview build.
+Every push to `master` deploys a Production build.
+
 ## Website analytics and crash alerts
 
 Firebase project `adamant-3eada` sends public website analytics to the Google Analytics web stream

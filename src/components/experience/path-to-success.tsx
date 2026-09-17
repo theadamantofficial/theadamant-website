@@ -193,9 +193,9 @@ return <section ref={shellRef} id="path-to-success" className={`journey-shell jo
             <ChallengeVisual kind={challenge.kind}/>
         </div>
             <div ref={characterRef} className="journey-character" style={playerStyle} aria-hidden="true">
-                {mode === "success" ? <Image src="/images/adamant-mascot/champion-cutout.webp" alt="" fill sizes="(max-width: 800px) 110px, 150px" quality={90} className="journey-character-image"/> : <JourneyRunner/>}
+                {mode === "success" ? <Image src="/images/adamant-mascot/champion-cutout.webp" alt="Adamant mascot celebrating business growth" fill sizes="(max-width: 800px) 110px, 150px" quality={90} className="journey-character-image"/> : <JourneyRunner/>}
             </div>
-            <div className="journey-success-car"><Image src="/images/adamant-avatar/roadster.webp" alt="" fill sizes="(max-width: 800px) 320px, 600px"/></div>
+            <div className="journey-success-car"><Image src="/images/adamant-avatar/roadster.webp" alt="Adamant business growth roadster illustration" fill sizes="(max-width: 800px) 320px, 600px"/></div>
         <div className="journey-hud"><span>ADAMANT SYSTEM <i/> ONLINE</span><strong>BUSINESS PROGRESS <b>{businessProgress}%</b></strong><div><i style={{width: `${businessProgress}%`}}/></div></div>
         {mode === "intro" && <div className="journey-panel journey-intro"><p>THE PATH TO SUCCESS</p><h3>Your path to <em>growth.</em></h3><span>Every business starts with an idea. What happens next depends on the systems behind it.</span><button data-magnetic className="button-primary" onClick={start}>Start journey →</button><small>Use arrow keys or W A S D to move.</small></div>}
         {(mode === "blocked" || mode === "transforming") && <div className="journey-panel journey-challenge" role="status" aria-live="polite"><p>{mode === "transforming" ? "ADAMANT SYSTEM · REORGANISING" : "ADAMANT SYSTEM · ANALYSING"}</p><h3>{mode === "transforming" ? challenge.result : challenge.title}</h3><span>{mode === "transforming" ? challenge.capabilities.join(" · ") : challenge.problem}</span>{mode === "blocked" && <><small>{challenge.diagnosis}</small><button className="button-primary" data-magnetic onClick={activate}>Activate Adamant <kbd>Space</kbd></button></>}</div>}
