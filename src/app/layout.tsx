@@ -4,7 +4,7 @@ import "../styles/experience.css";
 import "../styles/service-art.css";
 import {ReactNode} from "react";
 import {Toaster} from "react-hot-toast";
-import {headers} from "next/headers";
+import {cookies, headers} from "next/headers";
 import {DEFAULT_SITE_LOCALE, isSiteLocale, localeToHtmlLang, SiteLocale} from "@/lib/site-locale";
 import {getSiteMetadataBase} from "@/lib/site-url";
 import {buildOpenGraphMetadata, buildTwitterMetadata} from "@/lib/social-metadata";
@@ -13,6 +13,7 @@ import SiteBackgroundMusic from "@/components/ui/site-background-music";
 import Script from "next/script";
 import SiteAnalytics from "@/components/providers/site-analytics";
 import LocationLocaleDetector from "@/components/providers/location-locale-detector";
+import CookieConsent, {COOKIE_CONSENT_COOKIE} from "@/components/providers/cookie-consent";
 import {GOOGLE_TAG_MANAGER_ID, googleTagManagerEnabled, googleTagManagerScript} from "@/lib/google-tag-manager";
 
 export const metadata: Metadata = {
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
         default: "Adamant Technologies | Web, App, SaaS and Digital Marketing",
         template: "%s | Adamant",
     },
-    description: "JSSS Adamant Technologies Private Limited builds SEO-friendly websites, mobile apps, SaaS products, and digital marketing campaigns for businesses in India and global markets.",
+    description: "JSSS Adamant Technologies Private Limited builds SEO-friendly websites, mobile apps, SaaS products, and digital marketing campaigns for businesses worldwide.",
     applicationName: "Adamant",
     authors: [{name: "Adamant"}],
     creator: "Adamant",
@@ -42,11 +43,21 @@ export const metadata: Metadata = {
         "brand boosting",
         "paid ads management",
         "digital product studio",
+        "global web design agency",
+        "international SEO agency",
+        "website development worldwide",
+        "mobile app development worldwide",
+        "SaaS development worldwide",
         "China website development",
         "Chinese SEO",
         "中国网站开发",
         "中国数字营销",
     ],
+    other: {
+        "geo.region": "WORLD",
+        "geo.placename": "Worldwide",
+        "content-language": "en",
+    },
     robots: {
         index: true,
         follow: true,
@@ -69,11 +80,13 @@ export default async function RootLayout({children}: Readonly<{
     children: ReactNode;
 }>) {
     const requestHeaders = await headers();
+    const requestCookies = await cookies();
     const siteLocaleHeader = requestHeaders.get("x-site-locale");
     const siteLocale = isSiteLocale(siteLocaleHeader ?? "")
         ? siteLocaleHeader as SiteLocale
         : DEFAULT_SITE_LOCALE;
-    const enableTagManager = googleTagManagerEnabled();
+    const enableTagManager = googleTagManagerEnabled()
+        && requestCookies.get(COOKIE_CONSENT_COOKIE)?.value === "accepted";
 
     return (
         <html lang={localeToHtmlLang(siteLocale)} suppressHydrationWarning>
@@ -88,6 +101,7 @@ export default async function RootLayout({children}: Readonly<{
         <MotionProvider>
             <LocationLocaleDetector/>
             <SiteAnalytics/>
+            <CookieConsent/>
             <Toaster
                 position="top-right"
                 reverseOrder={false}

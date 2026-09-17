@@ -11,12 +11,22 @@ export interface RegionalSeo {
 
 const REGIONAL_SEO: Record<SiteLocale, RegionalSeo> = {
     en: {
-        region: "India and global markets",
-        countryCode: "IN",
-        ogLocale: "en_IN",
-        keywords: ["website development company India", "web design India", "SEO services India", "mobile app development India", "SaaS development India", "digital marketing India"],
+        region: "Worldwide",
+        countryCode: "001",
+        ogLocale: "en_US",
+        keywords: [
+            "global website development company",
+            "international web design agency",
+            "website development company India",
+            "web design India",
+            "SEO services worldwide",
+            "technical SEO agency",
+            "mobile app development company",
+            "SaaS development company",
+            "digital marketing agency worldwide",
+        ],
         blogTitle: "Adamant Blog | Web Design, SEO and Digital Growth",
-        blogDescription: "Practical insights on website development, UX, technical SEO, SaaS and digital marketing for businesses in India and global markets.",
+        blogDescription: "Practical insights on website development, UX, technical SEO, SaaS and digital marketing for businesses worldwide.",
     },
     "en-us": {
         region: "United States",

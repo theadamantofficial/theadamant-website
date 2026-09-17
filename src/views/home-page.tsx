@@ -49,7 +49,7 @@ export default function HomePage({
             foundingDate: "2026-04-27",
             description: copy.schema.organizationDescription,
             areaServed: {
-                "@type": "Country",
+                "@type": regionalSeo.countryCode === "001" ? "Place" : "Country",
                 name: regionalSeo.region,
                 identifier: regionalSeo.countryCode,
             },

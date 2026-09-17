@@ -4,6 +4,7 @@ import {useEffect} from "react";
 import {usePathname} from "next/navigation";
 import {getAnalyticsReferrer, isPublicAnalyticsPath, trackSiteEvent} from "@/lib/firebase-analytics";
 import {gtagSendEvent} from "@/lib/google-tag-manager";
+import {hasAnalyticsConsent} from "@/components/providers/cookie-consent";
 
 const sections = new Set(["services", "contact", "faq", "process", "credentials", "adamant-system", "path-to-success"]);
 let lastPage = "";
@@ -11,6 +12,12 @@ let lastPage = "";
 export default function SiteAnalytics() {
     const pathname = usePathname();
     useEffect(() => {
+        const handleConsent = () => window.location.reload();
+        window.addEventListener("adamant:cookie-consent", handleConsent);
+        return () => window.removeEventListener("adamant:cookie-consent", handleConsent);
+    }, []);
+    useEffect(() => {
+        if (!hasAnalyticsConsent()) return;
         if (!isPublicAnalyticsPath(pathname)) { lastPage = ""; return; }
         if (lastPage !== pathname) {
             const previousPage = lastPage;
