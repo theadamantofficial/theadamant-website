@@ -28,7 +28,7 @@ const STACK_GROUPS: StackGroup[] = [
     {label: "Cloud and delivery", icon: Cloud, items: ["AWS", "Azure", "Google Cloud", "Docker", "Kubernetes", "Vercel", "DevOps"]},
     {label: "Commerce and growth", icon: Megaphone, items: ["Shopify", "Technical SEO", "Digital marketing", "Paid campaigns", "Analytics"]},
     {label: "Design and collaboration", icon: Palette, items: ["Figma", "Adobe XD", "UI/UX design", "Git", "GitHub", "Bitbucket"]},
-    {label: "AI and automation", icon: Sparkles, items: ["OpenAI", "ChatGPT", "Claude", "Generative AI", "AI automation"]},
+    {label: "AI and automation", icon: Sparkles, items: ["OpenAI", "ChatGPT", "Claude", "n8n", "Generative AI", "AI automation"]},
 ];
 
 export default function TechnologyStackSection({locale}: {locale: SiteLocale}) {

@@ -97,6 +97,7 @@ const REGIONAL_SEO: Record<SiteLocale, RegionalSeo> = {
             "OpenAI integration services",
             "ChatGPT integration services",
             "Claude AI integration",
+            "n8n automation services",
             "generative AI development company",
             "AI automation services",
             "Figma UI UX design",
