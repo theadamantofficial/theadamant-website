@@ -16,6 +16,7 @@ import {SectionDepth} from "@/components/visuals/section-depth";
 import {buildWhatsAppContactUrl} from "@/lib/whatsapp-contact";
 import {trackSiteEvent} from "@/lib/firebase-analytics";
 import {gtagSendEvent} from "@/lib/google-tag-manager";
+import {BUSINESS_ADDRESS, BUSINESS_NAME, BUSINESS_PHONE, BUSINESS_PHONE_HREF} from "@/lib/business";
 
 const SUCCESS_RESET_MS = 4000;
 const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "default_service";
@@ -120,6 +121,13 @@ export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["c
                         <p className="section-copy">
                             {copy.description}
                         </p>
+                        <address className="mt-6 not-italic text-sm leading-7 text-foreground/70">
+                            <p className="font-semibold text-foreground">{BUSINESS_NAME}</p>
+                            <p>{BUSINESS_ADDRESS}</p>
+                            <a className="font-semibold text-primary hover:underline" href={BUSINESS_PHONE_HREF}>
+                                {BUSINESS_PHONE}
+                            </a>
+                        </address>
                     </div>
 
                     <div>

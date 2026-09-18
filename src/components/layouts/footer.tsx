@@ -11,6 +11,7 @@ import {getLocalizedPagePath, getLocalizedPath, SiteLocale} from "@/lib/site-loc
 import {BLOG_LABELS, MEDIUM_URL} from "@/lib/blog-config";
 import {SectionDepth} from "@/components/visuals/section-depth";
 import {MascotHeading} from "@/components/visuals/section-character";
+import {BUSINESS_ADDRESS, BUSINESS_NAME, BUSINESS_PHONE, BUSINESS_PHONE_HREF} from "@/lib/business";
 const MEDIUM_COPY: Partial<Record<SiteLocale, {
     kicker: string;
     title: string;
@@ -138,6 +139,11 @@ export default function Footer({
                         <p className="max-w-md text-sm leading-7 text-foreground/68">
                             {copy.description}
                         </p>
+                        <address className="mt-5 not-italic text-sm leading-6 text-foreground/68">
+                            <p className="font-semibold text-foreground">{BUSINESS_NAME}</p>
+                            <p>{BUSINESS_ADDRESS}</p>
+                            <a className="font-semibold text-primary hover:underline" href={BUSINESS_PHONE_HREF}>{BUSINESS_PHONE}</a>
+                        </address>
                     </div>
 
                     <div className="mt-6 flex gap-3">

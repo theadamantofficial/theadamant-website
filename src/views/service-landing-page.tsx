@@ -7,6 +7,7 @@ import ContactUsSection from "@/components/sections/contact-us-section";
 import {DEFAULT_SITE_LOCALE} from "@/lib/site-locale";
 import {getSiteCopy} from "@/lib/site-copy";
 import {getSiteUrl} from "@/lib/site-url";
+import {BUSINESS_ADDRESS_SCHEMA, BUSINESS_NAME, BUSINESS_PHONE} from "@/lib/business";
 import {ServiceLandingPageConfig} from "@/lib/service-landing-pages";
 import {ServiceLandingHero} from "@/components/sections/service-landing-hero";
 import {
@@ -44,8 +45,10 @@ export default function ServiceLandingPage({
         provider: {
             "@type": "Organization",
             "@id": `${siteUrl}/#organization`,
-            name: "Adamant",
+            name: BUSINESS_NAME,
             url: siteUrl,
+            telephone: BUSINESS_PHONE,
+            address: BUSINESS_ADDRESS_SCHEMA,
             sameAs: [
                 "https://www.instagram.com/theadamantofficial/",
                 "https://www.linkedin.com/company/the-adamant",

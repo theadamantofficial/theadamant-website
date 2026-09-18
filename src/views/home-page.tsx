@@ -10,6 +10,12 @@ import AdamantSystemSection from "@/components/experience/adamant-system-section
 import HeroSection from "@/components/sections/hero-section";
 import PeelReveal from "@/components/visuals/peel-reveal";
 import {getRegionalSeo} from "@/lib/regional-seo";
+import {
+    BUSINESS_ADDRESS_SCHEMA,
+    BUSINESS_NAME,
+    BUSINESS_PHONE,
+    LEGAL_BUSINESS_NAME,
+} from "@/lib/business";
 
 const CompanyCredentialsSection = dynamic(() => import("@/components/sections/company-credentials-section"));
 const PartnerProofStrip = dynamic(() => import("@/components/sections/partner-proof-strip"));
@@ -42,10 +48,12 @@ export default function HomePage({
             "@context": "https://schema.org",
             "@type": "Organization",
             "@id": `${getSiteUrl()}/#organization`,
-            name: "JSSS Adamant Technologies Private Limited",
+            name: BUSINESS_NAME,
             alternateName: ["Adamant Technologies", "Adamant"],
             url: getSiteUrl(),
-            legalName: "JSSS Adamant Technologies Private Limited",
+            legalName: LEGAL_BUSINESS_NAME,
+            telephone: BUSINESS_PHONE,
+            address: BUSINESS_ADDRESS_SCHEMA,
             foundingDate: "2026-04-27",
             description: copy.schema.organizationDescription,
             areaServed: {
