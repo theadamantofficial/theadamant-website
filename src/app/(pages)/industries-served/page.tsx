@@ -40,28 +40,28 @@ export const metadata: Metadata = {
 };
 
 const industries = [
-    ["Technology startups", "Launch a credible product website, explain a technical offer clearly, and create a foundation for organic growth and investor or customer conversations."],
-    ["Professional services", "Turn expertise into a clear digital presence with service pages, proof, lead-generation journeys, and content that answers high-intent questions."],
-    ["Education and training", "Make courses, institutions, and learning products easier to discover with structured information, conversion-focused pages, and accessible user flows."],
-    ["Real estate and construction", "Present projects, services, locations, and enquiries in a way that helps prospects compare options and take the next step."],
-    ["Healthcare and wellness", "Build trustworthy experiences with clear service information, accessible navigation, and content structured around real patient or customer questions."],
-    ["Ecommerce and retail", "Create useful catalogues, Shopify stores, product journeys, local search signals, and campaigns that connect discovery to action."],
-    ["Travel, hospitality, and food", "Build booking, ordering, discovery, and loyalty experiences for hotels, restaurants, travel companies, and food businesses."],
-    ["Photography and creative businesses", "Create portfolio websites, galleries, booking flows, personal brands, and creator platforms that put the work first."],
-    ["Finance and insurance", "Design clear digital experiences for financial products, insurance services, fintech teams, and customer support journeys."],
-    ["Logistics and transportation", "Connect customers and operations with tracking tools, service websites, portals, and workflow automation."],
-    ["Manufacturing and energy", "Explain complex capabilities, support distributors, and improve enquiries with practical websites and digital systems."],
-    ["Media, entertainment, and sports", "Build content platforms, fan experiences, campaign sites, and digital products for audiences that expect speed and clarity."],
-    ["Local and service businesses", "Give local teams a stronger presence with service pages, booking or enquiry flows, SEO, and ongoing marketing support."],
+    ["Technology startups", "Launch a credible product website that explains what the software does, who it helps, and why it is different. We can support product pages, investor-facing content, SaaS onboarding journeys, dashboards, and an SEO foundation for organic growth."],
+    ["Professional services", "Turn expertise into a clear digital presence with service pages, case studies, trust signals, lead-generation forms, and useful answers to common customer questions. This works well for consultants, agencies, legal teams, accountants, and other expert-led businesses."],
+    ["Education and training", "Make courses, institutions, and learning products easier to discover with structured information, accessible page layouts, enquiry flows, and content that helps learners or parents choose with confidence."],
+    ["Real estate and construction", "Present properties, projects, services, locations, and enquiries in a way that helps prospects compare options. We create property websites, project pages, location-focused SEO content, galleries, and lead-capture journeys."],
+    ["Healthcare and wellness", "Build trustworthy digital experiences with clear service information, accessible navigation, appointment or enquiry flows, and content structured around real patient and customer questions. The emphasis is on clarity without making unsupported claims."],
+    ["Ecommerce and retail", "Create useful product catalogues, Shopify stores, category pages, product journeys, payment flows, and campaigns that connect search discovery to purchase. We also improve mobile shopping experiences and conversion paths."],
+    ["Travel, hospitality, and food", "Build booking, ordering, discovery, and loyalty experiences for hotels, restaurants, travel companies, cafes, and food brands. Location pages, menus, galleries, reviews, and clear calls to action help customers decide faster."],
+    ["Photography and creative businesses", "Create portfolio websites, galleries, booking flows, personal brands, and creator platforms that put the work first. Fast image delivery, simple enquiries, service packages, and local SEO help creative businesses attract the right clients."],
+    ["Finance and insurance", "Design clear digital experiences for financial products, insurance services, fintech teams, and customer support journeys. We focus on understandable content, structured navigation, secure handoffs, and a professional experience across devices."],
+    ["Logistics and transportation", "Connect customers and operations with tracking tools, service websites, quote forms, portals, dashboards, and workflow automation. Clear service information helps businesses explain routes, coverage, delivery options, and next steps."],
+    ["Manufacturing and energy", "Explain complex capabilities in plain language, support distributors, and improve enquiries with practical websites, product pages, industry content, and digital systems that make technical information easier to use."],
+    ["Media, entertainment, and sports", "Build content platforms, fan experiences, campaign sites, membership journeys, and digital products for audiences that expect speed and clarity. Structured content and strong media presentation keep the experience easy to explore."],
+    ["Local and service businesses", "Give local teams a stronger presence with service pages, location content, booking or enquiry flows, Google-friendly technical foundations, and ongoing digital marketing support that is tied to real business goals."],
 ];
 
 const solutions = [
-    ["Websites and redesigns", "Marketing websites, service pages, portfolios, landing pages, ecommerce stores, and location pages built around the way customers find and choose a business."],
-    ["Mobile applications", "Customer apps, internal tools, booking flows, ordering experiences, and cross-platform products using practical mobile technology."],
-    ["SaaS and web applications", "Product discovery, UX flows, dashboards, APIs, user roles, integrations, and launch support for software businesses and internal platforms."],
-    ["SEO and content systems", "Technical SEO, search-intent mapping, industry pages, internal linking, analytics, and useful content that supports long-term visibility."],
-    ["Automation and AI workflows", "n8n workflows, AI integrations, CRM connections, notifications, reporting, and repetitive processes that can be made simpler."],
-    ["Digital marketing and growth", "Social media, paid campaigns, landing pages, brand positioning, and measurement connected to clear business goals."],
+    ["Websites and redesigns", "We plan and build marketing websites, service pages, portfolios, landing pages, ecommerce stores, and location pages around the way customers search, compare, and make contact. A redesign can also improve messaging, mobile usability, speed, and conversion paths without losing valuable content."],
+    ["Mobile applications", "We help shape customer apps, internal tools, booking flows, ordering experiences, and cross-platform products. The work can cover user journeys, interface design, Flutter or native development planning, analytics, and the practical steps needed for a reliable launch."],
+    ["SaaS and web applications", "For software companies and internal platforms, we support product discovery, UX flows, dashboards, APIs, user roles, integrations, and launch planning. The aim is to make complex workflows easier to understand for both new users and the teams who manage the product."],
+    ["SEO and content systems", "Our SEO work combines technical checks, search-intent mapping, industry pages, internal links, metadata, analytics, and useful content. The goal is not to repeat keywords; it is to make each page relevant to a real question and useful after someone arrives from search."],
+    ["Automation and AI workflows", "We can connect n8n workflows, AI integrations, CRM systems, notifications, reporting, and repetitive business tasks. Automation is planned around a clear process so it saves time, reduces manual errors, and remains understandable for the team using it."],
+    ["Digital marketing and growth", "We connect social media, paid campaigns, landing pages, brand positioning, SEO content, and measurement to a clear business goal. This gives each channel a useful role, from attracting attention to creating qualified enquiries or product sign-ups."],
 ];
 
 const faqs = [
@@ -107,7 +107,7 @@ export default function IndustriesServedPage() {
                     Adamant Technologies works with businesses across India and international markets. We build websites, mobile apps, SaaS products, automation workflows, SEO systems, and digital marketing experiences that reflect the questions, decision cycles, regulations, and expectations of each industry.
                 </p>
                 <p className="mt-5 max-w-3xl text-base leading-8 text-foreground/65">
-                    Whether you are launching a software product, promoting a photography portfolio, selling online, managing property enquiries, or improving an established company website, we connect strategy, design, development, and growth into one practical digital plan.
+                Whether you are launching a software product, promoting a photography portfolio, selling online, managing property enquiries, or improving an established company website, we connect strategy, design, development, and growth into one practical digital plan. That can include a new website, a mobile or SaaS product, technical SEO, content planning, automation, AI integrations, or ongoing digital marketing support.
                 </p>
 
                 <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
