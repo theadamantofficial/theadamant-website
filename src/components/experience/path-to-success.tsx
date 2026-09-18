@@ -8,6 +8,7 @@ import {JOURNEY_CHALLENGES} from "@/components/experience/journey-data";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 import {useMotionCapability} from "@/hooks/use-motion-capability";
 import JourneyRunner from "@/components/visuals/journey-runner";
+import {getLocalizedJourneyCopy} from "@/lib/localized-ui-copy";
 
 type JourneyMode = "intro" | "playing" | "blocked" | "transforming" | "success";
 type JourneyPosition = {x: number; z: number};
@@ -29,6 +30,7 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
     const [soundOn, setSoundOn] = useState(false);
     const [isInViewport, setIsInViewport] = useState(false);
     const challenge = JOURNEY_CHALLENGES[challengeIndex];
+    const copy = getLocalizedJourneyCopy(locale);
 
     useEffect(() => {
         const shell = shellRef.current;
@@ -179,8 +181,8 @@ export default function PathToSuccess({locale}: {locale: SiteLocale}) {
     const release = (key: string) => () => hold(key, false);
     const playerStyle = {"--player-x": 0, "--player-z": 0} as CSSProperties;
 
-return <section ref={shellRef} id="path-to-success" className={`journey-shell journey-${mode}`} aria-label="The Path to Success interactive business journey" data-motion={capability} data-motion-active={isInViewport && capability !== "reduced"} data-challenge={challenge.kind} style={{"--journey-z": 0} as CSSProperties} tabIndex={-1}>
-        <h2 className="sr-only">The Path to Success</h2>
+return <section ref={shellRef} id="path-to-success" className={`journey-shell journey-${mode}`} aria-label={copy.aria} data-motion={capability} data-motion-active={isInViewport && capability !== "reduced"} data-challenge={challenge.kind} style={{"--journey-z": 0} as CSSProperties} tabIndex={-1}>
+        <h2 className="sr-only">{copy.aria}</h2>
         <div className="journey-vignette" aria-hidden="true"/>
         <div className="journey-road" aria-hidden="true"><i/><i/><i/><i/><i/><i/><i/></div>
         <div className="journey-environment" aria-hidden="true">
@@ -197,12 +199,12 @@ return <section ref={shellRef} id="path-to-success" className={`journey-shell jo
             </div>
             <div className="journey-success-car"><Image src="/images/adamant-avatar/roadster.webp" alt="Adamant business growth roadster illustration" fill sizes="(max-width: 800px) 320px, 600px"/></div>
         <div className="journey-hud"><span>ADAMANT SYSTEM <i/> ONLINE</span><strong>BUSINESS PROGRESS <b>{businessProgress}%</b></strong><div><i style={{width: `${businessProgress}%`}}/></div></div>
-        {mode === "intro" && <div className="journey-panel journey-intro"><p>THE PATH TO SUCCESS</p><h3>Your path to <em>growth.</em></h3><span>Every business starts with an idea. What happens next depends on the systems behind it.</span><button data-magnetic className="button-primary" onClick={start}>Start journey →</button><small>Use arrow keys or W A S D to move.</small></div>}
+        {mode === "intro" && <div className="journey-panel journey-intro"><p>THE PATH TO SUCCESS</p><h3 dangerouslySetInnerHTML={{__html: copy.title}}/><span>{copy.description}</span><button data-magnetic className="button-primary" onClick={start}>{copy.start}</button><small>{copy.controls}</small></div>}
         {(mode === "blocked" || mode === "transforming") && <div className="journey-panel journey-challenge" role="status" aria-live="polite"><p>{mode === "transforming" ? "ADAMANT SYSTEM · REORGANISING" : "ADAMANT SYSTEM · ANALYSING"}</p><h3>{mode === "transforming" ? challenge.result : challenge.title}</h3><span>{mode === "transforming" ? challenge.capabilities.join(" · ") : challenge.problem}</span>{mode === "blocked" && <><small>{challenge.diagnosis}</small><button className="button-primary" data-magnetic onClick={activate}>Activate Adamant <kbd>Space</kbd></button></>}</div>}
-        {mode === "success" && <div className="journey-panel journey-success"><p>100% · CONNECTED BUSINESS</p><h3>From idea.<br/>To system.<br/><em>To growth.</em></h3><span>ADAMANT® — Firm in vision. Bold in action.</span><div><Link data-magnetic className="button-primary" href={getLocalizedPath(locale, "contact")}>Build your path →</Link><button className="button-secondary" onClick={start}>Replay journey</button></div></div>}
+        {mode === "success" && <div className="journey-panel journey-success"><p>100% · CONNECTED BUSINESS</p><h3 dangerouslySetInnerHTML={{__html: copy.success}}/><span>ADAMANT® — Firm in vision. Bold in action.</span><div><Link data-magnetic className="button-primary" href={getLocalizedPath(locale, "contact")}>Build your path →</Link><button className="button-secondary" onClick={start}>{copy.replay}</button></div></div>}
         <button className="journey-sound" type="button" onClick={() => setSoundOn((value) => !value)} aria-label={soundOn ? "Mute journey melody" : "Enable journey melody"} aria-pressed={soundOn}>{soundOn ? <Volume2 size={16}/> : <VolumeX size={16}/>}<span>{soundOn ? "MELODY ON" : "MELODY OFF"}</span></button>
         {mode !== "intro" && mode !== "success" && <div className="journey-controls" aria-label="Journey movement controls"><button aria-label="Move forward" onPointerDown={() => hold("w", true)} onPointerUp={release("w")} onPointerCancel={release("w")} onPointerLeave={release("w")}>↑</button><button aria-label="Move left" onPointerDown={() => hold("a", true)} onPointerUp={release("a")} onPointerCancel={release("a")} onPointerLeave={release("a")}>←</button><button aria-label="Move backwards" onPointerDown={() => hold("s", true)} onPointerUp={release("s")} onPointerCancel={release("s")} onPointerLeave={release("s")}>↓</button><button aria-label="Move right" onPointerDown={() => hold("d", true)} onPointerUp={release("d")} onPointerCancel={release("d")} onPointerLeave={release("d")}>→</button></div>}
-        <button className="journey-skip" onClick={skip}>{mode === "success" ? "Continue to footer" : "Skip experience"}</button>
+        <button className="journey-skip" onClick={skip}>{mode === "success" ? copy.footer : copy.skip}</button>
     </section>;
 }
 

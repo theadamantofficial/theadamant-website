@@ -24,11 +24,11 @@ function useNearViewport(margin: string) {
     return {ref, isNear, hasEntered};
 }
 
-export function DeferredAdamantSystem({services}: {services: SiteCopy["services"]}) {
+export function DeferredAdamantSystem({services, locale}: {services: SiteCopy["services"]; locale: SiteLocale}) {
     const {ref, isNear} = useNearViewport("700px 0px");
 
     return <div ref={ref} className="min-h-[100svh] bg-[var(--bg-primary)]">
-        {isNear ? <AdamantSystemSection services={services}/> : null}
+        {isNear ? <AdamantSystemSection services={services} locale={locale}/> : null}
     </div>;
 }
 

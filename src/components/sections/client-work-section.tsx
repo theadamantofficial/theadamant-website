@@ -8,6 +8,7 @@ import {Reveal} from "@/components/ui/reveal";
 import {type ClientWorkProject, type WorkCategory} from "@/content/client-work";
 import {getLocalizedPath, type SiteLocale} from "@/lib/site-locale";
 import {getProjectPreview} from "@/lib/project-previews";
+import {getLocalizedUiCopy} from "@/lib/localized-ui-copy";
 
 function ProjectPreview({project}: {project: ClientWorkProject}) {
     const isTeal = project.theme === "teal";
@@ -48,6 +49,7 @@ function ProjectCard({project}: {project: ClientWorkProject}) {
 }
 
 export default function ClientWorkSection({locale}: {locale: SiteLocale}) {
+    const copy = getLocalizedUiCopy(locale).work;
     const [category, setCategory] = useState<WorkCategory | "All work">("All work");
     const [items, setItems] = useState<ClientWorkProject[]>([]);
     const [loading, setLoading] = useState(true);
@@ -75,18 +77,18 @@ export default function ClientWorkSection({locale}: {locale: SiteLocale}) {
     return <section id="work" className="section-shell scroll-mt-28 py-20 sm:py-24" aria-labelledby="client-work-heading">
         <Reveal>
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-                <div className="max-w-2xl"><p className="section-kicker"><Layers3 className="h-4 w-4" aria-hidden="true"/> Our work</p><h2 id="client-work-heading" className="section-title">Ideas turned into<br/><span className="text-primary">digital experiences.</span></h2><p className="section-copy">Explore our websites and digital products. A closer look at the work we bring from first idea to launch.</p></div>
-                <Link href={getLocalizedPath(locale, "contact")} className="button-secondary w-fit">Let’s build your project <ArrowUpRight className="h-4 w-4" aria-hidden="true"/></Link>
+                <div className="max-w-2xl"><p className="section-kicker"><Layers3 className="h-4 w-4" aria-hidden="true"/> {copy.kicker}</p><h2 id="client-work-heading" className="section-title" dangerouslySetInnerHTML={{__html: copy.title}}/><p className="section-copy">{copy.description}</p></div>
+                <Link href={getLocalizedPath(locale, "contact")} className="button-secondary w-fit">{copy.buildCta} <ArrowUpRight className="h-4 w-4" aria-hidden="true"/></Link>
             </div>
         </Reveal>
-        {categories.length > 1 && <div role="group" aria-label="Filter projects by category" className="mt-8 flex flex-wrap gap-2">{(["All work", ...categories] as const).map((item) => <button key={item} type="button" aria-pressed={category === item} onClick={() => setCategory(item)} className={`rounded-full border px-4 py-2.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${category === item ? "border-primary bg-primary text-white" : "border-foreground/15 bg-background/50 text-foreground/70 hover:border-primary/40 hover:text-primary"}`}>{item}</button>)}</div>}
-        <p className="sr-only" role="status">Showing {projects.length} {projects.length === 1 ? "project" : "projects"}{category !== "All work" ? ` in ${category}` : ""}.</p>
-        {loading ? <p role="status" className="mt-8 flex items-center gap-2 text-sm text-foreground/65"><LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true"/>Loading projects…</p>
+        {categories.length > 1 && <div role="group" aria-label={copy.kicker} className="mt-8 flex flex-wrap gap-2">{(["All work", ...categories] as const).map((item) => <button key={item} type="button" aria-pressed={category === item} onClick={() => setCategory(item)} className={`rounded-full border px-4 py-2.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${category === item ? "border-primary bg-primary text-white" : "border-foreground/15 bg-background/50 text-foreground/70 hover:border-primary/40 hover:text-primary"}`}>{item === "All work" ? copy.all : item}</button>)}</div>}
+        <p className="sr-only" role="status">{projects.length} {projects.length === 1 ? "project" : "projects"}{category !== "All work" ? ` in ${category}` : ""}.</p>
+        {loading ? <p role="status" className="mt-8 flex items-center gap-2 text-sm text-foreground/65"><LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true"/>{copy.loading}</p>
             : projects.length ? <div className="mt-8 grid gap-6 md:grid-cols-2">{projects.map((project) => <ProjectCard key={project.id} project={project}/>)}</div>
-                : <div className="glass-panel mt-8 p-8 text-sm leading-7 text-foreground/65">{loadError ? "We couldn’t load our projects right now. Contact us to see examples of our work." : "More project stories are on the way. Contact us for examples relevant to your idea."}</div>}
+                : <div className="glass-panel mt-8 p-8 text-sm leading-7 text-foreground/65">{loadError ? copy.error : copy.empty}</div>}
         <Reveal className="mt-8 flex flex-col gap-5 rounded-[1.5rem] border border-primary/15 bg-primary/5 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
-            <div><h3 className="text-lg font-semibold tracking-tight">Have something in mind?</h3><p className="mt-2 text-sm leading-6 text-foreground/65">A website, an app, or a fresh product experience. Tell us what you’re planning.</p></div>
-            <Link href={getLocalizedPath(locale, "contact")} className="button-primary w-fit shrink-0">Start a conversation <ArrowRight className="h-4 w-4" aria-hidden="true"/></Link>
+            <div><h3 className="text-lg font-semibold tracking-tight">{copy.something}</h3><p className="mt-2 text-sm leading-6 text-foreground/65">{copy.somethingDescription}</p></div>
+            <Link href={getLocalizedPath(locale, "contact")} className="button-primary w-fit shrink-0">{copy.conversation} <ArrowRight className="h-4 w-4" aria-hidden="true"/></Link>
         </Reveal>
     </section>;
 }

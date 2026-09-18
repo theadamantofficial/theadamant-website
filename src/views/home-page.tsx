@@ -124,11 +124,11 @@ export default function HomePage({
 
         <InternationalMarketSection locale={locale}/>
 
-        <AdamantSystemSection services={copy.services}/>
+        <AdamantSystemSection services={copy.services} locale={locale}/>
 
         <ClientWorkSection locale={locale}/>
 
-        <CompanyCredentialsSection copy={copy.credentials}/>
+        <CompanyCredentialsSection copy={copy.credentials} locale={locale}/>
 
         <ValuePropsSection copy={copy.valueProps}/>
 
@@ -138,7 +138,7 @@ export default function HomePage({
 
         <ProcessSection copy={copy.process}/>
 
-        <TestimonialsSection/>
+        <TestimonialsSection locale={locale}/>
 
         <HomeSeoContentSection locale={locale}/>
 

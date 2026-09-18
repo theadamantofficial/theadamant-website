@@ -13,6 +13,8 @@ import {Reveal, StaggerGroup, StaggerItem} from "@/components/ui/reveal";
 import {SiteCopy} from "@/lib/site-copy";
 import {SectionDepth} from "@/components/visuals/section-depth";
 import {MascotHeading} from "@/components/visuals/section-character";
+import type {SiteLocale} from "@/lib/site-locale";
+import {getLocalizedUiCopy} from "@/lib/localized-ui-copy";
 
 type CredentialsCopy = NonNullable<SiteCopy["credentials"]>;
 
@@ -45,9 +47,12 @@ const STARTUP_INDIA_VERIFY_URL = "https://www.startupindia.gov.in/content/sih/en
 
 export default function CompanyCredentialsSection({
     copy = DEFAULT_COPY,
+    locale = "en",
 }: {
     copy?: SiteCopy["credentials"];
+    locale?: SiteLocale;
 }) {
+    const localizedUi = getLocalizedUiCopy(locale);
     return (
         <section
             id="credentials"
@@ -76,7 +81,7 @@ export default function CompanyCredentialsSection({
 
                         <div className="inline-flex w-fit items-center gap-3 rounded-full border border-primary/20 bg-primary/8 px-4 py-3 text-sm font-semibold text-primary dark:border-primary/25 dark:bg-primary/10">
                             <Landmark className="h-5 w-5" aria-hidden="true"/>
-                            Government of India · DPIIT
+                            {localizedUi.credentialBadge}
                         </div>
                     </div>
 

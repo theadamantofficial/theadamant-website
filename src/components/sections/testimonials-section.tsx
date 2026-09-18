@@ -6,6 +6,8 @@ import {ArrowUpRight, CheckCircle2, LoaderCircle, MessageSquareQuote, Quote, Sta
 import {Reveal} from "@/components/ui/reveal";
 import {GOOGLE_REVIEW_URL, type Testimonial} from "@/lib/testimonials";
 import {useMotionCapability} from "@/hooks/use-motion-capability";
+import type {SiteLocale} from "@/lib/site-locale";
+import {getLocalizedUiCopy} from "@/lib/localized-ui-copy";
 
 const DotLottieReact = dynamic(
     () => import("@lottiefiles/dotlottie-react").then((module) => module.DotLottieReact),
@@ -19,7 +21,8 @@ function GoogleReviewLink({className = "button-secondary"}: {className?: string}
     </a>;
 }
 
-export default function TestimonialsSection() {
+export default function TestimonialsSection({locale}: {locale: SiteLocale}) {
+    const copy = getLocalizedUiCopy(locale).testimonials;
     const {capability} = useMotionCapability();
     const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
     const [loading, setLoading] = useState(true);
@@ -83,9 +86,9 @@ export default function TestimonialsSection() {
         <Reveal>
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <div className="max-w-2xl">
-                    <p className="section-kicker"><MessageSquareQuote className="h-4 w-4" aria-hidden="true"/> Client testimonials</p>
-                    <h2 id="testimonials-heading" className="section-title">Your experience.<br/><span className="text-primary">In your words.</span></h2>
-                    <p className="section-copy">Good work starts with a conversation. Here’s what working with Adamant feels like, from the people who know us.</p>
+                    <p className="section-kicker"><MessageSquareQuote className="h-4 w-4" aria-hidden="true"/> {copy.kicker}</p>
+                    <h2 id="testimonials-heading" className="section-title" dangerouslySetInnerHTML={{__html: copy.title}}/>
+                    <p className="section-copy">{copy.description}</p>
                 </div>
                 <GoogleReviewLink/>
             </div>
@@ -93,7 +96,7 @@ export default function TestimonialsSection() {
 
         <div className="mt-10 grid items-stretch gap-6 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="flex min-w-0 flex-col">
-                {loading ? <div role="status" className="glass-panel flex min-h-64 flex-1 items-center justify-center gap-3 rounded-[2rem] p-8 text-foreground/65"><LoaderCircle className="h-5 w-5 animate-spin" aria-hidden="true"/> Loading testimonials…</div>
+                {loading ? <div role="status" className="glass-panel flex min-h-64 flex-1 items-center justify-center gap-3 rounded-[2rem] p-8 text-foreground/65"><LoaderCircle className="h-5 w-5 animate-spin" aria-hidden="true"/> {copy.loading}</div>
                     : testimonials.length ? <>
                         <div className="grid flex-1 auto-rows-fr gap-4 sm:grid-cols-2">
                             {testimonials.slice(0, visibleCount).map((testimonial) => <article key={testimonial.id} className="glass-panel flex h-full min-w-0 flex-col rounded-[1.5rem] p-6">
@@ -114,7 +117,7 @@ export default function TestimonialsSection() {
                     </> : <div className="relative flex flex-1 flex-col overflow-hidden rounded-[2rem] bg-[#0d363a] p-8 text-white sm:p-10">
                         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(88,183,179,0.25),transparent_65%)]"/>
                         <Quote className="relative h-12 w-12 text-white/25" aria-hidden="true"/>
-                        <h3 className="relative mt-8 text-3xl font-semibold tracking-tight">Every project has a story.<br/>We’d love to hear yours.</h3>
+                        <h3 className="relative mt-8 text-3xl font-semibold tracking-tight" dangerouslySetInnerHTML={{__html: copy.emptyTitle}}/>
                         <p className="relative mt-5 max-w-md text-sm leading-7 text-white/75">{loadError ? "We couldn’t load testimonials right now. You can still share your experience or visit our Google profile." : "Worked with us? Share what we built together, what stood out, and how it helped your business. Your words could help someone take their next step."}</p>
                         <div className="relative flex min-h-64 flex-1 items-center justify-center py-6 sm:min-h-80" aria-hidden="true">
                             <DotLottieReact
@@ -138,9 +141,9 @@ export default function TestimonialsSection() {
                         <div className="mt-6"><GoogleReviewLink className="button-primary"/></div>
                         <button type="button" className="mt-6 text-sm text-primary underline underline-offset-4" onClick={() => setSubmitted(false)}>Back to the form</button>
                     </div> : <>
-                        <p className="section-kicker">Over to you</p>
-                        <h3 className="mt-2 text-2xl font-semibold tracking-tight">Write a testimonial</h3>
-                        <p className="mt-3 text-sm leading-6 text-foreground/65">Tell us about your experience. Your email stays private.</p>
+                        <p className="section-kicker">{copy.overToYou}</p>
+                        <h3 className="mt-2 text-2xl font-semibold tracking-tight">{copy.write}</h3>
+                        <p className="mt-3 text-sm leading-6 text-foreground/65">{copy.formDescription}</p>
                         <form onSubmit={submit} className="mt-6">
                             <fieldset disabled={submitting} className="space-y-5">
                                 <div className="grid gap-4 sm:grid-cols-2">
