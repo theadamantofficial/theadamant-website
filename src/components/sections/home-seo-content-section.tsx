@@ -21,6 +21,18 @@ const serviceDetails = [
         label: "Explore app development",
     },
     {
+        title: "SaaS product development",
+        body: "For founders and teams turning a product idea into a focused release, we connect product scope, user flows, interface design, engineering planning, and launch measurement.",
+        href: "/saas-development-company",
+        label: "Explore SaaS development",
+    },
+    {
+        title: "SEO for Noida businesses",
+        body: "Technical SEO, search-intent mapping, service pages, internal links, and conversion measurement work together to attract more relevant local demand.",
+        href: "/seo-company-noida",
+        label: "Explore Noida SEO services",
+    },
+    {
         title: "Digital marketing and organic growth",
         body: "After launch, visibility depends on more than publishing occasional posts. We connect search intent, useful content, social media, brand positioning, paid campaigns, landing pages, and measurement. This gives every channel a clear role: attract the right audience, answer its questions, build confidence, and create a next step that can be measured.",
         href: "/digital-marketing-services",
@@ -62,6 +74,17 @@ export default function HomeSeoContentSection({locale}: {locale: SiteLocale}) {
                         </article>
                     ))}
                 </div>
+
+                <article className="mt-8 rounded-3xl border border-primary/20 bg-primary/[0.06] p-6 sm:p-7">
+                    <p className="section-kicker">Selected product work</p>
+                    <h3 className="mt-3 text-2xl font-semibold tracking-tight">AetherSEO: an SEO workspace built by Adamant</h3>
+                    <p className="mt-4 max-w-3xl text-sm leading-7 text-foreground/70">
+                        AetherSEO is Adamant&apos;s in-house SEO workspace for multilingual publishing, audits, content operations, and workflow tracking. It shows how we approach product strategy, structured workflows, and practical software experiences beyond marketing pages.
+                    </p>
+                    <Link href="https://aetherseo.com/en" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex text-sm font-semibold underline decoration-foreground/25 underline-offset-4 hover:decoration-foreground">
+                        Explore AetherSEO →
+                    </Link>
+                </article>
 
                 <div className="mt-12 grid gap-8 border-t border-foreground/10 pt-10 lg:grid-cols-[1.1fr_0.9fr]">
                     <div>

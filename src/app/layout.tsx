@@ -18,10 +18,10 @@ import {GOOGLE_TAG_MANAGER_ID, googleTagManagerEnabled, googleTagManagerScript} 
 
 export const metadata: Metadata = {
     title: {
-        default: "Adamant Technologies | Web, App, SaaS and Digital Marketing",
+        default: "Website & App Development Company in India | Adamant",
         template: "%s | Adamant",
     },
-    description: "JSSS Adamant Technologies Private Limited builds SEO-friendly websites, mobile apps, SaaS products, and digital marketing campaigns for businesses worldwide.",
+    description: "Adamant is a website and app development company in India building SEO-friendly websites, mobile apps, SaaS products, and digital marketing systems for growing businesses.",
     applicationName: "Adamant",
     authors: [{name: "Adamant"}],
     creator: "Adamant",
@@ -64,14 +64,14 @@ export const metadata: Metadata = {
     },
     openGraph: {
         ...buildOpenGraphMetadata({
-            title: "Adamant Technologies | Web, App, SaaS and Digital Marketing",
-            description: "Websites, mobile apps, SaaS products, and digital marketing from JSSS Adamant Technologies Private Limited.",
+            title: "Website & App Development Company in India | Adamant",
+            description: "SEO-friendly websites, mobile apps, SaaS products, and digital marketing systems for growing businesses.",
             pagePath: "/",
         }),
     },
     twitter: buildTwitterMetadata({
-        title: "Adamant Technologies | Web, App, SaaS and Digital Marketing",
-        description: "Websites, mobile apps, SaaS products, and digital marketing from JSSS Adamant Technologies Private Limited.",
+        title: "Website & App Development Company in India | Adamant",
+        description: "SEO-friendly websites, mobile apps, SaaS products, and digital marketing systems for growing businesses.",
     }),
     metadataBase: getSiteMetadataBase(),
 };

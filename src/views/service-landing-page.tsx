@@ -43,9 +43,46 @@ export default function ServiceLandingPage({
         serviceType: page.title,
         provider: {
             "@type": "Organization",
+            "@id": `${siteUrl}/#organization`,
             name: "Adamant",
             url: siteUrl,
+            sameAs: [
+                "https://www.instagram.com/theadamantofficial/",
+                "https://www.linkedin.com/company/the-adamant",
+                "https://x.com/theadamantofc",
+                "https://medium.com/@theadamant",
+            ],
         },
+    };
+    const breadcrumbSchema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+            {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: siteUrl,
+            },
+            {
+                "@type": "ListItem",
+                position: 2,
+                name: page.title,
+                item: pageUrl,
+            },
+        ],
+    };
+    const faqSchema = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: page.faqs.map((faq) => ({
+            "@type": "Question",
+            name: faq.question,
+            acceptedAnswer: {
+                "@type": "Answer",
+                text: faq.answer,
+            },
+        })),
     };
 
     return (
@@ -53,6 +90,14 @@ export default function ServiceLandingPage({
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{__html: JSON.stringify(pageSchema)}}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{__html: JSON.stringify(breadcrumbSchema)}}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{__html: JSON.stringify(faqSchema)}}
             />
 
             <Navbar copy={copy.navbar} locale={DEFAULT_SITE_LOCALE}/>
@@ -69,9 +114,9 @@ export default function ServiceLandingPage({
                 <Reveal className="glass-panel p-7 sm:p-8">
                     <div className="max-w-3xl">
                         <p className="section-kicker">Why teams choose this service</p>
-                        <h2 id="service-highlights-heading" className="section-title">What makes this landing page useful for SEO and conversion</h2>
+                        <h2 id="service-highlights-heading" className="section-title">What this service means for your business</h2>
                         <p className="section-copy">
-                            The content is built to explain the offer clearly, target the right intent, and make the next action obvious instead of burying everything inside a generic homepage.
+                            The work is shaped around the questions customers ask before they choose a provider: what you do, who it is for, what makes it credible, and what should happen next.
                         </p>
                     </div>
 

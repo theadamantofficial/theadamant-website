@@ -9,7 +9,7 @@ const regionalSeo = getRegionalSeo(DEFAULT_SITE_LOCALE);
 
 export const metadata: Metadata = {
     title: {
-        absolute: "Adamant Technologies | Web, App, SaaS and Digital Marketing",
+        absolute: "Website & App Development Company in India | Adamant",
     },
     description: copy.metadata.description,
     keywords: regionalSeo.keywords,
