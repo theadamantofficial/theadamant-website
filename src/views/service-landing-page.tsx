@@ -172,13 +172,25 @@ export default function ServiceLandingPage({
 
                         <div className="mt-8 grid gap-3">
                             {page.relatedLinks.map((link) => (
-                                <Link
-                                    key={link.href}
-                                    href={link.href}
-                                    className="rounded-[1.35rem] border border-black/8 bg-white/72 px-4 py-4 text-sm font-semibold text-foreground transition hover:border-black/16 hover:text-primary dark:border-white/10 dark:bg-white/5"
-                                >
-                                    {link.label}
-                                </Link>
+                                link.external ? (
+                                    <a
+                                        key={link.href}
+                                        href={link.href}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="rounded-[1.35rem] border border-black/8 bg-white/72 px-4 py-4 text-sm font-semibold text-foreground transition hover:border-black/16 hover:text-primary dark:border-white/10 dark:bg-white/5"
+                                    >
+                                        {link.label}
+                                    </a>
+                                ) : (
+                                    <Link
+                                        key={link.href}
+                                        href={link.href}
+                                        className="rounded-[1.35rem] border border-black/8 bg-white/72 px-4 py-4 text-sm font-semibold text-foreground transition hover:border-black/16 hover:text-primary dark:border-white/10 dark:bg-white/5"
+                                    >
+                                        {link.label}
+                                    </Link>
+                                )
                             ))}
                         </div>
                     </div>
