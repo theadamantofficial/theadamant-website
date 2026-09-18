@@ -18,7 +18,14 @@ const industries = [
     ["Education and training", "Make courses, institutions, and learning products easier to discover with structured information, conversion-focused pages, and accessible user flows."],
     ["Real estate and construction", "Present projects, services, locations, and enquiries in a way that helps prospects compare options and take the next step."],
     ["Healthcare and wellness", "Build trustworthy experiences with clear service information, accessible navigation, and content structured around real patient or customer questions."],
-    ["Ecommerce and local businesses", "Create useful landing pages, catalog or booking journeys, local search signals, and campaigns that connect discovery to action."],
+    ["Ecommerce and retail", "Create useful catalogues, Shopify stores, product journeys, local search signals, and campaigns that connect discovery to action."],
+    ["Travel, hospitality, and food", "Build booking, ordering, discovery, and loyalty experiences for hotels, restaurants, travel companies, and food businesses."],
+    ["Photography and creative businesses", "Create portfolio websites, galleries, booking flows, personal brands, and creator platforms that put the work first."],
+    ["Finance and insurance", "Design clear digital experiences for financial products, insurance services, fintech teams, and customer support journeys."],
+    ["Logistics and transportation", "Connect customers and operations with tracking tools, service websites, portals, and workflow automation."],
+    ["Manufacturing and energy", "Explain complex capabilities, support distributors, and improve enquiries with practical websites and digital systems."],
+    ["Media, entertainment, and sports", "Build content platforms, fan experiences, campaign sites, and digital products for audiences that expect speed and clarity."],
+    ["Local and service businesses", "Give local teams a stronger presence with service pages, booking or enquiry flows, SEO, and ongoing marketing support."],
 ];
 
 export default function IndustriesServedPage() {
