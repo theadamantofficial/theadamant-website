@@ -3,7 +3,7 @@ import type {NextConfig} from "next";
 const nextConfig: NextConfig = {
     distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
     htmlLimitedBots: /.*/,
-    productionBrowserSourceMaps: true,
+    productionBrowserSourceMaps: false,
     outputFileTracingIncludes: {
         "/api/admin/prospects/email": ["./private-assets/Adamant_Technologies_Client_Proposal.pdf"],
     },

@@ -67,7 +67,7 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
                 </div>
                 <div className="workspace-scene">
                     {!sceneReady && <div className="workspace-mascot-loader" role={enhanced && introComplete ? "status" : undefined}>
-                        <Image src="/images/adamant-character/builder-guide.webp" alt="Adamant builder guide illustration for website development and digital strategy" width={1184} height={1328} sizes="(max-width: 600px) 156px, 210px"/>
+                        <Image src="/images/adamant-character/builder-guide.webp" alt="Adamant builder guide illustration for website development and digital strategy" width={1184} height={1328} sizes="(max-width: 600px) 156px, 210px" quality={65} priority/>
                         {enhanced && introComplete ? <><span className="mascot-loading-dots" aria-hidden="true"><i/><i/><i/></span><span className="sr-only">Preparing the studio</span></> : <p>Big ideas. Thoughtfully made.</p>}
                     </div>}
                     {enhanced && introComplete && isHeroVisible && <StudioRoom onReady={() => setSceneReady(true)} onEnter={zoomIn} progressRef={progressRef} paused={false} resetKey={0} palette={0}/>}

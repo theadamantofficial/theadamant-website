@@ -75,6 +75,28 @@ export default function HomeSeoContentSection({locale}: {locale: SiteLocale}) {
                     ))}
                 </div>
 
+                <div className="mt-10 rounded-3xl border border-foreground/10 bg-background/55 p-6 sm:p-7">
+                    <h3 className="text-2xl font-semibold tracking-tight">Explore Our Main Services</h3>
+                    <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/68">
+                        Browse the service pages that match your next step, whether you need a new website, a mobile product, a SaaS platform, better search visibility, or a clearer digital marketing plan.
+                    </p>
+                    <nav aria-label="Main services" className="mt-5 flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold">
+                        {[
+                            ["/website-development", "Website Development"],
+                            ["/website-development-india", "Website Development In India"],
+                            ["/app-development-noida", "Mobile App Development"],
+                            ["/saas-development-company", "SaaS Development"],
+                            ["/seo-company-noida", "SEO Services"],
+                            ["/digital-marketing-services", "Digital Marketing"],
+                            ["/industries-served", "Industries We Serve"],
+                        ].map(([href, label]) => (
+                            <Link key={href} href={href} className="text-primary underline decoration-primary/25 underline-offset-4 hover:decoration-primary">
+                                {label} →
+                            </Link>
+                        ))}
+                    </nav>
+                </div>
+
                 <article className="mt-8 rounded-3xl border border-primary/20 bg-primary/[0.06] p-6 sm:p-7">
                     <p className="section-kicker">Selected product work</p>
                     <h3 className="mt-3 text-2xl font-semibold tracking-tight">AetherSEO: an SEO workspace built by Adamant</h3>
