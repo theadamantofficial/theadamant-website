@@ -15,6 +15,7 @@ const NAV_ITEMS = [
     {href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard},
     {href: "/admin/analytics", label: "Website Analytics", icon: BarChart3},
     {href: "/admin/leads", label: "Leads", icon: BriefcaseBusiness},
+    {href: "/admin/whatsapp", label: "WhatsApp", icon: MessageCircle},
     {href: "/admin/prospects", label: "Prospects", icon: Database},
     {href: "/admin/pipeline", label: "Pipeline", icon: Workflow},
     {href: "/admin/development", label: "Development", icon: Workflow},

@@ -1,7 +1,6 @@
 /**
- * WhatsApp CRM is intentionally paused. Keep the implementation in place so it
- * can be restored by setting WHATSAPP_CRM_ENABLED=true.
+ * WhatsApp CRM is enabled by default. Set the flag to false to pause its routes.
  */
 export function isWhatsAppCrmEnabled() {
-    return process.env.WHATSAPP_CRM_ENABLED?.trim().toLowerCase() === "true";
+    return process.env.WHATSAPP_CRM_ENABLED?.trim().toLowerCase() !== "false";
 }
