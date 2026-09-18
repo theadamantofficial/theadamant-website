@@ -30,13 +30,13 @@ type StackGroup = {
 };
 
 const STACK_GROUPS: StackGroup[] = [
-    {label: "Web and apps", icon: Code2, items: ["React.js", "Next.js", "Node.js", "Laravel", "PHP", "Python", "Java", ".NET", "Vue.js", "Angular", "TypeScript"]},
-    {label: "Mobile products", icon: Smartphone, items: ["Flutter", "Kotlin", "Android", "iOS", "React Native"]},
-    {label: "SaaS and data", icon: Database, items: ["SaaS products", "Web applications", "MongoDB", "PostgreSQL", "Firebase", "Supabase", "API integrations"]},
-    {label: "Cloud and delivery", icon: Cloud, items: ["AWS", "Azure", "Google Cloud", "Docker", "Kubernetes", "Vercel", "DevOps"]},
-    {label: "Commerce and growth", icon: Megaphone, items: ["Shopify", "Technical SEO", "Digital marketing", "Paid campaigns", "Analytics"]},
-    {label: "Design and collaboration", icon: Palette, items: ["Figma", "Adobe XD", "UI/UX design", "Git", "GitHub", "Bitbucket"]},
-    {label: "AI and automation", icon: Sparkles, items: ["OpenAI", "ChatGPT", "Claude", "n8n", "Generative AI", "AI automation"]},
+    {label: "Web And Apps", icon: Code2, items: ["React.js", "Next.js", "Node.js", "Laravel", "PHP", "Python", "Java", ".NET", "Vue.js", "Angular", "TypeScript"]},
+    {label: "Mobile Products", icon: Smartphone, items: ["Flutter", "Kotlin", "Android", "iOS", "React Native"]},
+    {label: "SaaS And Data", icon: Database, items: ["SaaS products", "Web applications", "MongoDB", "PostgreSQL", "Firebase", "Supabase", "API integrations"]},
+    {label: "Cloud And Delivery", icon: Cloud, items: ["AWS", "Azure", "Google Cloud", "Docker", "Kubernetes", "Vercel", "DevOps"]},
+    {label: "Commerce And Growth", icon: Megaphone, items: ["Shopify", "Technical SEO", "Digital marketing", "Paid campaigns", "Analytics"]},
+    {label: "Design And Collaboration", icon: Palette, items: ["Figma", "Adobe XD", "UI/UX design", "Git", "GitHub", "Bitbucket"]},
+    {label: "AI And Automation", icon: Sparkles, items: ["OpenAI", "ChatGPT", "Claude", "n8n", "Generative AI", "AI automation"]},
 ];
 
 const STACK_LOGOS: Record<string, string> = {
@@ -98,8 +98,8 @@ export default function TechnologyStackSection({locale}: {locale: SiteLocale}) {
         <section className="section-shell py-16 sm:py-24" aria-labelledby="technology-stack-heading">
             <div className="rounded-[2rem] border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8 lg:p-12">
                 <div className="max-w-3xl">
-                    <p className="section-kicker">Tools we work with</p>
-                    <h2 id="technology-stack-heading" className="section-title">The right stack for the job</h2>
+                    <p className="section-kicker">Tools We Work With</p>
+                    <h2 id="technology-stack-heading" className="section-title">The Right Stack For The Job</h2>
                     <p className="mt-5 text-base leading-8 text-foreground/70">
                         We choose tools around the product, the team, and the stage of the project. Here are some of the technologies we use across websites, apps, SaaS products, design systems, marketing, and AI-enabled workflows.
                     </p>
