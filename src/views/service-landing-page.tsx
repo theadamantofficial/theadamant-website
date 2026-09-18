@@ -42,6 +42,8 @@ export default function ServiceLandingPage({
         image: `${siteUrl}${page.image}`,
         areaServed: buildAreaServed(page.slug),
         serviceType: page.title,
+        keywords: page.keywords.join(", "),
+        knowsAbout: page.keywords,
         provider: {
             "@type": "Organization",
             "@id": `${siteUrl}/#organization`,

@@ -5,6 +5,7 @@ import {SiteCopy} from "@/lib/site-copy";
 import {SiteLocale} from "@/lib/site-locale";
 import {getSiteUrl} from "@/lib/site-url";
 import HomeSeoContentSection from "@/components/sections/home-seo-content-section";
+import TechnologyStackSection from "@/components/sections/technology-stack-section";
 import InternationalMarketSection from "@/components/sections/international-market-section";
 import AdamantSystemSection from "@/components/experience/adamant-system-section";
 import HeroSection from "@/components/sections/hero-section";
@@ -139,6 +140,8 @@ export default function HomePage({
         <ProcessSection copy={copy.process}/>
 
         <TestimonialsSection locale={locale}/>
+
+        <TechnologyStackSection locale={locale}/>
 
         <HomeSeoContentSection locale={locale}/>
 
