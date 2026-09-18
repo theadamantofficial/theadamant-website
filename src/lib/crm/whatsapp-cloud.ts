@@ -92,11 +92,15 @@ export function parseWhatsAppWebhook(payload: unknown): WhatsAppWebhookEvent[] {
     for (const entryValue of payload.entry) {
         if (!isRecord(entryValue) || !Array.isArray(entryValue.changes)) continue;
         const businessAccountId = text(entryValue.id);
+        const configuredBusinessAccountId = env("WHATSAPP_BUSINESS_ACCOUNT_ID");
+        if (configuredBusinessAccountId && businessAccountId && businessAccountId !== configuredBusinessAccountId) continue;
         for (const changeValue of entryValue.changes) {
             if (!isRecord(changeValue) || !isRecord(changeValue.value)) continue;
             const value = changeValue.value;
             const metadata = isRecord(value.metadata) ? value.metadata : {};
             const phoneNumberId = text(metadata.phone_number_id);
+            const configuredPhoneNumberId = env("WHATSAPP_PHONE_NUMBER_ID");
+            if (configuredPhoneNumberId && phoneNumberId && phoneNumberId !== configuredPhoneNumberId) continue;
             const contacts = Array.isArray(value.contacts) ? value.contacts : [];
             const contactNames = new Map<string, string>();
             for (const contact of contacts) {

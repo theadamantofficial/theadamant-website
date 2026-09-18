@@ -80,6 +80,20 @@ describe("WhatsApp Cloud API webhook", () => {
         expect(events[1]).toMatchObject({kind: "status", status: "read", messageId: "wamid.outbound"});
     });
 
+    it("ignores webhook events from another WhatsApp number or Business Account", () => {
+        process.env.WHATSAPP_PHONE_NUMBER_ID = "configured-phone";
+        process.env.WHATSAPP_BUSINESS_ACCOUNT_ID = "configured-waba";
+        const events = parseWhatsAppWebhook({
+            entry: [
+                {id: "other-waba", changes: [{value: {metadata: {phone_number_id: "other-phone"}, messages: [{from: "919876543210", id: "wamid.other", type: "text", text: {body: "Unrelated"}}]}}]},
+                {id: "configured-waba", changes: [{value: {metadata: {phone_number_id: "other-phone"}, messages: [{from: "919876543210", id: "wamid.other-phone", type: "text", text: {body: "Unrelated"}}]}}]},
+                {id: "configured-waba", changes: [{value: {metadata: {phone_number_id: "configured-phone"}, messages: [{from: "919876543210", id: "wamid.valid", type: "text", text: {body: "Valid"}}]}}]},
+            ],
+        });
+        expect(events).toHaveLength(1);
+        expect(events[0]).toMatchObject({messageId: "wamid.valid", body: "Valid"});
+    });
+
     it("represents media messages without storing the webhook payload", () => {
         const [event] = parseWhatsAppWebhook({entry: [{id: "waba", changes: [{value: {
             metadata: {phone_number_id: "phone"},
