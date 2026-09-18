@@ -124,7 +124,11 @@ export default function ContactUsSection({copy, serviceType}: {copy: SiteCopy["c
                         <address className="mt-6 not-italic text-sm leading-7 text-foreground/70">
                             <p className="font-semibold text-foreground">{BUSINESS_NAME}</p>
                             <p>{BUSINESS_ADDRESS}</p>
-                            <a className="font-semibold text-primary hover:underline" href={BUSINESS_PHONE_HREF}>
+                            <a
+                                className="font-semibold text-primary hover:underline"
+                                href={BUSINESS_PHONE_HREF}
+                                aria-label={`Call ${BUSINESS_NAME} at ${BUSINESS_PHONE}`}
+                            >
                                 {BUSINESS_PHONE}
                             </a>
                         </address>

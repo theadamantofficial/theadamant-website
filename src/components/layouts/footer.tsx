@@ -142,7 +142,13 @@ export default function Footer({
                         <address className="mt-5 not-italic text-sm leading-6 text-foreground/68">
                             <p className="font-semibold text-foreground">{BUSINESS_NAME}</p>
                             <p>{BUSINESS_ADDRESS}</p>
-                            <a className="font-semibold text-primary hover:underline" href={BUSINESS_PHONE_HREF}>{BUSINESS_PHONE}</a>
+                            <a
+                                className="font-semibold text-primary hover:underline"
+                                href={BUSINESS_PHONE_HREF}
+                                aria-label={`Call ${BUSINESS_NAME} at ${BUSINESS_PHONE}`}
+                            >
+                                {BUSINESS_PHONE}
+                            </a>
                         </address>
                     </div>
 
