@@ -19,7 +19,7 @@ type CredentialsCopy = NonNullable<SiteCopy["credentials"]>;
 const DEFAULT_COPY: CredentialsCopy = {
     kicker: "Company credentials",
     title: "Registered in India. Recognized by Startup India.",
-    description: "JSSS Adamant Technologies Private Limited is an incorporated Indian company recognized as a startup by DPIIT under the Government of India's Startup India initiative, with independent certifications for quality and information security management.",
+    description: "Adamant Technologies is an incorporated Indian company recognized as a startup by DPIIT under the Government of India's Startup India initiative, with independent certifications for quality and information security management.",
     startupEyebrow: "Government recognition",
     startupTitle: "DPIIT-recognized startup",
     startupDescription: "Recognized by the Department for Promotion of Industry and Internal Trade, Ministry of Commerce & Industry, Government of India.",

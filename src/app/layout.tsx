@@ -27,7 +27,6 @@ export const metadata: Metadata = {
     creator: "Adamant",
     publisher: "Adamant",
     keywords: [
-        "JSSS Adamant Technologies Private Limited",
         "Adamant Technologies",
         "web design",
         "website development",
