@@ -91,17 +91,17 @@ export function ServiceLandingHero({page}: {page: ServiceLandingPageConfig}) {
                     </motion.div>
 
                     <motion.div className="motion-reveal mt-8 flex flex-wrap gap-3" variants={itemVariants}>
-                        <span className="feature-chip">
-                            <Globe className="h-4 w-4"/>
+                        <span className="feature-chip max-w-full min-w-0">
+                            <Globe className="h-4 w-4 shrink-0"/>
                             SEO-ready structure
                         </span>
-                        <span className="feature-chip">
-                            <CheckCircle2 className="h-4 w-4"/>
-                            Conversion-focused UX
+                        <span className="feature-chip max-w-full min-w-0">
+                            <CheckCircle2 className="h-4 w-4 shrink-0"/>
+                            <span className="min-w-0 break-words">Conversion-focused UX</span>
                         </span>
-                        <span className="feature-chip">
-                            <MarketChipIcon className="h-4 w-4"/>
-                            {marketChipLabel}
+                        <span className="feature-chip max-w-full min-w-0">
+                            <MarketChipIcon className="h-4 w-4 shrink-0"/>
+                            <span className="min-w-0 break-words">{marketChipLabel}</span>
                         </span>
                     </motion.div>
                 </motion.div>

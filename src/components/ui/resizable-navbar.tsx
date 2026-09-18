@@ -56,25 +56,16 @@ interface MobileNavMenuProps {
 export const Navbar = ({children, className}: NavbarProps) => {
     const ref = useRef<HTMLDivElement>(null);
     const {scrollY} = useScroll();
-    const previousScrollY = useRef(0);
     const [visible, setVisible] = useState<boolean>(false);
-    const [hidden, setHidden] = useState<boolean>(false);
 
     useMotionValueEvent(scrollY, "change", (latest) => {
-        const wasScrollingDown = latest > previousScrollY.current;
-
         setVisible(latest > 24);
-        setHidden(wasScrollingDown && latest > 180);
-
-        previousScrollY.current = latest;
     });
 
     return (
         <motion.div
             ref={ref}
-            animate={{
-                y: hidden ? -120 : 0,
-            }}
+            animate={{y: 0}}
             transition={{
                 duration: 0.35,
                 ease: [0.22, 1, 0.36, 1],
@@ -85,7 +76,7 @@ export const Navbar = ({children, className}: NavbarProps) => {
                 React.isValidElement(child)
                     ? React.cloneElement(
                         child as React.ReactElement<{ visible?: boolean; hidden?: boolean }>,
-                        {visible, hidden},
+                        {visible},
                     )
                     : child,
             )}
@@ -110,6 +101,7 @@ export const NavBody = ({children, className, visible, hidden}: NavBodyProps) =>
                 visible && "border-black/8 bg-white/95 dark:border-[#5fcabd]/20 dark:bg-[#071820]/95",
                 className,
             )}
+            data-visible={visible ? "true" : "false"}
             style={{
                 transformOrigin: "top center",
             }}

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import {ArrowDown} from "lucide-react";
 import {useEffect, useRef, useState} from "react";
@@ -9,17 +8,13 @@ import {SiteCopy} from "@/lib/site-copy";
 import {getLocalizedPath, SiteLocale} from "@/lib/site-locale";
 import {useMotionCapability} from "@/hooks/use-motion-capability";
 
-const StudioRoom = dynamic(() => import("@/components/visuals/studio-room"), {ssr: false});
-
 export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; locale: SiteLocale}) {
-    const {capability, isReady} = useMotionCapability();
+    const {capability} = useMotionCapability();
     const sectionRef = useRef<HTMLElement>(null);
     const heroRef = useRef<HTMLDivElement>(null);
     const progressRef = useRef(0);
     const [introComplete, setIntroComplete] = useState(false);
     const [isHeroVisible, setIsHeroVisible] = useState(true);
-    const [sceneReady, setSceneReady] = useState(false);
-    const enhanced = isReady && capability === "full";
     useEffect(() => {
         const complete = () => setIntroComplete(true);
         if (document.documentElement.dataset.introComplete === "true") complete();
@@ -33,11 +28,6 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
         observer.observe(section);
         return () => observer.disconnect();
     }, []);
-    useEffect(() => {if (!isHeroVisible) setSceneReady(false);}, [isHeroVisible]);
-    const zoomIn = () => {
-        const section = sectionRef.current;
-        if (section) window.scrollTo({top: section.offsetTop + section.offsetHeight - innerHeight, behavior: capability === "reduced" ? "instant" : "smooth"});
-    };
     useEffect(() => {
         const section = sectionRef.current;
         const hero = heroRef.current;
@@ -66,11 +56,34 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
                     <p className="workspace-intro">{copy.description}</p>
                 </div>
                 <div className="workspace-scene">
-                    {!sceneReady && <div className="workspace-mascot-loader" role={enhanced && introComplete ? "status" : undefined}>
-                        <Image src="/images/adamant-character/builder-guide.webp" alt="Adamant builder guide illustration for website development and digital strategy" width={1184} height={1328} sizes="(max-width: 600px) 156px, 210px" quality={75} priority/>
-                        {enhanced && introComplete ? <><span className="mascot-loading-dots" aria-hidden="true"><i/><i/><i/></span><span className="sr-only">Preparing the studio</span></> : <p>Big ideas. Thoughtfully made.</p>}
-                    </div>}
-                    {enhanced && introComplete && isHeroVisible && <StudioRoom onReady={() => setSceneReady(true)} onEnter={zoomIn} progressRef={progressRef} paused={false} resetKey={0} palette={0}/>}
+                    <div className="workspace-static-art" aria-label="Adamant website, app, and digital product design workspace">
+                        <div className="workspace-static-glow"/>
+                        <div className="workspace-static-grid"/>
+                        <div className="workspace-static-window workspace-static-window-back" aria-hidden="true"/>
+                        <div className="workspace-static-window workspace-static-window-front">
+                            <div className="workspace-static-window-bar"><span/><span/><span/><b>Adamant Studio</b></div>
+                            <div className="workspace-static-window-body">
+                                <div className="workspace-static-sidebar"><i/><i/><i/><i/></div>
+                                <div className="workspace-static-dashboard">
+                                    <span className="workspace-static-eyebrow">Build With Clarity</span>
+                                    <strong>Websites, Apps<br/>And Digital Growth.</strong>
+                                    <div className="workspace-static-lines"><i/><i/><i/></div>
+                                </div>
+                            </div>
+                        </div>
+                        <Image
+                            src="/images/adamant-character/builder-guide.webp"
+                            alt="Adamant designer building websites, apps, and digital products"
+                            width={1184}
+                            height={1328}
+                            sizes="(max-width: 600px) 250px, (max-width: 1000px) 330px, 430px"
+                            quality={75}
+                            priority
+                            className="workspace-static-character"
+                        />
+                        <div className="workspace-static-chip workspace-static-chip-top">Web · Apps · SaaS <b>↗</b></div>
+                        <div className="workspace-static-chip workspace-static-chip-bottom">SEO · AI · Automation</div>
+                    </div>
                 </div>
                 <div className="workspace-bottom">
                     <span />
