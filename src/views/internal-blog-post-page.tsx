@@ -17,6 +17,10 @@ const SeoChatFab = dynamic(
     () => import("@/components/ui/seo-chat-fab").then((module) => module.SeoChatFab),
 );
 
+function buildArticleImageAlt(title: string, fallback: string) {
+    return title.trim() || fallback;
+}
+
 export default function InternalBlogPostPage({
     copy,
     locale,
@@ -115,7 +119,7 @@ export default function InternalBlogPostPage({
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                         src={post.coverImage || buildFallbackBlogCoverDataUrl(post)}
-                        alt={post.title}
+                        alt={buildArticleImageAlt(post.title, "Adamant article cover image")}
                         className="h-[18rem] w-full object-cover sm:h-[24rem]"
                     />
 

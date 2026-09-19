@@ -61,6 +61,11 @@ export const metadata: Metadata = {
         index: true,
         follow: true,
     },
+    icons: {
+        icon: "/favicon.ico",
+        shortcut: "/favicon.ico",
+        apple: "/favicon.ico",
+    },
     openGraph: {
         ...buildOpenGraphMetadata({
             title: "Website & App Development Company in India | Adamant",

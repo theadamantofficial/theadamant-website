@@ -19,6 +19,10 @@ const SeoChatFab = dynamic(
     () => import("@/components/ui/seo-chat-fab").then((module) => module.SeoChatFab),
 );
 
+function buildBlogImageAlt(title: string, fallback: string) {
+    return title.trim() || fallback;
+}
+
 const BLOG_COPY: Partial<Record<SiteLocale, {
     kicker: string;
     title: string;
@@ -286,7 +290,7 @@ export default function BlogPage({
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
                                         src={post.coverImage || buildFallbackBlogCoverDataUrl(post)}
-                                        alt={post.title}
+                                        alt={buildBlogImageAlt(post.title, "Adamant blog cover image")}
                                         className="h-52 w-full object-cover"
                                         loading="lazy"
                                     />
@@ -344,7 +348,7 @@ export default function BlogPage({
                                         // eslint-disable-next-line @next/next/no-img-element
                                         <img
                                             src={post.thumbnailUrl}
-                                            alt={post.title}
+                                            alt={buildBlogImageAlt(post.title, "Adamant article preview image")}
                                             className="h-52 w-full object-cover"
                                             loading="lazy"
                                         />

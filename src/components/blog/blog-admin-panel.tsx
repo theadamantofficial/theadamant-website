@@ -37,6 +37,11 @@ const initialFormState: BlogFormState = {
     content: "",
 };
 
+function buildCoverPreviewAlt(title: string) {
+    const trimmedTitle = title.trim();
+    return trimmedTitle ? `Cover preview for ${trimmedTitle}` : "Blog cover preview image";
+}
+
 async function requestBlogAdminSession() {
     const response = await fetch("/api/blog-admin/session", {cache: "no-store"});
     return await response.json() as SessionPayload;
@@ -577,7 +582,7 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={coverPreview}
-                                    alt="Cover preview"
+                                    alt={buildCoverPreviewAlt(formState.title)}
                                     className="h-52 w-full object-cover"
                                 />
                             </div>
@@ -638,7 +643,7 @@ export function BlogAdminPanel({locale}: { locale: SiteLocale }) {
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={post.coverImage || buildFallbackBlogCoverDataUrl(post)}
-                                    alt={post.title}
+                                    alt={buildCoverPreviewAlt(post.title)}
                                     className="h-32 w-full object-cover"
                                 />
                             </div>
