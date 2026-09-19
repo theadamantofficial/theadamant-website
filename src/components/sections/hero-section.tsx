@@ -33,6 +33,26 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
                     <h1 id="hero-heading">{copy.title}</h1>
                     <p className="workspace-intro">{copy.description}</p>
                 </div>
+                <div className="workspace-scene" aria-hidden="true">
+                    <div className="workspace-static-art">
+                        <div className="workspace-static-glow"/>
+                        <div className="workspace-static-grid"/>
+                        <div className="workspace-static-window workspace-static-window-back"/>
+                        <div className="workspace-static-window workspace-static-window-front">
+                            <div className="workspace-static-window-bar"><span/><span/><span/><b>Adamant Studio</b></div>
+                            <div className="workspace-static-window-body">
+                                <div className="workspace-static-sidebar"><i/><i/><i/><i/></div>
+                                <div className="workspace-static-dashboard">
+                                    <span className="workspace-static-eyebrow">Build With Clarity</span>
+                                    <strong>Websites, Apps<br/>And Digital Growth.</strong>
+                                    <div className="workspace-static-lines"><i/><i/><i/></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="workspace-static-chip workspace-static-chip-top">Web · Apps · SaaS <b>↗</b></div>
+                        <div className="workspace-static-chip workspace-static-chip-bottom">SEO · AI · Automation</div>
+                    </div>
+                </div>
                 <div className="workspace-bottom">
                     <span />
                     <div className="workspace-controls">
