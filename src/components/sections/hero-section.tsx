@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import {ArrowDown} from "lucide-react";
 import {useEffect, useRef, useState} from "react";
 import {SiteCopy} from "@/lib/site-copy";
@@ -71,16 +70,6 @@ export default function HeroSection({copy, locale}: {copy: SiteCopy["hero"]; loc
                                 </div>
                             </div>
                         </div>
-                        <Image
-                            src="/images/adamant-character/builder-guide.webp"
-                            alt="Adamant designer building websites, apps, and digital products"
-                            width={1184}
-                            height={1328}
-                            sizes="(max-width: 600px) 250px, (max-width: 1000px) 330px, 430px"
-                            quality={75}
-                            priority
-                            className="workspace-static-character"
-                        />
                         <div className="workspace-static-chip workspace-static-chip-top">Web · Apps · SaaS <b>↗</b></div>
                         <div className="workspace-static-chip workspace-static-chip-bottom">SEO · AI · Automation</div>
                     </div>
