@@ -5,6 +5,9 @@ import {SectionDepth} from "@/components/visuals/section-depth";
 import {MascotHeading} from "@/components/visuals/section-character";
 
 export default function FaqSection({copy}: { copy: SiteCopy["faq"] }) {
+    const featuredAnswers = copy.items.slice(0, 3);
+    const remainingAnswers = copy.items.slice(3);
+
     return (
         <section id="faq" className="section-shell py-24" aria-labelledby="faq-heading">
             <SectionDepth variant="faq"/>
@@ -20,7 +23,15 @@ export default function FaqSection({copy}: { copy: SiteCopy["faq"] }) {
             </Reveal>
             </MascotHeading>
 
-            <AnimatedFaqList items={copy.items} className="mt-10" idPrefix="homepage-faq"/>
+            <div className="mt-10 grid gap-4 lg:grid-cols-3">
+                {featuredAnswers.map((item) => (
+                    <article key={item.question} className="glass-panel p-6">
+                        <h3 className="text-lg font-semibold tracking-tight text-foreground">{item.question}</h3>
+                        <p className="mt-4 text-sm leading-7 text-foreground/70">{item.answer}</p>
+                    </article>
+                ))}
+            </div>
+            <AnimatedFaqList items={remainingAnswers} className="mt-4" idPrefix="homepage-faq"/>
         </section>
     );
 }

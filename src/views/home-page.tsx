@@ -11,7 +11,6 @@ import InternationalMarketSection from "@/components/sections/international-mark
 import AdamantSystemSection from "@/components/experience/adamant-system-section";
 import HeroSection from "@/components/sections/hero-section";
 import PeelReveal from "@/components/visuals/peel-reveal";
-import {getRegionalSeo} from "@/lib/regional-seo";
 import {
     BUSINESS_ADDRESS_SCHEMA,
     BUSINESS_NAME,
@@ -44,27 +43,20 @@ export default function HomePage({
         ...copy.services,
         items: copy.services.items.filter((item) => (item.proofHighlights?.length ?? 0) === 0),
     };
-    const regionalSeo = getRegionalSeo(locale);
     const schemas = [
         {
             "@context": "https://schema.org",
             "@type": "Organization",
             "@id": `${getSiteUrl()}/#organization`,
             name: BUSINESS_NAME,
-            alternateName: ["Adamant Technologies", "Adamant"],
+            alternateName: "Adamant",
             url: getSiteUrl(),
             legalName: LEGAL_BUSINESS_NAME,
             telephone: BUSINESS_PHONE,
             address: BUSINESS_ADDRESS_SCHEMA,
             foundingDate: "2026-04-27",
             description: copy.schema.organizationDescription,
-            areaServed: {
-                "@type": regionalSeo.countryCode === "001" ? "Place" : "Country",
-                name: regionalSeo.region,
-                identifier: regionalSeo.countryCode,
-            },
-            logo: `${getSiteUrl()}/opengraph-image`,
-            inLanguage: locale,
+            logo: `${getSiteUrl()}/vectors/logo-the-adamant.svg`,
             identifier: {
                 "@type": "PropertyValue",
                 propertyID: "DPIIT Certificate Number",
@@ -85,11 +77,6 @@ export default function HomePage({
             name: "Adamant Technologies",
             url: getSiteUrl(),
             publisher: {"@id": `${getSiteUrl()}/#organization`},
-            potentialAction: {
-                "@type": "SearchAction",
-                target: `${getSiteUrl()}/blog?query={search_term_string}`,
-                "query-input": "required name=search_term_string",
-            },
         },
         {
             "@context": "https://schema.org",

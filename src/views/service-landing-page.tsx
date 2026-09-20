@@ -7,7 +7,7 @@ import ContactUsSection from "@/components/sections/contact-us-section";
 import {DEFAULT_SITE_LOCALE} from "@/lib/site-locale";
 import {getSiteCopy} from "@/lib/site-copy";
 import {getSiteUrl} from "@/lib/site-url";
-import {BUSINESS_ADDRESS_SCHEMA, BUSINESS_NAME, BUSINESS_PHONE} from "@/lib/business";
+import {BUSINESS_NAME} from "@/lib/business";
 import {ServiceLandingPageConfig} from "@/lib/service-landing-pages";
 import {ServiceLandingHero} from "@/components/sections/service-landing-hero";
 import {
@@ -33,30 +33,24 @@ export default function ServiceLandingPage({
 }) {
     const siteUrl = getSiteUrl();
     const pageUrl = `${siteUrl}/${page.slug}`;
+    const featuredFaq = page.faqs[0];
+    const remainingFaqs = page.faqs.slice(1);
     const pageSchema = {
         "@context": "https://schema.org",
-        "@type": "ProfessionalService",
-        name: `Adamant - ${page.metaTitle}`,
+        "@type": "Service",
+        "@id": `${pageUrl}#service`,
+        name: page.title,
         url: pageUrl,
+        mainEntityOfPage: pageUrl,
         description: page.metaDescription,
         image: `${siteUrl}${page.image}`,
         areaServed: buildAreaServed(page.slug),
-        serviceType: page.title,
-        keywords: page.keywords.join(", "),
-        knowsAbout: page.keywords,
+        serviceType: page.eyebrow,
         provider: {
             "@type": "Organization",
             "@id": `${siteUrl}/#organization`,
             name: BUSINESS_NAME,
             url: siteUrl,
-            telephone: BUSINESS_PHONE,
-            address: BUSINESS_ADDRESS_SCHEMA,
-            sameAs: [
-                "https://www.instagram.com/theadamantofficial/",
-                "https://www.linkedin.com/company/the-adamant",
-                "https://x.com/theadamantofc",
-                "https://medium.com/@theadamant",
-            ],
         },
     };
     const breadcrumbSchema = {
@@ -111,6 +105,16 @@ export default function ServiceLandingPage({
             <ServiceLandingProgress/>
 
             <ServiceLandingHero page={page}/>
+
+            {featuredFaq && (
+                <ServiceGlideSection className="section-shell pb-12" ariaLabelledby="service-quick-answer-heading">
+                    <article className="glass-panel max-w-4xl p-7 sm:p-8">
+                        <p className="section-kicker">Quick answer</p>
+                        <h2 id="service-quick-answer-heading" className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">{featuredFaq.question}</h2>
+                        <p className="mt-4 text-base leading-8 text-foreground/70">{featuredFaq.answer}</p>
+                    </article>
+                </ServiceGlideSection>
+            )}
 
             <ServiceGlideSection
                 className="section-shell pb-12"
@@ -208,11 +212,11 @@ export default function ServiceLandingPage({
                     <p className="section-kicker">FAQ</p>
                     <h2 id="service-faq-heading" className="section-title">Questions that usually come up before the first call</h2>
                     <p className="section-copy">
-                        FAQ content helps both search engines and buyers understand how the service works, what it includes, and whether the page matches the project they want to discuss.
+                        Find direct answers about scope, delivery, and how this service fits your project.
                     </p>
                 </Reveal>
 
-                <AnimatedFaqList items={page.faqs} className="mt-8" idPrefix={`${page.slug}-faq`}/>
+                <AnimatedFaqList items={remainingFaqs} className="mt-8" idPrefix={`${page.slug}-faq`}/>
             </ServiceGlideSection>
 
             <ContactUsSection copy={copy.contact} serviceType={page.eyebrow}/>
@@ -222,6 +226,14 @@ export default function ServiceLandingPage({
 }
 
 function buildAreaServed(slug: string) {
+    if (slug.includes("ghaziabad")) {
+        return {"@type": "City", name: "Ghaziabad"};
+    }
+
+    if (slug.includes("delhi-ncr")) {
+        return {"@type": "AdministrativeArea", name: "Delhi NCR"};
+    }
+
     if (slug.includes("noida")) {
         return {
             "@type": "City",
@@ -252,6 +264,10 @@ function buildAreaServed(slug: string) {
         {
             "@type": "Country",
             name: "Japan",
+        },
+        {
+            "@type": "Country",
+            name: "South Africa",
         },
     ];
 }
