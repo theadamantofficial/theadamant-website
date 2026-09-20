@@ -55,7 +55,7 @@ export function Navbar({
         })),
         {
             name: "Industries",
-            link: getLocalizedPagePath(locale, "industries-served"),
+            link: "/industries-served",
         },
         {
             name: BLOG_LABELS[locale] ?? BLOG_LABELS.en!,

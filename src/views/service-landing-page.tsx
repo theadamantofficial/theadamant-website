@@ -167,9 +167,9 @@ export default function ServiceLandingPage({
                     <StaggerItem className="h-full">
                     <div className="glass-panel h-full p-7 sm:p-8">
                         <p className="section-kicker">Related pages</p>
-                        <h2 className="section-title">Support the service with clearer internal links</h2>
+                        <h2 className="section-title">Explore services that work together</h2>
                         <p className="section-copy">
-                            These supporting routes give search engines clearer service context and let visitors move to the page that best matches their intent.
+                            Many projects connect websites, products, search, and marketing. Explore the related service that matches the next part of your project.
                         </p>
 
                         <div className="mt-8 grid gap-3">

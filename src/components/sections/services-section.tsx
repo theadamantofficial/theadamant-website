@@ -1,7 +1,7 @@
 import {Reveal} from "@/components/ui/reveal";
 import type {SiteCopy} from "@/lib/site-copy";
 import Link from "next/link";
-import {getLocalizedPagePath, type SiteLocale} from "@/lib/site-locale";
+import type {SiteLocale} from "@/lib/site-locale";
 import {SectionDepth} from "@/components/visuals/section-depth";
 import {MascotHeading} from "@/components/visuals/section-character";
 import ServiceTiltCard from "@/components/visuals/service-tilt-card";
@@ -9,7 +9,7 @@ import ServiceTiltCard from "@/components/visuals/service-tilt-card";
 const DETAILS = [
     {timeline: "Typical scope: 2–4 weeks", proof: ["Clickable prototype", "Responsive design system"], cta: "Plan the experience", path: "contact"},
     {timeline: "Typical scope: 4–8 weeks", proof: ["SEO and performance handoff", "Editable content setup"], cta: "Scope a website", path: "website-development"},
-    {timeline: "Typical scope: 8–14 weeks", proof: ["iOS + Android delivery plan", "Testable release milestones"], cta: "Discuss your app", path: "app-development-noida"},
+    {timeline: "Typical scope: 8–14 weeks", proof: ["iOS + Android delivery plan", "Testable release milestones"], cta: "Discuss your app", path: "app-development-india"},
     {timeline: "First plan: about 10 days", proof: ["Creative and channel plan", "Measurement and reporting setup"], cta: "Build a growth plan", path: "digital-marketing-services"},
 ];
 export default function ServicesSection({copy, locale}: {copy: SiteCopy["services"]; locale: SiteLocale}) {
@@ -25,7 +25,7 @@ export default function ServicesSection({copy, locale}: {copy: SiteCopy["service
         <div className="service-prism-grid mt-12">
             {copy.items.map((service, index) => {
                 const detail = DETAILS[index % DETAILS.length];
-                const href = detail.path === "contact" ? "#contact" : getLocalizedPagePath(locale, detail.path);
+                const href = detail.path === "contact" ? "#contact" : `/${detail.path}`;
                 return <ServiceTiltCard key={service.title}>
                     <div className={"service-art service-art-" + index} aria-hidden="true">
                         <div className="service-art-platform"/><div className="service-art-object"><i/><i/><i/><i/><b/><span/></div>

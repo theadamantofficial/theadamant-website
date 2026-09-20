@@ -51,7 +51,7 @@ const STACK_LOGOS: Record<string, string> = {
 function StackIcon({label}: {label: string}) {
     const logoPath = STACK_LOGOS[label];
     if (logoPath) {
-        return <Image src={logoPath} alt="" width={14} height={14} className="h-3.5 w-3.5 object-contain" aria-hidden="true"/>;
+        return <Image src={logoPath} alt={`${label} logo`} width={14} height={14} className="h-3.5 w-3.5 object-contain"/>;
     }
 
     const Icon = label.includes("SEO") || label === "Analytics"

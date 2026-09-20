@@ -205,7 +205,7 @@ export default function Footer({
                                             link.anchor === "__blog__"
                                                 ? getLocalizedPagePath(locale, "blog")
                                                 : link.anchor === "__about__"
-                                                    ? getLocalizedPagePath(locale, "about")
+                                                    ? "/about"
                                                     : getLocalizedPath(locale, link.anchor)
                                         }
                                         className="text-sm text-foreground/70 transition hover:text-foreground hover:underline"
