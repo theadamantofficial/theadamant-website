@@ -4,7 +4,7 @@ import {getSiteUrl} from "@/lib/site-url";
 
 export const metadata: Metadata = {
     title: {
-        absolute: "Industries We Serve | Web, App, SaaS and Digital Solutions | Adamant",
+        absolute: "Industries We Serve | Adamant",
     },
     description: "Adamant Technologies builds websites, mobile apps, SaaS products, automation, SEO, and digital marketing solutions for technology, healthcare, education, ecommerce, real estate, photography, and growing businesses worldwide.",
     keywords: [

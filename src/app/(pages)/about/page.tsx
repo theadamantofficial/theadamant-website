@@ -12,7 +12,7 @@ import {
 
 export const metadata: Metadata = {
     title: {
-        absolute: "About Adamant Technologies | JSSS Adamant Technologies Private Limited",
+        absolute: "About Adamant Technologies",
     },
     description: "Learn about JSSS Adamant Technologies Private Limited, a DPIIT-recognized Indian technology company building websites, mobile apps, SaaS products, and digital growth systems.",
     alternates: {

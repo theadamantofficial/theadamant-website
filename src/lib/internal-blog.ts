@@ -74,17 +74,27 @@ const BLOG_ADMIN_EMAIL_FALLBACK = "team@theadamant.local";
 const BLOG_ADMIN_PASSWORD_FALLBACK = "theadamant-admin";
 const BLOG_ADMIN_SECRET_FALLBACK = "theadamant-blog-local-secret";
 const BLOG_ADMIN_SESSION_MAX_AGE = 60 * 60 * 24 * 14;
-const DEFAULT_BLOG_SEO_FOCUS = "Website Design, UX & SEO";
+const BLOG_TITLE_SUFFIX = " | Adamant";
+const MAX_BLOG_TITLE_LENGTH = 55;
 
 export const BLOG_ADMIN_COOKIE_NAME = "theadamant-blog-admin";
 
-export function getEnhancedBlogSeoTitle(title: string, tags: string[] = []) {
-    const safeTitle = title.trim().replace(/\s+/g, " ");
-    const focus = (tags[0]?.trim() || DEFAULT_BLOG_SEO_FOCUS).replace(/\s+/g, " ");
+export function getEnhancedBlogSeoTitle(title: string) {
+    const safeTitle = title.trim().replace(/\s+/g, " ").replace(/\s*\|\s*Adamant(?: Technologies)?$/i, "");
+    const availableLength = MAX_BLOG_TITLE_LENGTH - BLOG_TITLE_SUFFIX.length;
 
-    const preferredTitle = safeTitle.length > 54 ? `${safeTitle.slice(0, 51).trim()}...` : safeTitle;
+    if (safeTitle.length <= availableLength) {
+        return `${safeTitle}${BLOG_TITLE_SUFFIX}`;
+    }
 
-    return `${preferredTitle} | ${focus} | Adamant`;
+    const prefix = safeTitle.slice(0, availableLength);
+    const lastSpace = prefix.lastIndexOf(" ");
+    const shortenedTitle = (lastSpace >= 30 ? prefix.slice(0, lastSpace) : prefix)
+        .replace(/[\s,;:|&-]+$/, "")
+        .replace(/\b(?:with|and|for|to|of|in|a|the|by|on|or)$/i, "")
+        .trim();
+
+    return `${shortenedTitle}${BLOG_TITLE_SUFFIX}`;
 }
 
 export function getBlogAuthorDisplayName(authorName: string) {
@@ -264,7 +274,7 @@ export async function createInternalBlogPost(input: CreateInternalBlogPostInput)
             id,
             slug,
             title: resolvedDraft.title,
-            seoTitle: resolvedDraft.seoTitle || getEnhancedBlogSeoTitle(resolvedDraft.title, tags),
+            seoTitle: getEnhancedBlogSeoTitle(resolvedDraft.seoTitle || resolvedDraft.title),
             excerpt,
             content: resolvedDraft.content,
             coverImage: normalizeCoverImage(input.coverImage),
@@ -320,7 +330,7 @@ export async function updateInternalBlogPost(input: UpdateInternalBlogPostInput)
     const nextPost: InternalBlogPost = {
         ...existingPost,
         title: resolvedDraft.title,
-        seoTitle: resolvedDraft.seoTitle || getEnhancedBlogSeoTitle(resolvedDraft.title, tags),
+        seoTitle: getEnhancedBlogSeoTitle(resolvedDraft.seoTitle || resolvedDraft.title),
         excerpt,
         content: resolvedDraft.content,
         coverImage: input.coverImage === undefined
@@ -642,7 +652,7 @@ async function resolveUniqueBlogDraft({
             title: candidateTitle,
             excerpt: candidateExcerpt,
             content,
-            seoTitle: getEnhancedBlogSeoTitle(candidateTitle, tags),
+            seoTitle: getEnhancedBlogSeoTitle(candidateTitle),
         };
     }
 
@@ -666,7 +676,7 @@ async function resolveUniqueBlogDraft({
         title: fallbackTitle,
         excerpt: candidateExcerpt,
         content,
-        seoTitle: getEnhancedBlogSeoTitle(fallbackTitle, tags),
+        seoTitle: getEnhancedBlogSeoTitle(fallbackTitle),
     };
 }
 

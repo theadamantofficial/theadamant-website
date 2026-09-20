@@ -30,7 +30,7 @@ export async function generateMetadata({
     const pathname = `blog/${post.slug}`;
     const siteUrl = getSiteUrl();
     const url = `${siteUrl}${getLocalizedPagePath(DEFAULT_SITE_LOCALE, pathname)}`;
-    const seoTitle = getEnhancedBlogSeoTitle(post.title, post.tags);
+    const seoTitle = getEnhancedBlogSeoTitle(post.seoTitle || post.title);
 
     return {
         title: {

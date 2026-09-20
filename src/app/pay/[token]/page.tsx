@@ -6,7 +6,7 @@ import {loadCheckoutOrder, requirePayableCheckout} from "@/lib/crm/whatsapp-chec
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-    title: "Secure payment | Adamant Technologies",
+    title: {absolute: "Secure Payment | Adamant"},
     robots: {index: false, follow: false}, referrer: "no-referrer",
 };
 
